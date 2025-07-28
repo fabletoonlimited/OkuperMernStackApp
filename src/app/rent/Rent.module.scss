@@ -1,0 +1,15 @@
+$primary-color: #ffff;
+$secondary-color: #003399;
+$hover-color: #0e1d48;
+
+
+.cardBtn {
+    align-items: center;
+}
+
+.cardBtnItems {
+    background-color: $hover-color;
+    color: $primary-color;
+    width: 30px;
+    height: 10px;
+}

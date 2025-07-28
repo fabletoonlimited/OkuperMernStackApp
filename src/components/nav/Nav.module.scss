@@ -1,0 +1,135 @@
+$primary-color: #ffff;
+$secondary-color: #003399;
+$hover-color: #0e1d48;
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  position: relative;
+  background-color: $primary-color;
+  color: $secondary-color;
+  width: 100%;
+
+  // Hamburger Menu Icon
+  &__hamburger {
+    display: none; // Hide by default on large screens
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: $secondary-color;
+  }
+
+  // Shared Logo Styling
+  &__logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
+
+  // Show mobile logo only on small screens
+  &__logo--mobile {
+    display: block;
+    position: relative;
+    left: -20px;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  // Show desktop logo only on larger screens
+  &__logo--desktop {
+    display: none;
+
+    @media (min-width: 768px) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+    }
+  }
+
+  &__menu {
+    list-style: none;
+    align-items: center;
+    display: flex;
+    gap: 4.9rem;
+    margin: 0;
+    padding: 0;
+
+    // Style nav items
+    .navbar__item {
+      a {
+        text-decoration: none;
+        color: $secondary-color;
+        font-weight: 300;
+        transition: color 0.3s;
+        font-size: 16px;
+
+        &:hover {
+          color: $hover-color;
+        }
+      }
+    }
+  }
+
+  // Mobile View adjustments
+  @media (max-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    &__logo {
+      order: -1;
+      margin-left: 10px;
+    }
+
+    &__menu {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      gap: 1rem;
+      margin: 0;
+      padding: 1rem;
+      align-items: flex-start;
+      background-color: $primary-color;
+      opacity: 90%;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+      z-index: 50;
+    }
+
+    &__menu--open {
+      display: flex !important;
+    }
+
+    &__hamburger {
+      display: block;
+      margin-top: 30px;
+    }
+  }
+
+  // Laptop/Desktop View adjustments
+  @media (min-width: 768px) {
+    &__logo {
+      margin: 0 auto;
+    }
+
+    &__menu {
+      justify-content: center;
+    }
+
+    &__hamburger {
+      display: none;
+    }
+  }
+}
+.cursor-pointer{
+  color: $secondary-color;
+}
