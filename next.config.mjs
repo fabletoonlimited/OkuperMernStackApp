@@ -3,8 +3,8 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'res.cloudinary.com'
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       },
     ],
   },
@@ -13,7 +13,6 @@ const nextConfig = {
   },
   webpack(config, { isServer }) {
     if (!isServer) {
-      // Explicitly ignore the fs module on the client-side
       config.resolve.fallback = {
         fs: false,
       };

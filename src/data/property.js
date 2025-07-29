@@ -2,10 +2,10 @@
 
 const property = [
   {
-    id: "Prop-001",
-    Img: [
+    _id: "Prop-001",
+    img: [
       {
-        "publicId": "IMG_4074_2_i0u7ds",
+        "publicId": "fully-detached-apartments-for-sale-vgc_on3vew",
         "size": 1000
       }
     ],
@@ -23,10 +23,10 @@ const property = [
   },
 
   {
-    id: "Prop-002",
-    Img: [
+    _id: "Prop-002",
+    img: [
       {
-        "publicId": "IMG_4074_2_i0u7ds",
+        "publicId": "fully-detached-apartments-for-sale-vgc_on3vew",
         "size": 1000
       }
     ],
@@ -44,10 +44,10 @@ const property = [
   },
 
   {
-    id: "Prop-003",
-     Img: [
+    _id: "Prop-003",
+     img: [
       {
-        "publicId": "IMG_4074_2_i0u7ds",
+        "publicId": "fully-detached-apartments-for-sale-vgc_on3vew",
         "size": 1000
       }
     ],
@@ -66,11 +66,11 @@ const property = [
   },
 
   {
-    id: "Prop-004",
+    _id: "Prop-004",
 
-    Img: [
+    img: [
       {
-        "publicId": "IMG_4074_2_i0u7ds",
+        "publicId": "fully-detached-apartments-for-sale-vgc_on3vew",
         "size": 1000
       }
     ],
@@ -87,11 +87,11 @@ const property = [
     numberOfBath: "4Bath",
   },
   {
-    id: "Prop-005",
+    _id: "Prop-005",
 
-    Img: [
+    img: [
       {
-        "publicId": "IMG_4074_2_i0u7ds",
+        "publicId": "fully-detached-apartments-for-sale-vgc_on3vew",
         "size": 1000
       }
     ],
@@ -109,10 +109,10 @@ const property = [
   },
 
   {
-    id: "Prop-006",
-     Img1: [
+    _id: "Prop-006",
+     img: [
       {
-        "publicId": "IMG_4074_2_i0u7ds",
+        "publicId": "fully-detached-apartments-for-sale-vgc_on3vew",
         "size": 1000
       }
     ],

@@ -15,11 +15,10 @@ function Homepage() {
   const [hoverLeft, setHoverLeft] = useState(false);
   const [hoverRight, setHoverRight] = useState(false);
 
-
-    // Filter out real property cards
+// Filter out real property cards
   const propertyItems = propertyData.filter(
     (item) =>
-      item.Img && Array.isArray(item.Img) && item.Img.length > 0 && item._id
+      item.img && Array.isArray(item.img) && item.img.length > 0 && item._id
   );
 
   // Insert an ad banner after every 6 or 7 property cards
@@ -50,7 +49,7 @@ return (
       <StorySection />
         <div className='rentCarousel px-10 py-10 mb-10'>
           <h3 className='text-3xl font-medium mb-4 ml-30'>Trending Homes</h3>
-          <span className='btn ml-300'>
+          <span className='btn ml-65 md:ml-290'>
             <button className="cursor-pointer border-none bg-transparent mx-5">
               <FaChevronCircleLeft 
                 className="cursor-pointer"
@@ -85,7 +84,7 @@ return (
       
       <div className='shortLetCarousel px-10 py-10 mb-10'>
           <h3 className='text-3xl font-medium mb-4 ml-30'>Shortlets Nearby</h3>
-          <span className='btn ml-300'>
+          <span className='btn ml-65 md:ml-290 mt-50'>
             <button className="cursor-pointer border-none bg-transparent mx-5">
               <FaChevronCircleLeft 
                 className="cursor-pointer"
@@ -102,7 +101,7 @@ return (
                 size={45}
                 onMouseEnter={() => setHoverRight(true)}
                 onMouseLeave={() => setHoverRight(false)}
-            />
+              />
             </button>
           </span>
             <TrendingRentIndexCarousel rent={mixedItems} />
