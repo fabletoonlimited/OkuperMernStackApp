@@ -47,8 +47,8 @@ return (
     <>
       <Banner />
       <StorySection />
-        <div className='rentCarousel px-10 py-10 mb-10'>
-          <h3 className='text-3xl font-medium mb-4 ml-30'>Trending Homes</h3>
+        <div className='px-10 py-10 mb-10 '>
+          <h3 className='text-3xl font-medium ml-30'>Trending Homes</h3>
           <span className='btn ml-65 md:ml-290'>
             <button className="cursor-pointer border-none bg-transparent mx-5">
               <FaChevronCircleLeft 
@@ -69,8 +69,10 @@ return (
             />
             </button>
           </span>
-            <TrendingRentIndexCarousel rent={mixedItems} />
+          <TrendingRentIndexCarousel className='rentCarousel overflow-x-scroll scrollbar-hide'
+          rent={mixedItems} />
         </div>
+        
         <div className='ExploreSegment'>
           <h3 className='text-4xl font-medium mb-4 ml-23 md:ml-40'>Explore homes</h3>
             <div>

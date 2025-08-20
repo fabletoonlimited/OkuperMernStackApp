@@ -12,13 +12,22 @@ const propertySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  savedHomes: {
+    type: String,
+    default: false
+  },
   price: {
     type: String,
     required: true
   },
   desc: String,
-  location: String,
-  category: String,
+  location: String, 
+
+  category: {
+    type: String,
+    enum: ["Rent", "Buy", "Sell","Shortlet", "Commercial", "Land", "Other"],
+    default: "Rent",
+  },
   rating: String,
   numberOfBed: String,
   propertyType: String,

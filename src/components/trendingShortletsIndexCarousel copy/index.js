@@ -3,8 +3,8 @@ import PropertyCard from "../propertyCard/index";
 import AdBanner from "../listingAdCard/index";
 
 
-const TrendingRentIndexCarousel = ({ rent = [] }) => {
-  const slicedItems = rent.slice(0, 9).map((item) => ({
+const TrendingShortletIndexCarousel = ({ shortlets= [] }) => {
+  const slicedItems = shortlets.slice(0, 9).map((item) => ({
     ...item,
     isAd: item.isAd || false,
   }));
@@ -32,4 +32,4 @@ const TrendingRentIndexCarousel = ({ rent = [] }) => {
   );
 };
 
-export default TrendingRentIndexCarousel;
+export default TrendingShortletIndexCarousel;

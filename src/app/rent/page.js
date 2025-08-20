@@ -1,52 +1,41 @@
- 'use client';
+'use client';
 import React, { useEffect, useState } from 'react';
-import AdBannerCard from '../../components/listingAdCard/index';
-import PropertyCard from '../../components/propertyCard/index';
-import FilterNavbarIndex from '../../components/filterNavbarHome/index';
+import AdBannerCard from '../../components/listingAdCard';
+import PropertyCard from '../../components/propertyCard';
+import FilterNavbarIndex from '../../components/filterNavbarHome';
 import '../../style/globals.css';
-import { categories } from '@/data/constants';
+import { insertAdBanners } from '../../utils/insertAdBanners';
+
 
 function Rent() {
   const [propertyItems, setPropertyItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = await fetch('/api/properties'); // or your endpoint
-        const data = await response.json();
+useEffect(() => {
+  const fetchProperties = async () => {
+    try {
+      const res = await fetch('/api/properties');
+      const data = await res.json();
 
-        const filtered = data.filter(
-          (item) => item.Img && Array.isArray(item.Img) && item.Img.length > 0 && item._id
-        );
+      const filtered = data.filter(
+        (item) =>
+          item.img && Array.isArray(item.img) && item.img.length > 0 && item._id
+      );
 
-        // Insert ad banners after every 6 property cards
-        const mixedItems = [];
-        let counter = 0;
+      const mixed = insertAdBanners(filtered);
+      setPropertyItems(mixed);
+    } catch (err) {
+      console.error('Error loading properties:', err);
+      setError('Failed to load properties.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        for (let i = 0; i < filtered.length; i++) {
-          mixedItems.push(filtered[i]);
-          counter++;
+  fetchProperties();
+}, []);
 
-          if (counter === 6) {
-            mixedItems.push({
-              _id: 'ad-banner-' + i,
-              isAd: true,
-              topic: 'Ad Banner',
-              desc: 'This is an Ad',
-              btn: '/ad-link',
-            });
-            counter = 0;
-          }
-        }
-
-        setPropertyItems(mixedItems);
-      } catch (error) {
-        console.error('Error fetching properties:', error);
-      }
-    };
-
-    fetchProperties();
-  }, []);
 
   return (
     <>
@@ -55,19 +44,33 @@ function Rent() {
         <h1 className="text-3xl font-bold text-blue-800 mb-2 text-start">
           Rental Listing
         </h1>
-          <p className="text-md text-blue-800 mb-10 text-start">
-            {propertyItems.filter((item) => !item.isAd).length} homes available
-          </p>
+        <p className="text-md text-blue-800 mb-6 text-start">
+          {propertyItems.filter((item) => !item.isAd).length} homes available
+        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {propertyItems.map((item) =>
-            item.isAd ? (
-              <AdBannerCard key={item._id} {...item} />
-            ) : (
-              <PropertyCard key={item._id} {...item} />
-            )
-          )}
-        </div>
+        {loading && (
+          <div className="text-center text-blue-600 font-semibold">
+            Loading properties...
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center text-red-600 font-semibold">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {propertyItems.map((item) =>
+              item.isAd ? (
+                <AdBannerCard key={item._id} {...item} />
+              ) : (
+                <PropertyCard key={item._id} {...item} />
+              )
+            )}
+          </div>
+        )}
       </main>
     </>
   );

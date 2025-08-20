@@ -7,8 +7,11 @@ import homeIcon from "../../../public/Home_Icon.png"
 import userIcon from "../../../public/user.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadset, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
 
 function Banner() {
+  const router = useRouter();
+
   return (
     <div className="relative w-full md:bg-transparent bg-white px-10 md:px-0 mb-10 md:mb-8 z-10">
       {/* Model Image */}
@@ -31,10 +34,15 @@ function Banner() {
 
         {/* Support Icon */}
         <div className="absolute top-10 right-4 md:top-10 md:right-10 h-12 w-12 md:h-16 md:w-16 bg-amber-600 rounded-full animate-bounce z-30 flex items-center justify-center">
+          <button onClick={() => router.push('/contactAgent')}>
           <FontAwesomeIcon
             icon={faHeadset}
             className="text-white text-2xl md:text-4xl"
+            style={{cursor: 'pointer'}}
           />
+        </button>
+
+          
         </div>
 
         {/* Content Over Banner */}
