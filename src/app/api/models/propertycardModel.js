@@ -1,20 +1,18 @@
 // Backend/models/Property.js
 import mongoose from 'mongoose';
 
-const propertySchema = new mongoose.Schema({
-  Img: [
-    {
-      publicId: String,
-      url: String
-    }
-  ],
-    unitsAvailable: {
-    type: Number,
-    default: 0
+const propertyCardSchema = new mongoose.Schema({
+  previewPix: {
+    type: String,
+    required: true
   },
   savedHomes: {
     type: String,
     default: false
+  },
+  unitsAvailable: {
+    type: Number,
+    default: 0
   },
   price: {
     type: String,
@@ -36,6 +34,6 @@ const propertySchema = new mongoose.Schema({
   timestamps: true
 });
 
-const Property = mongoose.model('Property', propertySchema);
+const PropertyCard = mongoose.model('PropertyCard', propertyCardSchema);
 
-export default Property;
+export default PropertyCard;

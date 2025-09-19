@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "menuItems": [
+      { "name": "Dashboard", "route": "/dashboard" },
+      { "name": "Help Center", "route": "/help" },
+      { "name": "Saved Homes", "route": "/saved-homes" },
+      { "name": "Messages", "route": "/messages" },
+      { "name": "Listings", "route": "/listings" },
+      { "name": "Verifications", "route": "/verifications" },
+      { 
+        "name": "Home Interest", 
+        "route": "/home-interest", 
+        "notification": true 
+      }
+    ]
+  },
+  "mainContent": {
+    "sectionTitle": "Your next steps",
+    "description": "In order to complete your profile and listing, there are a few things left to do.",
+    "cards": [
+      {
+        "title": "Your Profile",
+        "description": "Your profile information is 50% complete",
+        "action": { "label": "Update Your Profile", "route": "/profile/update" }
+      },
+      {
+        "title": "Listings",
+        "description": "Add your listings to showcase it to tenants",
+        "action": { "label": "Add Listing", "route": "/listings/add" }
+      },
+      {
+        "title": "Address Verification",
+        "description": "Verify your address of your listing by providing the required documentation",
+        "action": { "label": "Verify Your Address", "route": "/verification/address" }
+      },
+      {
+        "title": "Profile Picture",
+        "description": "Add a profile picture to help guests know you better",
+        "action": { "label": "Add Picture", "route": "/profile/picture" }
+      },
+      {
+        "title": "Property Preferences",
+        "description": "These preferences, will help us match better with homes",
+        "action": { "label": "Update Preferences", "route": "/preferences/update" }
+      },
+      {
+        "title": "Account Details",
+        "description": "Add your account details to enable us forward your tenants payments after finalizing home",
+        "action": { "label": "Add Account", "route": "/account/add" }
+      }
+    ]
+  }
+}
