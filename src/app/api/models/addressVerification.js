@@ -5,21 +5,36 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const addressVerificationSchema = new mongoose.Schema({
-    street: {type: String, required: true},
-    city: {type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true},
+    street: {
+        type: String, 
+        required: true
+    },
+    city: {
+        type: String, 
+        required: true 
+    },
+    state: { 
+        type: String, 
+        required: true 
+    },
+    country: { 
+        type: String, 
+        required: true
+    },
     zipCode: {type: String},
 
-    isVerified: {type: Boolean, default: false},
+    isVerified: {
+        type: Boolean, 
+        default: false
+    },
     verificationDetails: {
-        billType: { type: String, enum: ['Light', 'Lawma', "Water", "Other"]},
+        billType: { type: String, enum: ['Light', 'Lawma', "Water"]},
         billUrl: { type: String},
         matchedByOkHi: { type: Boolean, default: false },
         okHiResponse: { type: Object },
     },
 
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+    // user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true},
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
 

@@ -2,6 +2,7 @@ import express from "express";
 import tenant from "./tenant/route.js"
 import landlord from "../api/landlord/route.js";
 import admin from "../api/admin/route.js"
+import user from "../api/user/route.js"
 
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
@@ -19,9 +20,9 @@ mongoose
 
 // middleware
 app.use(express.json());
-app.use(
-  express.text({ 
-  type: ["application/javascript", "text/plain", "text/html", "application/xml"]}));
+app.use(express.text({ 
+  type: ["application/javascript", "text/plain", "text/html", "application/xml"]
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -38,6 +39,7 @@ app.use(express.text({
 }));
 
 // Routes
+app.use('/api/user', user);
 app.use('/api/landlord', landlord);
 app.use('/api/tenant', tenant);
 app.use('/api/admin', admin);

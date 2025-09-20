@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
         required: true
     },
 
+    user: {
+        type: Boolean,
+        default: true
+    },
+
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"},
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord"},
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp"}
