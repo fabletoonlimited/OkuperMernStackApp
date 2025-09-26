@@ -60,7 +60,7 @@ return ( <nav className={styles.navbar}>
       <Link href="/manage" onClick={() => setIsMenuOpen(false)}>MANAGE</Link>
     </li>
     <li className={styles.navbar__item}>
-      <Link href="/advert" onClick={() => setIsMenuOpen(false)}>ADVERT</Link>
+      <Link href="/advertise" onClick={() => setIsMenuOpen(false)}>ADVERTISE</Link>
     </li>
     <li className={styles.navbar__item}>
       <Link href="/help" onClick={() => setIsMenuOpen(false)}>HELP</Link>

@@ -1,0 +1,60 @@
+
+
+
+
+@media (max-width: 768px) {
+    .container{
+        display:flex;
+        gap: 4rem;
+       flex-direction: column;
+
+         
+    }
+  .title {
+    font-size: 2rem ;
+    text-align: center;
+  }
+  .sample {
+    margin: 2rem 0 0 3rem;
+    .card {
+        margin-left: 9rem;
+    }
+  }
+
+    .banner {
+        margin: 2rem 0 0 0;
+        .banner h3{
+            font-size: 2rem;
+            font-weight: 300;
+        }
+        .brand {
+            margin-left: 8rem;
+        }
+      }
+
+      
+    .text {
+        margin: 5rem;
+          
+    }
+    .case {
+          
+        margin-bottom: -1px;
+        }
+       
+
+
+    
+    
+  
+   
+
+  
+  
+
+
+
+
+}
+
+
