@@ -1,4 +1,130 @@
 
+  @media only screen and (max-width: 600px) {
+    .container {
+      display:flex;
+      flex-direction: column;
+      gap: 3rem;
+      justify-content: center;
+      align-items: center;
+      
+      }
+      .group{
+        margin-right: 2rem;
+      }
+
+      .title h1 {
+        font-size: 2rem ;
+        
+      }
+      
+      .sample {
+        text-align: center;
+      
+      }
+
+    .form{
+        margin: auto;
+    }              
+
+    .sample h3{
+      font-size: 28px !important; 
+      margin-left: 2rem;
+    }
+
+
+    .dim{
+      margin: 0 0 0 4rem;
+      font-size: medium;
+    }
+      
+    .banner{
+      text-align: center;
+
+    }
+    .brand {
+      align-items: center;
+      margin: auto !important;
+    }
+      
+    .brand h4{
+      font-size: 20px;
+    }
+
+    .brand p{
+      font-size: 18px;
+    }
+    .banner h3{
+      font-size: 28px !important; 
+      margin-left: 2rem;
+    }
+    .sio{
+      margin: 2rem 0 0 0;
+      font-size: medium;
+      
+    }
+  
+      .text{
+          margin:  5rem 0 0 0;
+      }
+  
+      .text p{
+        font-size: 13px !important;
+        white-space: nowrap;
+        padding: 0 0 3rem 3rem;
+        
+        
+      }
+        
+      .case h2{
+        font-size: 20px;
+        white-space: nowrap;
+      }
+      
+      .bannersam{
+        width: auto;
+        
+      }
+      .bannerlady{
+        width: 260px;
+        padding:  4rem 0 0 0;
+      }
+          
+  
+  
+  
+      
+      
+
+
+
+      
+      
+
+
+      
+
+        
+
+        
+        
+        
+      
+
+      
+
+    }
+
+              
+
+
+            
+
+
+              
+
+               
+                    
+    
 
 
 
@@ -16,20 +142,12 @@
   }
   .sample {
     margin: 2rem 0 0 3rem;
-    .card {
-        margin-left: 9rem;
-    }
+    
   }
 
     .banner {
-        margin: 2rem 0 0 0;
-        .banner h3{
-            font-size: 2rem;
-            font-weight: 300;
-        }
-        .brand {
-            margin-left: 8rem;
-        }
+        margin: 2rem 0 0 3rem;
+        
       }
 
       
@@ -56,5 +174,3 @@
 
 
 }
-
-
