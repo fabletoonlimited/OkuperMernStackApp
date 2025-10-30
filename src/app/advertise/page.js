@@ -53,7 +53,7 @@ function Advertise () {
         </div>
         </div>
 
-            <h4 className={`font-semibold text-xl leading-relaxed text-center mr-10 text-[rgba(14,29,72,1) ${styles.sio}`}>Dimension: 350px by 870px
+            <h4 className={`font-semibold text-xl leading-relaxed text-center mr-5 text-[rgba(14,29,72,1) ${styles.sio}`}>Dimension: 350px by 870px
                 <span className="block">or</span> 870px by 350px</h4>
         </div>
         </div>
