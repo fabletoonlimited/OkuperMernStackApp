@@ -1,23 +1,23 @@
 import express from "express";
-import {authenticateToken} from "./authMiddleware.js";
-import { signupTenant, loginTenant, getTenant, updateTenant, deleteTenant, errorPage } from "../controllers/tenant.controller.js";
+import {authenticateTenant} from "../middlewares/tenantMiddleware";
+import { verifyOtp } from "../controllers/otpController.js";
+import { createTenant, loginTenant, getTenant, getAllTenant, updateTenant, deleteTenant } from "../controllers/tenant.controller.js";
 
 const route = express.Router();
 
-// Example route to authenticate Tenants
-route.post('/signup', signupTenant);
+// Route to authenticate Landlords
+
+route.post('/signup', verifyOtp, createTenant);
 route.post('/login', loginTenant);
 
-
-route.get('/allTenant', authenticateToken, getTenant);
-route.put('/:id', authenticateToken, updateTenant);
-route.delete('/:id', authenticateToken, deleteTenant);
+route.get('/getTenant', authenticateTenant, getTenant);
+route.get('/allTenant', authenticateTenant, getAllTenant);
+route.put('/:id', authenticateTenant, updateTenant);
+route.delete('/:id', authenticateTenant, deleteTenant);
 
 //Protected Route
-route.get('/:id', authenticateToken, (req, res) => {
+route.get('/:id', authenticateTenant, (req, res) => {
 res.status(200).json({ message: 'Welcome to the Tenant Dashboard' })});
 
-// Error handling route
-route.use(errorPage);
 
 export default route;

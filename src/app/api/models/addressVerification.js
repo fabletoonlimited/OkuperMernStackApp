@@ -23,15 +23,17 @@ const addressVerificationSchema = new mongoose.Schema({
     },
     zipCode: {type: String},
 
-    isVerified: {
-        type: Boolean, 
-        default: false
-    },
     verificationDetails: {
-        billType: { type: String, enum: ['Light', 'Lawma', "Water"]},
+        billType: { type: String, 
+        enum: ['Light', 'Lawma', "Water", "Image", "Document"]
+        },
         billUrl: { type: String},
         matchedByOkHi: { type: Boolean, default: false },
         okHiResponse: { type: Object },
+    },
+    isVerified: {
+        type: Boolean, 
+        default: false
     },
 
     // user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
@@ -41,7 +43,7 @@ const addressVerificationSchema = new mongoose.Schema({
 }, {timestamps: true});  
 
 addressVerificationSchema.pre('save', async function(next) {    
-    if (this.isVerified) {
+  if (this.isVerified || this.verificationDetails?.matchedByOkHi) {
         return next();
     }    
     try {
@@ -50,25 +52,26 @@ addressVerificationSchema.pre('save', async function(next) {
             apiSecret: process.env.OKHI_API_SECRET,
             environment: process.env.OKHI_ENVIRONMENT || 'sandbox',
         });
-        const address = {
-            street: this.street,
-            city: this.city,
-            state: this.state,
-            country: this.country,
-            zipCode: this.zipCode,
-        };
-        const response = await okhiClient.verifyAddress(address);
 
-        if (response && response.status === 'verified') {
-            this.isVerified = true;
-            this.verificationDetails = response;
-        } else {
-            this.isVerified = false;
-            this.verificationDetails = response;
+        const addressString = `${this.street}, ${this.city}, ${this.state}, ${this.country}`;
+
+        const response = await okhiClient.verifyAddress({
+            address: addressString,
+            country: this.country
+        });
+        
+        if (!this.verificationDetails) {
+        this.verificationDetails = {};
         }
+
+        this.verificationDetails.matchedByOkHi = response?.status === 'verified';
+        this.verificationDetails.okHiResponse = response;
+        this.isVerified = response?.status === 'verified';
+
         next();
     } catch (error) {
-        next(error);
+        console.error("OkHi verification failed:", error);
+        next();
     }
 });
 const AddressVerification = mongoose.model('AddressVerification', addressVerificationSchema);

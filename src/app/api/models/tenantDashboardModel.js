@@ -1,3 +1,4 @@
+import property from "@/data/property";
 import mongoose from "mongoose";
 
 const tenantDashboardSchema = new mongoose.Schema({
@@ -24,10 +25,10 @@ sidebar: {
             notification: { type: Boolean, default: false },
             ref: 'Messages' 
         },
-            listings: { 
+            property: { 
             type: String,
             route: { type: String, required: true },
-            ref: 'Listings' 
+            ref: 'Property' 
         },
             verfication: { 
             type: String,
@@ -56,7 +57,7 @@ mainContent: {
             }
         },
         {
-            listings: { type: String, required: true },
+            property: { type: String, required: true },
             desc: { type: String },
             action: {
                 label: { type: String, required: true },
@@ -91,8 +92,10 @@ mainContent: {
     tenants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}],
     tenantKyc: { type: mongoose.Schema.Types.ObjectId, enum: ['Pending', 'Approved', 'Rejected'], ref: "LandlordKyc", required: false},
     messages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Message", default: [], required: false }],
-    listings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property", default: [], required: false}],
-    savedHomes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property", default: [], required: false}],
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property", default: [], required: false}],
+    savedHomes: [{ type: mongoose.Schema.Types.ObjectId, ref: "SavedHomes", default: [], required: false}],
+    addressVerification: { type: mongoose.Schema.Types.ObjectId, ref: "AddressVerification"},    
+    homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest", default: [], required: false }],
     
 }, { timestamps: true });
 

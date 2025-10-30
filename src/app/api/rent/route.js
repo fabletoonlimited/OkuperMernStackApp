@@ -1,6 +1,6 @@
 // import { NextResponse } from "next/server";
 import express from 'express';
-import propertyModel from '../models/listingModel.js';
+import propertyModel from '../models/propertyModel.js';
 
 const router = express.Router();
 

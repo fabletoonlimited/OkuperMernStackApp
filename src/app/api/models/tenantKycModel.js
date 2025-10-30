@@ -78,7 +78,7 @@ const tenantKycSchema = new mongoose.Schema({
     companyEmail: {
         type: String,
     },
-    currentHomeAddress: {
+    currentAddress: {
         type: String,
         required: true,
     },
