@@ -1,9 +1,15 @@
 import styles from './Advertise.module.scss'
+
 function Advertise () {
     return (
         <>
-        <div className= {`flex gap-16 ${styles.container}` }>
-       
+            <div className= {`flex gap-16 ${styles.container}`}>
+                <div className={`mt-20 ${styles.left}`}>
+                    <div className={`space-y-5 p-8 mt-10 ml-14 ${styles.title}`} >
+                        <h1 className="text-5xl  font-bold">Advertise your brand</h1>
+                        <h4 className="text-xl  font-medium whitespace-nowrap">Please send your desired AD request to adverts@okuper.com</h4>
+                        <h4 className="text-xl  font-medium">We will respond by sending you the price list,advert duration<br/>and dimensions to send to us by email for upload.</h4>
+                    </div>
 
         <div className={`${styles.group}`}>
              <div className={`space-y-5 p-8 mt-10 ml-14 ${styles.title}`} >
@@ -13,6 +19,8 @@ function Advertise () {
                 and dimensions to send to us by email for upload.  </h4>
         </div>
 
+                        <div className={`space-y-5 p-10 mt-12 ${styles.banner}`}>          
+                            <h3 className="font-medium text-4xl text-center mr-10 text-[rgba(14,29,72,1)] ">Sample of side AD Banner.</h3>
 
         <div className={`space-y-5 mt-5 ${styles.sample}`}>
             <h3 className="font-medium text-4xl  text-center mr-8 text-[rgba(14,29,72,1)] ">Sample of in-List AD banner.</h3>
@@ -80,25 +88,7 @@ function Advertise () {
             className={`rounded-b-2xl ${styles.bannersam}`}/>
             </div>
             
-
-            
-        
-       
-       
-
-
-
-            </div>
-
-            
-        
-        
-        
-        
-        
         </>
-
     )
-
 }
 export default Advertise; 

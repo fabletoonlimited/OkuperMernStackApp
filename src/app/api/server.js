@@ -3,6 +3,10 @@ import tenant from "./tenant/route.js"
 import landlord from "../api/landlord/route.js";
 import admin from "../api/admin/route.js"
 import user from "../api/user/route.js"
+import message from "../api/message/route.js"
+import landlordAddressVerification from "./landlordAddressVerfication/route.js";
+import tenantAddressVerification from "./tenantAddressVerification/route.js";
+import otp from "./otp.js/route.js"
 
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
@@ -18,7 +22,7 @@ mongoose
   .then(() => {console.log("✅ MongoDB connection successful")})
   .catch(() => console.log("❌ MongoDB connection error:"));
 
-// middleware
+//Middleware
 app.use(express.json());
 app.use(express.text({ 
   type: ["application/javascript", "text/plain", "text/html", "application/xml"]
@@ -38,19 +42,23 @@ app.use(express.text({
   type: ["application/javascript", "text/plain", "text/html", "application/xml"]
 }));
 
-// Routes
-app.use('/api/user', user);
+// Routes completed
+app.use('/api/user', user); 
+app.use('/api/admin', admin);
+app.use('/api/otp', otp);
 app.use('/api/landlord', landlord);
 app.use('/api/tenant', tenant);
-app.use('/api/admin', admin);
+app.use('/api/message', message);
+
+// Routes not completed
 app.use('/api/property', property);
 app.use('/api/listing', listing);
-app.use('/api/otp', otp);
 app.use('/api/landlordKyc', landlordKyc);
 app.use('/api/landlordDashboard', landlordDashboard);
-app.use('/api/addressVerification', addressVerification);
 app.use('/api/tenantKyc', tenantKyc);
 app.use('/api/tenantDashboard', tenantDashboard);
+app.use('/api/landlordAddressVerification', landlordAddressVerification);
+app.use('/api/tenantAddressVerification', tenantAddressVerification);
 app.use('/api/enquiry', enquiry);
 app.use('/api/appointment', appointment);
 app.use('/api/faq', faq);
@@ -70,8 +78,6 @@ app.use('/api/maintenanceRequest', maintenanceRequest);
 app.use('/api/leaseAgreement', leaseAgreement);
 app.use('/api/notification', notification);
 app.use('/api/report', report);
-app.use('/api/admin', admin);
-app.use('/api/auth', auth);
 
 
 const PORT = process.env.PORT || 5001;

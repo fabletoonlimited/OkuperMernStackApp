@@ -1,12 +1,40 @@
 import { icon } from '@fortawesome/fontawesome-svg-core';
 import mongoose from 'mongoose';
 
+//Home interest Schem
+const homeInterestSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  message: {
+    type: String,
+    required: true,
+  },
+
+  property: { type: mongoose.Schema.Types.ObjectId, ref: "Property"},
+
+}, { timestamps: true }
+)
+
+export const HomeInterest = mongoose.model("HomeInterest", homeInterestSchema);
+
+//PropertySchema 
 const imageSchema = new mongoose.Schema({
   publicId: String,
   url: String
 })
 
-const listingSchema = new mongoose.Schema({
+const propertySchema = new mongoose.Schema({
   previewPix: {
     type: String,
     required: true
@@ -40,7 +68,7 @@ const listingSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["Rent", "Buy", "Sell", "Shortlet", "Commercial", "Land", "Other"],
+    enum: ["Rent", "Buy", "Sell", "Shortlet"],
     default: "Rent",
   },
 
@@ -60,6 +88,13 @@ const listingSchema = new mongoose.Schema({
     type: String,
     enum: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "More than 10"],
     default: "1",
+  },
+  listedBy: {
+    type: String,
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   features: {
     buildingAmenities: {
@@ -87,6 +122,6 @@ const listingSchema = new mongoose.Schema({
 }, {timestamps: true}
 );
 
-const Listing = mongoose.model('Listing', listingSchema);
+const Property = mongoose.model('Property', propertySchema);
 
-export default Listing;
+export default Property;

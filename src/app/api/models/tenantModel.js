@@ -9,13 +9,13 @@ const tenantSchema = new mongoose.Schema({
 
     survey: {type: Boolean, required: false },
     agreement: {type: Boolean, default: false},
-    forgotPasswordToken: {type: String},
+    // forgotPasswordToken: {type: String},
 
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp"},
     tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc", required: false},
     tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
-    property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     
 }, {timestamps: true});
 
