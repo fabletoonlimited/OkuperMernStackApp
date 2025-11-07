@@ -9,6 +9,7 @@ import { FaChevronCircleLeft } from 'react-icons/fa';
 import { FaChevronCircleRight } from 'react-icons/fa';
 import HomesCategory from '../components/homesCategory/index'
 import XStories from '../components/xStories/index'
+import styles from './Homepage.css'
 
 function Homepage() {
   //Chevron cntls
@@ -44,59 +45,24 @@ function Homepage() {
   }
 
 return (
-    <>
-      <Banner />
-      <StorySection />
-        <div className='px-10 py-10 mb-10 '>
-          <h3 className='text-3xl font-medium ml-30'>Trending Homes</h3>
+  <>
+    <Banner />
+    <StorySection />
+
+      {/*Tending Slider*/}
+      <div className='px-10 py-10 mb-10 TendingSliderContainer'>
+        <h3 className='text-3xl font-medium ml-30'>Trending Homes</h3>
           <span className='btn ml-65 md:ml-290'>
             <button className="cursor-pointer border-none bg-transparent mx-5">
-              <FaChevronCircleLeft 
-                className="cursor-pointer"
+              <FaChevronCircleLeft className="cursor-pointer-L"
                 color= {hoverLeft ? "#003399" : "e4e5e9"}
                 size={45}
                 onMouseEnter={() => setHoverLeft(true)}
                 onMouseLeave={() => setHoverLeft(false)}
               />
             </button>
-            <button className="cursor-pointer border-none bg-transparent">
-              <FaChevronCircleRight 
-                className="cursor-pointer"
-                color= {hoverRight ? "#003399" : "e4e5e9"}
-                size={45}
-                onMouseEnter={() => setHoverRight(true)}
-                onMouseLeave={() => setHoverRight(false)}
-            />
-            </button>
-          </span>
-          <TrendingRentIndexCarousel className='rentCarousel overflow-x-scroll scrollbar-hide'
-          rent={mixedItems} />
-        </div>
-        
-        <div className='ExploreSegment'>
-          <h3 className='text-4xl font-medium mb-4 ml-23 md:ml-40'>Explore homes</h3>
-            <div>
-              <HomesCategory />
-            </div>
-        </div>
 
-        <div>
-          <XStories />
-        </div>
-      
-      <div className='shortLetCarousel px-10 py-10 mb-10'>
-          <h3 className='text-3xl font-medium mb-4 ml-30'>Shortlets Nearby</h3>
-          <span className='btn ml-65 md:ml-290 mt-50'>
-            <button className="cursor-pointer border-none bg-transparent mx-5">
-              <FaChevronCircleLeft 
-                className="cursor-pointer"
-                color= {hoverLeft ? "#003399" : "e4e5e9"}
-                size={45}
-                onMouseEnter={() => setHoverLeft(true)}
-                onMouseLeave={() => setHoverLeft(false)}
-              />
-            </button>
-            <button className="cursor-pointer border-none bg-transparent">
+            <button className="cursor-pointer-R border-none bg-transparent">
               <FaChevronCircleRight 
                 className="cursor-pointer"
                 color= {hoverRight ? "#003399" : "e4e5e9"}
@@ -106,9 +72,47 @@ return (
               />
             </button>
           </span>
-            <TrendingRentIndexCarousel rent={mixedItems} />
+        <TrendingRentIndexCarousel className='rentCarousel overflow-x-scroll scrollbar-hide w-100%' rent={mixedItems} />
+      </div>
+
+      {/*Explore Segment*/}  
+      <div className='ExploreSegment'>
+        <h3 className='text-4xl font-medium mb-4 ml-23 md:ml-40'>Explore homes</h3>
+        <div>
+          <HomesCategory />
         </div>
-    </>
+      </div>
+      {/* X Stories Segment */}
+      <div>
+        <XStories />
+      </div>
+      
+      {/* Shortlet Carousel */}
+      <div className='shortLetCarousel px-10 py-10 mb-10'>
+        <h3 className='text-3xl font-medium mb-4 ml-30'>Shortlets Nearby</h3>
+        <span className='btn ml-65 md:ml-290 mt-50'>
+          <button className="cursor-pointer border-none bg-transparent mx-5">
+            <FaChevronCircleLeft 
+              className="cursor-pointer"
+              color= {hoverLeft ? "#003399" : "e4e5e9"}
+              size={45}
+              onMouseEnter={() => setHoverLeft(true)}
+              onMouseLeave={() => setHoverLeft(false)}
+            />
+          </button>
+          <button className="cursor-pointer border-none bg-transparent">
+            <FaChevronCircleRight 
+              className="cursor-pointer"
+              color= {hoverRight ? "#003399" : "e4e5e9"}
+              size={45}
+              onMouseEnter={() => setHoverRight(true)}
+              onMouseLeave={() => setHoverRight(false)}
+            />
+          </button>
+        </span>
+        <TrendingRentIndexCarousel rent={mixedItems} />
+      </div>
+  </>
   )
 }
 export default Homepage

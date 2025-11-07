@@ -1,0 +1,14 @@
+
+@media (max-width: 768px) {
+  .rentCarousel {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .rentCarousel * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}

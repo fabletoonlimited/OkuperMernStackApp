@@ -11,7 +11,7 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
 const [isMenuSelected,setIsMenuSelected] = useState(false);
-const menuClose = () => setIsMenuClose(!setIsMenuClose);
+const menuClose = () => setIsMenuOpen(!setIsMenuOpen);
 
 return ( <nav className={styles.navbar}>
 {/* Hamburger Icon */} 
@@ -66,7 +66,7 @@ return ( <nav className={styles.navbar}>
       <Link href="/help" onClick={() => setIsMenuOpen(false)}>HELP</Link>
     </li>
     <li className={styles.navbar__item}>
-      <Link href="/signIn" onClick={() => setIsMenuOpen(false)}>SIGN IN / SIGN UP</Link>
+      <Link href="/signUpLanding" onClick={() => setIsMenuOpen(false)}>SIGN IN / SIGN UP</Link>
     </li>
   </ul>
 </nav>

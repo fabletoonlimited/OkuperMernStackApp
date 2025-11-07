@@ -100,15 +100,18 @@ function Banner() {
           "Property ratings by tenants and flagging of suspicious accounts",
           "Tenants NIN identity, proof, financial record and occupation.",
           "All communications securely happens within the platform.",
-        ].map((text, index) => (
+        ]
+        .map((text, index) => (
 
-          <div key={index} className="w-full md:max-w-[280px] bg-sky-100 
-            rounded-xl px-10 md:px-9 py-7 md:py-9 shadow-md flex-shrink-0">
+          <div key={index} 
+            className="w-full md:max-w-[280px] bg-sky-100 
+              rounded-xl px-10 md:px-9 py-7 md:py-9 shadow-md flex-shrink-0">
             <FontAwesomeIcon icon={faCircleCheck} 
             className="text-[#0E1D48] text-5xl md:text-3xl mb-2"/>
 
-            <p className="font-semibold text-lg md:text-md text-left
-            md:text-left">{text}</p>
+              <p className="font-semibold text-lg md:text-md text-left md:text-left">
+                {text}
+              </p>
           </div>
         ))}
       </div>

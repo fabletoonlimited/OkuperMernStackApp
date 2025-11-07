@@ -22,10 +22,11 @@ $hover-color: #0e1d48;
 
   // Shared Logo Styling
   &__logo {
-    display: flex;
+    position: relative;
     justify-content: center;
     align-items: center;
     margin: 0 auto;
+    z-index: 100;
   }
 
   // Show mobile logo only on small screens

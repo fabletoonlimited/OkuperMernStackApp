@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Okuper",
-  description: "Connecting verfied home owners to landlords",
+  description: "Connecting verfied tenants to home owners",
 };
 
 export default function RootLayout({ children }) {
