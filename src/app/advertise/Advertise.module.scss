@@ -1,93 +1,105 @@
 
-  @media only screen and (max-width: 600px) {
-    .container {
-      display:flex;
-      flex-direction: column;
-      gap: 3rem;
-      justify-content: center;
-      align-items: center;
+//   @media only screen and (max-width: 600px) {
+//     .container {
+//       display:flex;
+//       flex-direction: column;
+//       gap: 3rem;
+//       justify-content: center;
+//       align-items: center;
       
-      }
-      .group{
-        margin-right: 2rem;
-      }
-
-      .title h1 {
-        font-size: 2rem ;
+//       }
+//       .group{
+//         margin-right: 2rem;
+//       }
+      
+      
+//       .title h1 {
+//         font-size: 2rem ;
         
-      }
+//       }
+
+//       title.h4{
+//         width: 70%;
+
+        
+        
+//       }
       
-      .sample {
-        text-align: center;
+//       .sample {
+//         text-align: center;
       
-      }
+//       }
 
-    .form{
-        margin: auto;
-    }              
+//     .form{
+//         margin: auto;
+//     }              
 
-    .sample h3{
-      font-size: 28px !important; 
-      margin-left: 2rem;
-    }
+//     .sample h3{
+//       font-size: 28px !important; 
+//       margin-left: 2rem;
+//     }
 
 
-    .dim{
-      margin: 0 0 0 4rem;
-      font-size: medium;
-    }
+//     .dim{
+//       margin: 0 0 0 4rem;
+//       font-size: medium;
+//     }
       
-    .banner{
-      text-align: center;
+//     .banner{
+//       text-align: center;
 
-    }
-    .brand {
-      align-items: center;
-      margin: auto !important;
-    }
+//     }
+//     .brand {
+//       align-items: center;
+//       margin: auto !important;
+//     }
       
-    .brand h4{
-      font-size: 20px;
-    }
+//     .brand h4{
+//       font-size: 20px;
+//     }
 
-    .brand p{
-      font-size: 18px;
-    }
-    .banner h3{
-      font-size: 28px !important; 
-      margin-left: 2rem;
-    }
-    .sio{
-      margin: 2rem 0 0 0;
-      font-size: medium;
+//     .brand p{
+//       font-size: 18px;
+//     }
+//     .banner h3{
+//       font-size: 28px !important; 
+//       margin-left: 2rem;
+//     }
+//     .sio{
+//       margin: 2rem 0 0 0;
+//       font-size: medium;
       
-    }
+//     }
   
-      .text{
-          margin:  5rem 0 0 0;
-      }
+//       .advertiseThankubanner{
+//           margin:5rem;
+//           width: 330px;
+          
+          
+//       }
   
-      .text p{
-        font-size: 13px !important;
-        white-space: nowrap;
-        padding: 0 0 3rem 3rem;
+//       .advertiseThankubanner p{
+//         font-size: 13px !important;
+//         white-space: nowrap;
+//         padding: 0 0 3rem 3rem;
         
         
-      }
+//       }
         
-      .case h2{
-        font-size: 20px;
-        white-space: nowrap;
-      }
+//       .case h2{
+//         font-size: 25px;
+//         white-space: nowrap;
+//       }
       
-      .bannersam{
-        width: auto;
+//       .bannersam{
+//         width: auto;
+     
         
-      }
-      .bannerlady{
-        width: 260px;
-        padding:  4rem 0 0 0;
-      }
+//       }
+//       .bannerlady{
+//         width: 260px;
+//         padding:  6.6rem 0 0 0;
+//       }
           
   
   
@@ -112,7 +124,7 @@
 
       
 
-    }
+//     }
 
               
 
@@ -128,37 +140,37 @@
 
 
 
-@media (max-width: 768px) {
-    .container{
-        display:flex;
-        gap: 4rem;
-       flex-direction: column;
+// @media (max-width: 768px) {
+//     .container{
+//         display:flex;
+//         gap: 4rem;
+//        flex-direction: column;
 
          
-    }
-  .title {
-    font-size: 2rem ;
-    text-align: center;
-  }
-  .sample {
-    margin: 2rem 0 0 3rem;
+//     }
+//   .title {
+//     font-size: 2rem ;
+//     text-align: center;
+//   }
+//   .sample {
+//     margin: 2rem 0 0 3rem;
     
-  }
+//   }
 
-    .banner {
-        margin: 2rem 0 0 3rem;
+//     .banner {
+//         margin: 2rem 0 0 3rem;
         
-      }
+//       }
 
       
-    .text {
-        margin: 5rem;
+//     .text {
+//         margin: 5rem;
           
-    }
-    .case {
+//     }
+//     .case {
           
-        margin-bottom: -1px;
-        }
+//         margin-bottom: -1px;
+//         }
        
 
 
@@ -173,4 +185,4 @@
 
 
 
-}
+// }
