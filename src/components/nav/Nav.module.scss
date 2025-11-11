@@ -56,9 +56,11 @@ $hover-color: #0e1d48;
     list-style: none;
     align-items: center;
     display: flex;
-    gap: 4.9rem;
+    gap: 4.8rem;
     margin: 0;
     padding: 0;
+    z-index: 50;
+    position: relative;
 
     // Style nav items
     .navbar__item {

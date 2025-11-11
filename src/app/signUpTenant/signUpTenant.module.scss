@@ -1,0 +1,26 @@
+html, body{
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+.bannerGirl {
+    transition: all 0.3s ease-in-out;
+}
+
+@media screen and (max-width: 768px) {
+  .bannerGirl {
+    // position: absolute !important;
+    bottom: 0; /* move up */
+    width: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .bannerGirl {
+    bottom: 20px;
+    width: 90%;
+  }
+    
+}

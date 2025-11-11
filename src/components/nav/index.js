@@ -26,24 +26,21 @@ return ( <nav className={styles.navbar}>
     </Link>
   </div>
 
-  {/* Menu */}
+  {/*Menu */}
   <ul
     className={`${styles.navbar__menu} 
     ${
       isMenuOpen ? styles["navbar__menu--open"] : ""} `}>
     
-    <li className={styles.navbar__item}>
-      <Link href="/rent" onClick={() => setIsMenuOpen(false)}>RENT</Link>
-    </li>
-    <li className={styles.navbar__item}>
-      <Link href="/sell" onClick={() => setIsMenuOpen(false)}>SELL</Link>
-    </li>
-    <li className={styles.navbar__item}>
-      <Link href="/buy" onClick={() => setIsMenuOpen(false)}>BUY</Link>
-    </li>
-    <li className={styles.navbar__item}>
-      <Link href="/shortlets" onClick={() => setIsMenuOpen(false)}>SHORTLETS</Link>
-    </li>
+    
+    <Link href="/rent" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>RENT</li></Link>
+   
+    <Link href="/sell" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>SELL</li></Link>
+
+    <Link href="/buy" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>BUY</li></Link>
+
+    <Link href="/shortlets" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>SHORTLETS</li></Link>
+
 
     {/* Desktop-only logo */}
     <div className={`${styles.navbar__logo} ${styles['navbar__logo--desktop']}`}>
@@ -56,18 +53,14 @@ return ( <nav className={styles.navbar}>
       </Link>
     </div>
 
-    <li className={styles.navbar__item}>
-      <Link href="/manage" onClick={() => setIsMenuOpen(false)}>MANAGE</Link>
-    </li>
-    <li className={styles.navbar__item}>
-      <Link href="/advertise" onClick={() => setIsMenuOpen(false)}>ADVERTISE</Link>
-    </li>
-    <li className={styles.navbar__item}>
-      <Link href="/help" onClick={() => setIsMenuOpen(false)}>HELP</Link>
-    </li>
-    <li className={styles.navbar__item}>
-      <Link href="/signUpLanding" onClick={() => setIsMenuOpen(false)}>SIGN IN / SIGN UP</Link>
-    </li>
+    <Link href="/manage" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>MANAGE</li></Link>
+
+    <Link href="/advertise" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>ADVERTISE</li></Link>
+
+    <Link href="/help" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>HELP</li></Link>
+
+    <Link href="/signUpLanding" onClick={() => setIsMenuOpen(false)}><li className={styles.navbar__item}>SIGN UP/ SIGN IN</li></Link>
+
   </ul>
 </nav>
 
