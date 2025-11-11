@@ -1,118 +1,137 @@
-"use client"
-import { useState } from 'react'
-import Banner from '../components/bannerIndex'
-import StorySection from '../components/storySection'
-import TrendingRentIndexCarousel from '../components/trendingRentIndexCarousel/index'
-import propertyData from '../data/property.js'
-import '../style/globals.css'
-import { FaChevronCircleLeft } from 'react-icons/fa';
-import { FaChevronCircleRight } from 'react-icons/fa';
-import HomesCategory from '../components/homesCategory/index'
-import XStories from '../components/xStories/index'
-import styles from './Homepage.css'
+"use client";
+import { useRef, useState } from "react";
+import Banner from "../components/bannerIndex";
+import StorySection from "../components/storySection";
+import TrendingRentIndexCarousel from "../components/trendingRentIndexCarousel";
+import propertyData from "../data/property";
+import HomesCategory from "../components/homesCategory";
+import XStories from "../components/xStories";
+import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
+import "../style/globals.css";
 
 function Homepage() {
-  //Chevron cntls
   const [hoverLeft, setHoverLeft] = useState(false);
   const [hoverRight, setHoverRight] = useState(false);
 
-// Filter out real property cards
+  // Separate refs for each carousel
+  const trendingRef = useRef(null);
+  const shortletsRef = useRef(null);
+
+  const scrollLeft = (ref) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: -400, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = (ref) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: 400, behavior: "smooth" });
+    }
+  };
+
+  // Filter property items
   const propertyItems = propertyData.filter(
-    (item) =>
-      item.img && Array.isArray(item.img) && item.img.length > 0 && item._id
+    (item) => item.img && Array.isArray(item.img) && item.img.length > 0 && item._id
   );
 
-  // Insert an ad banner after every 6 or 7 property cards
+  // Mix ad banners
   const mixedItems = [];
   let counter = 0;
-
-  // Loop through the properties and insert an ad banner at regular intervals
   for (let i = 0; i < propertyItems.length; i++) {
     mixedItems.push(propertyItems[i]);
     counter++;
-
-    // After every 6th or 7th property card, add an ad banner (use _id "06" as an example)
     if (counter === 6) {
       mixedItems.push({
-        _id: "ad-banner", // Unique ID for the ad
-        isAd: true, // Mark this as an ad banner
+        _id: "ad-banner",
+        isAd: true,
         topic: "Ad Banner",
         desc: "This is an Ad",
-        btn: "url", // Example button link
+        btn: "url",
       });
-      counter = 0; // Reset counter after the ad
+      counter = 0;
     }
   }
 
-return (
-  <>
-    <Banner />
-    <StorySection />
+  return (
+    <>
+      <Banner />
+      <StorySection />
 
-      {/*Tending Slider*/}
-      <div className='px-10 py-10 mb-10 TendingSliderContainer'>
-        <h3 className='text-3xl font-medium ml-30'>Trending Homes</h3>
-          <span className='btn ml-65 md:ml-290'>
-            <button className="cursor-pointer border-none bg-transparent mx-5">
-              <FaChevronCircleLeft className="cursor-pointer-L"
-                color= {hoverLeft ? "#003399" : "e4e5e9"}
-                size={45}
-                onMouseEnter={() => setHoverLeft(true)}
-                onMouseLeave={() => setHoverLeft(false)}
-              />
-            </button>
-
-            <button className="cursor-pointer-R border-none bg-transparent">
-              <FaChevronCircleRight 
-                className="cursor-pointer"
-                color= {hoverRight ? "#003399" : "e4e5e9"}
-                size={45}
-                onMouseEnter={() => setHoverRight(true)}
-                onMouseLeave={() => setHoverRight(false)}
-              />
-            </button>
-          </span>
-        <TrendingRentIndexCarousel className='rentCarousel overflow-x-scroll scrollbar-hide w-100%' rent={mixedItems} />
-      </div>
-
-      {/*Explore Segment*/}  
-      <div className='ExploreSegment'>
-        <h3 className='text-4xl font-medium mb-4 ml-23 md:ml-40'>Explore homes</h3>
-        <div>
-          <HomesCategory />
-        </div>
-      </div>
-      {/* X Stories Segment */}
-      <div>
-        <XStories />
-      </div>
-      
-      {/* Shortlet Carousel */}
-      <div className='shortLetCarousel px-10 py-10 mb-10'>
-        <h3 className='text-3xl font-medium mb-4 ml-30'>Shortlets Nearby</h3>
-        <span className='btn ml-65 md:ml-290 mt-50'>
-          <button className="cursor-pointer border-none bg-transparent mx-5">
-            <FaChevronCircleLeft 
+      {/* Trending Section */}
+      <section className="max-w-7xl mx-auto px-10 md:px-4 py-10">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-3xl font-semibold">Trending Homes</h3>
+          <div className="hidden md:flex gap-4">
+            <FaChevronCircleLeft
+              color={hoverLeft ? "#003399" : "#e4e5e9"}
+              size={40}
               className="cursor-pointer"
-              color= {hoverLeft ? "#003399" : "e4e5e9"}
-              size={45}
               onMouseEnter={() => setHoverLeft(true)}
               onMouseLeave={() => setHoverLeft(false)}
+              onClick={() => scrollLeft(trendingRef)}
             />
-          </button>
-          <button className="cursor-pointer border-none bg-transparent">
-            <FaChevronCircleRight 
+            <FaChevronCircleRight
+              color={hoverRight ? "#003399" : "#e4e5e9"}
+              size={40}
               className="cursor-pointer"
-              color= {hoverRight ? "#003399" : "e4e5e9"}
-              size={45}
               onMouseEnter={() => setHoverRight(true)}
               onMouseLeave={() => setHoverRight(false)}
+              onClick={() => scrollRight(trendingRef)}
             />
-          </button>
-        </span>
-        <TrendingRentIndexCarousel rent={mixedItems} />
-      </div>
-  </>
-  )
+          </div>
+        </div>
+
+        <div
+          ref={trendingRef}
+          className="flex -ml-15 md:-ml-0 gap-4 overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide"
+        >
+          <TrendingRentIndexCarousel rent={mixedItems} />
+        </div>
+      </section>
+
+      {/* Explore Homes */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <h3 className="text-4xl font-semibold mb-8">Explore Homes</h3>
+        <HomesCategory />
+      </section>
+
+      {/* Stories */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <XStories />
+      </section>
+
+      {/* Shortlets */}
+      <section className="max-w-7xl mx-auto px-10 md:px-4 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-3xl font-semibold">Shortlets Nearby</h3>
+          <div className="gap-4 hidden md:flex">
+            <FaChevronCircleLeft
+              color={hoverLeft ? "#003399" : "#e4e5e9"}
+              size={40}
+              className="cursor-pointer"
+              onMouseEnter={() => setHoverLeft(true)}
+              onMouseLeave={() => setHoverLeft(false)}
+              onClick={() => scrollLeft(shortletsRef)}
+            />
+            <FaChevronCircleRight
+              color={hoverRight ? "#003399" : "#e4e5e9"}
+              size={40}
+              className="cursor-pointer"
+              onMouseEnter={() => setHoverRight(true)}
+              onMouseLeave={() => setHoverRight(false)}
+              onClick={() => scrollRight(shortletsRef)}
+            />
+          </div>
+        </div>
+        <div
+          ref={shortletsRef}
+          className="flex -ml-15 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide"
+        >
+          <TrendingRentIndexCarousel rent={mixedItems} />
+        </div>
+      </section>
+    </>
+  );
 }
-export default Homepage
+
+export default Homepage;

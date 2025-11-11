@@ -12,7 +12,7 @@ const TrendingRentIndexCarousel = ({ rent = [] }) => {
   if (slicedItems.length === 0) return null;
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 overflow-x-auto space-x-6 px-30 pb-15 scrollbar-hide"
+    <div className="flex flex-col md:flex-row gap-4 space-x-6 px-30 pb-15 flex-shrink-0"
       style={{
         scrollbarWidth: "none",
         msOverflowStyle: "none",
@@ -23,7 +23,9 @@ const TrendingRentIndexCarousel = ({ rent = [] }) => {
             key={item._id || `ad-${index}`}
             desc={item.desc}
             topic={item.topic}
-            btn={item.btn}/>
+            btn={item.btn}
+            className="w-full md:w-1/3 flex-shrink-0"
+            />
         ) : (
           <PropertyCard key={item._id} {...item} />
         )
