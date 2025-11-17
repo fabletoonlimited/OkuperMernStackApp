@@ -1,10 +1,11 @@
+"use client"
 import Link from 'next/link'
 import React from 'react'
 
-const tenantDashboard = () => {
+const index = () => {
   return (
   // {cards}
-    <div className='relative left-15 -mt-[1290px] px-50 md:flex flex-col'>
+    <div className='mt-10 px-6 md:px-12'>
       <div className='tenantDashboardCard grid grid-cols-2 md:grid-cols-3 gap-3'>
         <div 
           className="items-center space-y-2 rounded-lg bg-white md:w-[310px] w-[310px] md:h-[250px] h-auto p-5 md:p-8 mb-4"
@@ -71,4 +72,4 @@ const tenantDashboard = () => {
   )
 }
 
-export default tenantDashboard
+export default index

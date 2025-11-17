@@ -1,8 +1,6 @@
 "use client";
 // import { headers } from "next/headers";
-
 import { usePathname } from "next/navigation";
-
 import "../style/globals.css"; 
 import "./Homepage.css"
 import Nav from "../components/nav"
@@ -26,7 +24,7 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  const noLayoutRoutes = ["/landlordDashboard"];
+  const noLayoutRoutes = ["/landlordDashboard", "/tenantDashboard"];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
   return (

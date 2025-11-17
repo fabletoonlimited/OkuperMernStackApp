@@ -7,11 +7,8 @@ import LandlordDashboardFooter  from "../../components/landlordDashboardFooter/i
 function landlordDashboard() {   
     return (
         <>
-           
-
             <div className="landlordDashboardContainer flex">
-                 <LandlordDashboardSidebar />
-
+                <LandlordDashboardSidebar />
                 <div>
                     <div className="landlordDashboardWelcomeMessage mt-8 p-6 bg-white" 
                     style={{
@@ -32,28 +29,10 @@ function landlordDashboard() {
                                 listing,there are a few things left to do.
                             </p>
                     </div>
-                </div>
-                    
+                </div>  
             </div>
-                   <LandlordDashboardCard />
-                   <LandlordDashboardFooter /> 
-                
-
-
-                
-                
-                
-            
-           
-          
-              
-               
-            
-                      
-                      
-
-            
-
+                <LandlordDashboardCard />
+                <LandlordDashboardFooter /> 
         </>
     );
 }
@@ -62,7 +41,7 @@ function landlordDashboard() {
 //     return {page};
 //   };
 
-    export default landlordDashboard;
+export default landlordDashboard;
         
         
         

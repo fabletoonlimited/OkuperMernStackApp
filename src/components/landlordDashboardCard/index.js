@@ -1,7 +1,8 @@
+"use client"
 import Link from 'next/link'
 import React from 'react'
 
-const landlordDashboard = () => {
+const index = () => {
   return (
   // {cards}
     <div className='relative left-15 -mt-[1290px] px-50 md:flex flex-col'>
@@ -71,4 +72,4 @@ const landlordDashboard = () => {
   )
 }
 
-export default landlordDashboard
+export default index
