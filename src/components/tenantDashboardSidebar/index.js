@@ -28,8 +28,8 @@ const index = () => {
     {/* Sidebar */}
         <aside 
             className={`
-            landlordDashboardSidebar 
-            text-white px-2 bg-blue-950 h-screen w-[272px]
+            tenantDashboardSidebar 
+            text-white px-2 bg-blue-950 md:h-screen h-screen w-[272px]
             fixed top-0 left-0 z-50
             transform transition-transform duration-300
             ${isOpen ? "translate-x-0" : "-translate-x-full"}
@@ -43,7 +43,7 @@ const index = () => {
                 />
             </Link>
             <ul className='m-8 -mt-2 justify-between w-30 flex flex-col space-y-6 cursor-pointer'>
-                <Link  href="/landlordDashboard">
+                <Link  href="/tenantDashboard">
                     <li>Dashboard</li> 
                 </Link> 
                
