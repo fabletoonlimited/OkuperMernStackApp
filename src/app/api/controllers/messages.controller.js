@@ -1,5 +1,5 @@
 import Message from "../models/message.js"
-import Conversation from "../models/messageModel.js"
+import Conversation from "../models/messagesModel.js"
 import Tenant from "../models/tenantModel.js";
 import Landlord from "../models/landlordModel.js";
 

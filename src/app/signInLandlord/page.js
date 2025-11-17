@@ -1,8 +1,6 @@
 "use client";
-
 import React, { useState, useEffect} from 'react'
 import Link from 'next/link';
-import { set } from 'mongoose';
 import { href } from 'react-router-dom';
 
        
@@ -13,8 +11,8 @@ const page = () => {
         <h1 className='font-bold text-4xl' style={{paddingLeft: 45, marginTop: 70}}>Sign in</h1>
 
         {/*SignUp Form*/}
-        <div className='signUpLoandingContainer md:flex-col col mt-10 mb-50'>
-            <div className='tenantSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10' 
+        <div className='signInLoandingContainer md:flex-col col mt-10 mb-50'>
+            <div className='landlordSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10' 
                 style={{ 
                     display: 'flex',
                     flexDirection: 'column', 
@@ -75,10 +73,10 @@ const page = () => {
             </div>
                 
             {/*SignIn Btn*/}
-            <div className="tenantSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-                <Link href='/tenantDashboard'>
+            <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
+                <Link href='/landlordDashboard'>
                     <button 
-                    className='tenantSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30'> Sign In </button>
+                    className='landlordSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30'> Sign In </button>
                 </Link>
             </div>
 

@@ -1,3 +1,8 @@
+"use client";
+// import { headers } from "next/headers";
+
+import { usePathname } from "next/navigation";
+
 import "../style/globals.css"; 
 import "./Homepage.css"
 import Nav from "../components/nav"
@@ -14,18 +19,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Okuper",
-  description: "Connecting verfied tenants to home owners",
-};
+// export const metadata = {
+//   title: "Okuper",
+//   description: "Connecting verfied tenants to home owners",
+// };
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+  const noLayoutRoutes = ["/landlordDashboard"];
+
+  const shouldHideLayout = noLayoutRoutes.includes(pathname);
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Nav />
+        {!shouldHideLayout && <Nav />}
         {children}
-        <Footer />
+        {!shouldHideLayout && <Footer />}
       </body>
     </html>
   );

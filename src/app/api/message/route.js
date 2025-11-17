@@ -1,4 +1,4 @@
-import {sendMessage} from "../controllers/message.controller.js"
+import {sendMessage} from "../controllers/messages.controller.js"
 
 const route = express.Router();
 

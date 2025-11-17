@@ -17,6 +17,7 @@
     "@nodelib/fs.walk": "^3.0.1",
     "autoprefixer": "^10.4.21",
     "browserslist": "^4.24.4",
+    "lucide-react": "^0.553.0",
     "next": "^15.3.1",
     "next-cloudinary": "^6.16.0",
     "postcss": "^8.5.3",
@@ -29,7 +30,6 @@
     "sass": "^1.87.0",
     "tailwindcss": "^4.1.6"
   },
-  
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.6",
