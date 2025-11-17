@@ -5,8 +5,6 @@ import LandlordDashboardFooter  from "../../components/landlordDashboardFooter/i
 
 
 function landlordDashboard() {   
-
-
     return (
         <>
            

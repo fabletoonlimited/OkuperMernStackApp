@@ -23,7 +23,8 @@ const index = () => {
   return (
     <>
     {/* Sidebar */}
-        <aside className="landlordDashboardSidebar text-white px-2 bg-blue-950 h-[1630px] w-[272px]">
+        <aside className="landlordDashboardSidebar text-white px-2 bg-blue-950 h-[1630px] w-[272px]"
+            >
             <Link href={"/"}>
                 <img
                 className="w-45 px-4 h-auto "
@@ -31,7 +32,6 @@ const index = () => {
                 alt="Okuper Logo"
                 />
             </Link>
-          
             <ul className='m-8 -mt-2 justify-between w-30 flex flex-col space-y-6 cursor-pointer'>
                 <Link  href="/landlordDashboard">
                     <li>Dashboard</li> 

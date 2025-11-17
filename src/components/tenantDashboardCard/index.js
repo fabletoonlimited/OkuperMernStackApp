@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import React from 'react'
 
-const landlordDashboard = () => {
+const tenantDashboard = () => {
   return (
   // {cards}
     <div className='relative left-15 -mt-[1290px] px-50 md:flex flex-col'>
-      <div className='landlordDashboardCard grid grid-cols-2 md:grid-cols-3 gap-3'>
+      <div className='tenantDashboardCard grid grid-cols-2 md:grid-cols-3 gap-3'>
         <div 
           className="items-center space-y-2 rounded-lg bg-white md:w-[310px] w-[310px] md:h-[250px] h-auto p-5 md:p-8 mb-4"
           style={{boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"}}
@@ -71,4 +71,4 @@ const landlordDashboard = () => {
   )
 }
 
-export default landlordDashboard
+export default tenantDashboard
