@@ -10,6 +10,7 @@ const index = () => {
           className="items-center space-y-2 rounded-lg bg-white md:w-[310px] w-[310px] md:h-[250px] h-auto p-5 md:p-8 mb-4"
           style={{boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"}}
         >
+            <h4 className='font-black text-2xl md:leading-7 mb-3'>Your profile</h4>
               <p className='text-justify'>Your profile information is 50% complete</p>
             <Link href="./" className='bg-blue-900 rounded-xl md:p-2 p-3  text-white '>
               <button className='md:p-8 md:m-0 mt-3  cursor-pointer'>Update Your profile </button>
