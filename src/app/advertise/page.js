@@ -72,14 +72,14 @@ function Advertise() {
         {/* RIGHT SECTION */}
         <div className={ 'text-white m-6 md:mt-20 md:h-[900px] md:w-[1100px] relative' }>
           <div
-            className={'relative p-10 rounded-t-2xl bg-[rgba(0,51,153,1)]'}
+            className={'relative p-10 rounded-t-2xl bg-blue-900'}
           >
             <h2 className="font-medium md:text-3xl text-3xl leading-relaxed px-6 md:px-6">
               Thank you for choosing to advertise your brand on Okuper.
             </h2>
           </div>
 
-          <p className="absolute md:font-medium leading-[1.5] -mt-5 md:text-[20px] px-12 md:px-18 text-xl md:text-justify">
+          <p className="absolute md:font-medium leading-[1.5] -mt-5 md:text-[20px] px-10 md:px-18 text-xl md:text-justify">
             Showcase your brand to the hundreds of users who interact with our
             platform daily. Join us as we reshape the real estate industry and
             give the power back to the people.
@@ -89,7 +89,7 @@ function Advertise() {
           <img
             src="/bannerlady.png"
             alt="bannerlady"
-            className={'absolute md:mt-25 mt-17 md:h-auto'}
+            className={'absolute md:mt-23 mt-22 h-110 md:h-125'}
           />
 
           <img

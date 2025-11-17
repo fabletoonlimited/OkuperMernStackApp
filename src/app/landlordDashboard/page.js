@@ -10,7 +10,6 @@ function landlordDashboard() {
     return (
         <>
            
-
             <div className="landlordDashboardContainer flex">
                  <LandlordDashboardSidebar />
 
@@ -27,7 +26,7 @@ function landlordDashboard() {
                         </p>
 
                     </div>
-                    <div className="landlordDashboardNextSteps md:mt-8 p-7   ">
+                    <div className="landlordDashboardNextSteps md:mt-8 p-7">
                         <h3 className="font-medium md:text-4xl text-2xl pl-7">Your next steps</h3>
                             <p className="mt-2 md:text-xl pl-7 md:w-auto w-70 text-justify">
                                 In other to complete your profile and
