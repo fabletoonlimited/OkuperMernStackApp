@@ -1,11 +1,6 @@
 "use client";
-
 import React, { useState, useEffect} from 'react'
 import Link from 'next/link';
-import { set } from 'mongoose';
-import { href } from 'react-router-dom';
-
-       
 
 const page = () => {
   return (
@@ -75,10 +70,10 @@ const page = () => {
             </div>
                 
             {/*SignIn Btn*/}
-            <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-                <Link href='/landlordDashboard'>
+            <div className="tenantSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
+                <Link href='/tenantDashboard'>
                     <button 
-                    className='landlordSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30'> Sign In </button>
+                    className='tenantSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30'> Sign In </button>
                 </Link>
             </div>
 

@@ -4,8 +4,8 @@ import React from 'react'
 
 const index = () => {
   return (
-    <div className='bg-blue-950 text-white md:p-3 p-4 md:mt-199 mt-145 w-full'>
-       <ul className='flex justify-between md:px-20 space-x-2'>
+    <div className='bg-blue-950 text-white md:p-3 p-4 md:mt-199 mt-145 md:min-w-[1700px] w-170'>
+       <ul className='flex justify-between md:px-20 '>
             <Link href ="/okuper2025">
                <li>
                     <p>Okuper2025</p>
@@ -13,7 +13,7 @@ const index = () => {
             </Link>
             <Link href ="/copyright">
                <li>
-                    <p className=' md:m-0 m-5 text-center'>&copy; Copyright.All Right Reserved</p>
+                    <p className=''>&copy; Copyright.All Right Reserved</p>
                </li>    
             </Link>
             
