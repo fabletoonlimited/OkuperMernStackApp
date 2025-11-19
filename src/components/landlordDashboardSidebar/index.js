@@ -43,34 +43,19 @@ const index = () => {
                     <li>Dashboard</li> 
                 </Link> 
                
-                
                 <Link href="/helpCenter">
                         <li> Help Center </li>
                 </Link> 
                 
-               
                     <Link href="/savedHomes">
                         <li> Saved Homes </li>
                     </Link> 
-                
-               
-                  <Link href="/messages">
+                 
+                  <Link href="/landlordDashboardInbox">
                       <li>
                           messages
                       </li>
                     </Link>
-
-                        <Link href="/helpCenter">
-                            <li> Help Center </li>
-                        </Link>
-
-                        <Link href="/savedHomes">
-                            <li> Saved Homes </li>
-                        </Link>
-
-                        <Link href="/messages">
-                            <li> Messages </li>
-                        </Link>
 
                         <Link href="/propertyLanding">
                             <li> Listings </li>
