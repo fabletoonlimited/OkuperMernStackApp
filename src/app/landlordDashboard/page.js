@@ -12,15 +12,11 @@ function landlordDashboard() {
                 <div className="flex-1">
                     <div
                         className="landlordDashboardWelcomeMessage mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]"
-                        // style={{
-                        //     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                        //     minWidth: "1500px"
-                        //     }}
-                    >
+                        >
                         <h1 className="font-bold md:text-5xl text-2xl pl-7">
                             Welcome,Landlord!
                         </h1>
-                        <p className="mt-2 md:text-xl pl-7 md:w-auto w-70 text-justify">
+                        <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
                             We are thrilled that you have chosen to list your
                             property with Okuper.
                         </p>
@@ -29,14 +25,14 @@ function landlordDashboard() {
                         <h3 className="font-medium md:text-4xl text-2xl pl-7">
                             Your next steps
                         </h3>
-                        <p className="mt-2 md:text-xl pl-7 md:w-auto w-70 text-justify">
-                            In other to complete your profile and listing,there
+                        <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
+                            In other to complete your profile and listing, there
                             are a few things left to do.
                         </p>
                     </div>
+            <LandlordDashboardCard />
                 </div>
             </div>
-            <LandlordDashboardCard />
             <LandlordDashboardFooter />
         </>
     );

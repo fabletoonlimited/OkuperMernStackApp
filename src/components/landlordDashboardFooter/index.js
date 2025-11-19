@@ -4,7 +4,7 @@ import React from 'react'
 
 const index = () => {
   return (
-    <div className='bg-blue-950 text-white md:p-3 p-4 md:mt-199 mt-145 w-full'>
+    <div className='bg-blue-950 text-white md:p-3 p-6 md:mt-199 mt-145 w-full '>
        <ul className='flex justify-between md:px-20 space-x-2'>
             <Link href ="/okuper2025">
                <li>
