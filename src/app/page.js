@@ -79,20 +79,21 @@ function Homepage() {
               onClick={() => scrollRight(trendingRef)}
             />
           </div>
-        </div>
 
+        </div>
+      {/*Carousel*/}
         <div
           ref={trendingRef}
-          className="flex -ml-15 md:-ml-0 gap-4 overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide"
+          className="flex -ml-28 md:-ml-0 gap-4 overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide"
         >
           <TrendingRentIndexCarousel rent={mixedItems} />
         </div>
       </section>
 
       {/* Explore Homes */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="max-w-7xl mx-auto px-10 md:px-4 py-10">
         <h3 className="text-4xl font-semibold mb-8">Explore Homes</h3>
-        <HomesCategory />
+        <div className="-ml-28 md:-ml-0"><HomesCategory /></div>
       </section>
 
       {/* Stories */}
@@ -125,7 +126,7 @@ function Homepage() {
         </div>
         <div
           ref={shortletsRef}
-          className="flex -ml-15 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide"
+          className="flex -ml-28 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide"
         >
           <TrendingRentIndexCarousel rent={mixedItems} />
         </div>
