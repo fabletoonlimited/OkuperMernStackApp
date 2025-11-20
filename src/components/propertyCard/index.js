@@ -35,7 +35,6 @@ const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
   return (
   <>
     <Link href={'/propertyCardExpanded'}>
-      <PropertyExpandedNav />
       <div className="rounded-xl overflow-hidden shadow-md 
       bg-white hover:shadow-lg transition-shadow duration-300 
         w-[310px] md:min-w-[310px] md:min-h-[520px] min-h-[520px] 
