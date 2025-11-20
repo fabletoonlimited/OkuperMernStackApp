@@ -18,7 +18,9 @@ const index = ({ isOpen, onClose }) => {
               </div>
 
               <div className="text-center text-white">
-                  <div className="text-red-600 bg-white rounded-full w-40 h-40">x</div>
+                  <div className=" bg-white rounded-full ml-19 w-28 h-28 m-4">
+                      <p className="text-red-600 text-5xl pt-9">x</p>
+                  </div>
                   <h2>Error</h2>
                   <p>You are on a free subscription</p>
                   <p>

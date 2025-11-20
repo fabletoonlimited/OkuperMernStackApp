@@ -5,9 +5,11 @@ import LandlordDashboardSidebar from '../../components/landlordDashboardSidebar'
 import LandlordDashboardFooter from '../../components/landlordDashboardFooter'
 import { CldImage } from 'next-cloudinary'
 import { toast, ToastContainer } from "react-toastify"
+import SubscriptionModal1 from '../../components/subscriptionModal1/index.js'
 
 
 function Message({ id }) {
+  const [openModal, setOpenModal] = useState(false);
 
   const [backendMessage, setBackendMessage] = useState(null);
 
@@ -38,54 +40,50 @@ function Message({ id }) {
   const publicId1 = backendMessage?.sender?.profilePic;
 
   return (
-    <div className='landlordDashboardInboxContainer'>
-      <LandlordDashboardSidebar />
+      <div className="landlordDashboardInboxContainer">
+          <LandlordDashboardSidebar />
 
-      <div className="landlordInbox mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
-        <h3 className="text-4xl text-blue-800 font-bold">Inbox</h3>
-      </div>
-
-      <div className="landlordinbox mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)] flex gap-6">
-
-        <div className='flex items-center gap-4'>
-
-          <h5 className="text-xl font-semibold text-blue-950">My messages</h5>
-
-          <Link href="/compose">
-            <p className='text-blue-800 cursor-pointer'>Compose</p>
-          </Link>
-
-          {/* Display pic */}
-          <div className='w-20 h-20 rounded-full overflow-hidden bg-gray-200'>
-
-            {publicId1 && (
-              <CldImage
-                src={publicId1}
-                width={80}
-                height={80}
-                crop="fill"
-                gravity="auto"
-                alt="profile"
-              />
-            )}
-
+          <div className="landlordInbox mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
+              <h3 className="text-4xl text-blue-800 font-bold">Inbox</h3>
           </div>
-        </div>
 
-        <div>
-          <Link href="/">
-            <button 
-              onClick={() => setOpenModal()}
-              className="cursor-pointer bg-blue-800 w-40 h-10 text-white text-lg">
-              Show Profile
-            </button>
-          </Link>
-        </div>
+          <div className="landlordinbox mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)] flex gap-6">
+              <div className="flex items-center gap-4">
+                  <h5 className="text-xl font-semibold text-blue-950">
+                      My messages
+                  </h5>
+
+                  <Link href="/compose">
+                      <p className="text-blue-800 cursor-pointer">Compose</p>
+                  </Link>
+
+                  {/* Display pic */}
+                  <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
+                      {publicId1 && (
+                          <CldImage
+                              src={publicId1}
+                              width={80}
+                              height={80}
+                              crop="fill"
+                              gravity="auto"
+                              alt="profile"
+                          />
+                      )}
+                  </div>
+              </div>
+
+              <div>
+                      <button
+                          onClick={() => setOpenModal(true)}
+                          className="cursor-pointer bg-blue-800 w-40 h-10 text-white text-lg">
+                          Show Profile
+                      </button>
+              </div>
+          </div>
+          <SubscriptionModal1 isOpen={openModal} onClose={() => setOpenModal(false)} />
+          <LandlordDashboardFooter />
+          <ToastContainer />
       </div>
-
-      <LandlordDashboardFooter />
-      <ToastContainer />
-    </div>
   );
 }
 
