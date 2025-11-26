@@ -24,7 +24,7 @@ function landlordDashboard() {
                     </div>
 
                     {/* Dashboard Section*/}
-                    <div className="landlordDashboardNextSteps md:mt-8 px-20">
+                    <div className="landlordDashboardNextSteps md:mt-8 md:px-20 px-0">
                         <h3 className="font-medium md:text-4xl text-2xl pl-7">
                             Your next steps
                         </h3>
@@ -33,7 +33,7 @@ function landlordDashboard() {
                             are a few things left to do.
                         </p>
                     </div>
-                    <div className="px-16">
+                    <div className="md:px-16 px-0">
                         <LandlordDashboardCard />
                     </div>
                 </div>
