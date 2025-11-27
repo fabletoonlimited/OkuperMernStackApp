@@ -1,14 +1,14 @@
 "use client";
 import Link from 'next/link';
 import React, {useState} from 'react'
-import SubscriptionModal1 from "../../components/subscriptionModal1"
+import SubscriptionModal2 from "../../components/subscriptionModal2"
 
 const index = () => {
     const [isOpen, setIsOpen] = useState(false);
   return (
-      <div className="bg-white md:w-[1300px] md:h-[800px] h-210 m-6 md:px-77">
+      <div className="bg-white md:w-[1300px] md:h-[2098px] h-210 m-8">
           {/* Grid container */}
-          <div className="grid grid-cols-1 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 md:px-50">
               <div className="flex flex-col items-center mt-8">
                   <div className="md:w-60 md:h-60 w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center">
                       <span className="md:text-[200px] text-7xl font-bold text-gray-400">
@@ -16,7 +16,7 @@ const index = () => {
                       </span>
                   </div>
 
-                  <Link href="./">
+                  <Link href="/propertyLandingForm">
                       <button className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded cursor-pointer font-medium">
                           Start uploading
                       </button>
@@ -29,7 +29,7 @@ const index = () => {
                       </span>
                   </div>
 
-                  <Link href="./">
+                  <Link href="/propertyLandingForm">
                       <button className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded cursor-pointer font-medium">
                           Start uploading
                       </button>
@@ -48,7 +48,7 @@ const index = () => {
                       Start uploading
                   </button>
                   {/* Modal Component */}
-                  <SubscriptionModal1
+                  <SubscriptionModal2
                       isOpen={isOpen}
                       onClose={() => setIsOpen(false)}
                   />

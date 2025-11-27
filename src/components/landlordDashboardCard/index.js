@@ -34,7 +34,7 @@ const index = () => {
                       Add your property listings to showcase it to tenants
                   </p>
                   <Link
-                      href="./"
+                      href="/propertyLanding"
                       className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white ">
                       <button className="md:p-8 md:m-0 mt-3 cursor-pointer text-sm">
                           Update Your profile{" "}
