@@ -53,7 +53,7 @@ const index = () => {
                  
                   <Link href="/landlordDashboardInbox">
                       <li>
-                          messages
+                          Messages
                       </li>
                     </Link>
 
