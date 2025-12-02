@@ -16,7 +16,7 @@ const index = () => {
                       </span>
                   </div>
 
-                  <Link href="/propertyLandingForm">
+                  <Link href="/propertyListingUploadForm">
                       <button className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded cursor-pointer font-medium">
                           Start uploading
                       </button>
@@ -29,7 +29,7 @@ const index = () => {
                       </span>
                   </div>
 
-                  <Link href="/propertyLandingForm">
+                  <Link href="/propertyListingUploadForm">
                       <button className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded cursor-pointer font-medium">
                           Start uploading
                       </button>
