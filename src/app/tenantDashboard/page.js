@@ -7,7 +7,6 @@ function TenantDashboard() {
     return (
         <>
             <div className="tenantDashboardContainer flex">
-                
                 {/* Sidebar */}
                 <TenantDashboardSidebar />
 
@@ -17,13 +16,13 @@ function TenantDashboard() {
                         className="tenantDashboardWelcomeMessage mt-8 p-6 bg-white"
                         style={{
                             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                        }}
-                    >
+                        }}>
                         <h1 className="font-bold md:text-5xl text-2xl pl-7">
                             Welcome, tenant!
                         </h1>
                         <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-                            We are thrilled that you have chosen Okuper to rent your next property.
+                            We are thrilled that you have chosen Okuper to rent
+                            your next property.
                         </p>
                     </div>
 
@@ -32,11 +31,13 @@ function TenantDashboard() {
                             Your next steps
                         </h3>
                         <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-                            In order to complete your profile and listing, there are a few things left to do.
+                            In order to complete your profile and listing, there
+                            are a few things left to do.
                         </p>
                     </div>
-
-                    <TenantDashboardCard />
+                    <div className="md:px-16 px-0">
+                        <TenantDashboardCard />
+                    </div>
                 </div>
             </div>
 

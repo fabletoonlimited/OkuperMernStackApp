@@ -1,8 +1,8 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import LandlordDashboardSidebar from '../../components/landlordDashboardSidebar'
-import LandlordDashboardFooter from '../../components/landlordDashboardFooter'
+import LandlordDashboardSidebar from '../../components/landlordDashboardSidebar/index.js'
+import LandlordDashboardFooter from '../../components/landlordDashboardFooter/index.js'
 import { CldImage } from 'next-cloudinary'
 import { toast, ToastContainer } from "react-toastify"
 import SubscriptionModal1 from '../../components/subscriptionModal1/index.js'
