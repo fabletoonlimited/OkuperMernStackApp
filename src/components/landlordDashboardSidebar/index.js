@@ -57,7 +57,7 @@ const index = () => {
                       </li>
                     </Link>
 
-                        <Link href="/propertyLanding">
+                        <Link href="/propertyListing">
                             <li> Listings </li>
                         </Link>
 
