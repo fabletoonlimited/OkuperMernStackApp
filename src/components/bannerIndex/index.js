@@ -15,7 +15,7 @@ function Banner() {
   return (
     <div className="relative w-full md:bg-transparent bg-white px-10 md:px-0 mb-10 md:mb-8 z-10">
       {/* Model Image */}
-      <div className="absolute bottom-25.5 left-[33%] transform -translate-x-1/2 z-30 hidden md:block">
+      <div className="absolute bottom-45 left-[33%] transform -translate-x-1/2 z-30 hidden md:block">
         <Image
           src={Model1}
           alt="bannerModel"
@@ -40,9 +40,7 @@ function Banner() {
             className="text-white text-2xl md:text-4xl"
             style={{cursor: 'pointer'}}
           />
-        </button>
-
-          
+        </button>  
         </div>
 
         {/* Content Over Banner */}
@@ -54,19 +52,18 @@ function Banner() {
             width={60}
             height={65}
           />
-          <h1 className="text-2xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start">
+          <h1 className="text-4xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start justify-items-start">
             We got you covered
           </h1>
-          <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light mt-2 text-center md:text-justify">
+          <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light mt-4 px-4 md:px-0 text-justify md:text-justify">
             The Nigerian rental market has become tainted by the
             greed of middlemen, who often charge exorbitant fees.
           </h3>
 
           {/* Buttons */}
-          <div className="mt-4 md:mt-6 flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
-            
-            <button className="bg-[#0E1D48] flex text-white px-10 gap-2 pt-3 md:px-8 md:py-3 
-            rounded-md text-sm md:text-base hover:bg-blue-400  hover:text-[#0E1D48] transition">
+          <div className="mt-15 md:mt-6 flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
+            <button className="bg-blue-950 flex text-white px-22 md:px-8 gap-2 pt-3 md:py-3 
+            rounded-md text-md md:text-base hover:bg-blue-300  hover:text-[#0E1D48] transition">
             <Image
             className="self-start mb-2 md:mb-0"
             src={homeIcon}
@@ -75,8 +72,8 @@ function Banner() {
             height={25}/>Got a vacant home?
             </button>
 
-            <button className="bg-white text-[#0E1D48] flex gap-3 px-10 pt-3 
-            md:px-8 md:py-3 rounded-md text-sm md:text-base hover:bg-gray-300 transition">
+            <button className="bg-white text-blue-950 flex gap-3 md:px-8 px-22 pt-3 
+            md:py-3 rounded-md text-md md:text-base hover:bg-amber-200 transition">
               <Image
               className="self-start mb-2 md:mb-0"
               src={userIcon}
@@ -89,9 +86,9 @@ function Banner() {
       </div>
 
       {/* Feature Boxes */}
-      <div className="bannerBoxes relative z-30 top-20 md:row md:gap-6 md:px-30 mb-3 
-        w-full py-0 flex flex-row md:top-0 gap-8 mt-[-140px] md:mt-[-80px] px-4 pb-3 
-        md:overflow-hidden overflow-x-auto md:w-auto max-w-auto"
+      <div className="bannerBoxes relative z-30 top-30 md:row md:gap-6 md:px-30 px-12 mb-30 
+       py-0 h-65 flex flex-row md:top-0 gap-8 mt-[-80px] md:mt-[-80px] pb-3 
+        md:overflow-hidden overflow-x-auto max-w-auto w-full md:w-auto"
         style={{ scrollbarWidth: 'none', // Firefox
          msOverflowStyle: 'none', // IE & Edge
         }}>
@@ -99,17 +96,13 @@ function Banner() {
         {["Background Check required for home owners and tenants.",
           "Property ratings by tenants and flagging of suspicious accounts",
           "Tenants NIN identity, proof, financial record and occupation.",
-          "All communications securely happens within the platform.",
-        ]
-        .map((text, index) => (
+          "All communications securely happens within the platform."
+        ].map((text, index) => (
 
-          <div key={index} 
-            className="w-full md:max-w-[280px] bg-sky-100 
-              rounded-xl px-10 md:px-9 py-7 md:py-9 shadow-md flex-shrink-0">
-            <FontAwesomeIcon icon={faCircleCheck} 
-            className="text-[#0E1D48] text-5xl md:text-3xl mb-2"/>
-
-              <p className="font-semibold text-lg md:text-md text-left md:text-left">
+          <div key={index} className="w-full md:max-w-[280px] h-250px md:h-[250px] bg-sky-100 
+              rounded-xl px-10 md:px-5.5 py-10 md:py-6 pt-10 shadow-md flex-shrink-0 hover:bg-amber-200 pointer-cursor transition">
+            <FontAwesomeIcon icon={faCircleCheck} className="text-[#0E1D48] text-5xl md:text-3xl mb-2"/>
+              <p className="font-semibold text-2xl md:text-md text-left md:text-left">
                 {text}
               </p>
           </div>

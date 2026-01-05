@@ -58,7 +58,7 @@ function Homepage() {
       <StorySection />
 
       {/* Trending Section */}
-      <section className="max-w-7xl mx-auto px-10 md:px-4 py-10">
+      <section className="max-w-7xl mx-auto px-10 md:px-4 py-2">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-3xl font-semibold">Trending Homes</h3>
           <div className="hidden md:flex gap-4">
@@ -93,11 +93,13 @@ function Homepage() {
       {/* Explore Homes */}
       <section className="max-w-7xl mx-auto px-10 md:px-4 py-10">
         <h3 className="text-4xl font-semibold mb-8">Explore Homes</h3>
-        <div className="-ml-28 md:-ml-0"><HomesCategory /></div>
+        <div className="-ml-28 md:-ml-0">
+          <HomesCategory />
+        </div>
       </section>
 
       {/* Stories */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="py-12">
         <XStories />
       </section>
 
@@ -124,10 +126,7 @@ function Homepage() {
             />
           </div>
         </div>
-        <div
-          ref={shortletsRef}
-          className="flex -ml-28 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide"
-        >
+        <div ref={shortletsRef} className="flex -ml-28 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide">
           <TrendingRentIndexCarousel rent={mixedItems} />
         </div>
       </section>

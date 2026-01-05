@@ -35,10 +35,8 @@ const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
   return (
   <>
     <Link href={'/propertyCardExpanded'}>
-      <div className="rounded-xl overflow-hidden shadow-md 
-      bg-white hover:shadow-lg transition-shadow duration-300 
-        w-[310px] md:min-w-[310px] md:min-h-[520px] min-h-[520px] 
-        md:mt-13 mt-0 col-span-full"
+      <div className="rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300 
+        w-[310px] md:min-w-[310px] md:min-h-[520px] min-h-[520px] md:mt-13 mt-0 col-span-full hover:scale-105"
         style={{ 
           maxWidth: '310px', minHeight: '520px', 
           maxHeight: '520px', minWidth: '310px', 
@@ -77,7 +75,7 @@ const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
             )}
         </div>
 
-        <div className="p-4 text-center -mt-30 md:-mt-30">
+        <div className="p-4 text-center -mt-30 md:-mt-30 ">
           <h3 className="text-lg font-semibold mt-10 mb-2">
             ₦{price ? price.toLocaleString() : 'N/A'} / yr</h3>
             <p className="text-sm text-gray-800 mt-2">{desc || 'No description provided mb-4'}</p>

@@ -43,6 +43,7 @@ app.use(express.text({
 }));
 
 // Routes completed
+app.use('/', index);
 app.use('/api/user', user); 
 app.use('/api/admin', admin);
 app.use('/api/otp', otp);

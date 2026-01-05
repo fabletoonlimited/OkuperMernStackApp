@@ -83,7 +83,7 @@ const page = () => {
                 <div className={ 'relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170'}>
                     <div className={'relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor '}>
                         <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-center">
-                        <b>Rent & Buy your Homes Directly on Okuper</b>
+                            <b>Rent & Buy your Homes Directly on Okuper</b>
                         </h2>
                     </div>
 
@@ -107,8 +107,7 @@ const page = () => {
                 </div>
             </div>
             {/*End of Banner Section*/}
-       
-    </div>
+        </div>
     </>
 )}
 

@@ -46,18 +46,18 @@ const page = () => {
                     />
 
                     {/*Email*/}
-                    <p style={{paddingTop: 20, marginBottom: 30}}>Password</p>
+                    <p style={{paddingTop: 20, marginBottom: 30}}>Email</p>
                     <input 
-                        type="password" 
-                        placeholder="Create a password" 
+                        type="email" 
+                        placeholder="username@gmail.com" 
                         className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
                     />
 
                     {/*Password Confirmation*/}
-                    <p style={{paddingTop: 20, marginBottom: 30}}>Confirm Password</p>                 
+                    <p style={{paddingTop: 20, marginBottom: 30}}>Password</p>                 
                     <input 
                         type="password" 
-                        placeholder="Confirm password" 
+                        placeholder="password" 
                         className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
                     />
 

@@ -17,7 +17,6 @@ const otpSchema = new mongoose.Schema({
         expires: 300,
     },
 
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false},
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: false},
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: false},
 

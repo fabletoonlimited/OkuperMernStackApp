@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     selection1: {
         type: String,
-        enum: ["Nigerian Citizen", "Temporary Resident", "Permanent Resident", "Work Permit", "International Student"]
+        enum: ["Citizen", "Permanent Resident", "Work Permit", "Student Visa", "Visitors Visa"]
     },
     selection2: {
         type: String,

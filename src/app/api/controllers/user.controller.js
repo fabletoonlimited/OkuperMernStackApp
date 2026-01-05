@@ -1,15 +1,19 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js"
+import Landlord from "../models/landlordModel.js";
+import Tenant from "../models/tenantModel.js";
+import Otp from "../models/otpModel.js";
 
+//Create User
 export const createUser = async (req, res) => {
     const {selection1, selection2, role} = req.body;
 
     if (!selection1 || !selection2 || !role) {
-        return res.status(400).json({message: "All fields required"})
+        return res.status(400).json({message: "Kindly select all fields required"})
     }
 
-    //check if user already in DB
-    const existingUser = await User.findOne({selection1, selection2,role});
+    //check if user exists in DB
+    const existingUser = await User.findOne({selection1, selection2, role});
     if (existingUser) {
         return res.status(400).json({message: "User already exist!!"})
     }
@@ -22,13 +26,120 @@ export const createUser = async (req, res) => {
     
     await newUser.save();
     return res.status(201).json({
-        message: "Record saved successfully",
+        message: "New User created Successfully",
         user: newUser,
     });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong", error: error.message });
     }
+};
+
+//Signup Landlord
+export const signupLandlord = async (req, res) => {
+    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
+
+    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
+        return res.status(400).json({message: "Kindly fill all fields required"})
+    }
+
+    //check if landlord exists in DB
+    const existingUser = await Landlord.findOne({email});
+    if (existingUser) {
+        return res.status(400).json({message: "Landlord already exist!! Please login"})
+    }
+
+    try {
+        const newLandlord = new Landlord({
+            firstName,
+            lastName,
+            email,
+            password,
+            otp,
+            referalCode,
+            survey: surveyInputField,
+            terms,
+            role: "landlord"
+        });
+
+        await newLandlord.save();
+        return res.status(201).json({
+            message: "New Landlord created Successfully",
+            user: newLandlord
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+//Signup Tenant
+export const signupTenant = async (req, res) => {
+    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
+
+    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
+        return res.status(400).json({message: "Kindly fill all fields required"})
+    }
+
+    //check if landlord exists in DB
+    const existingUser = await Tenant.findOne({email});
+    if (existingUser) {
+        return res.status(400).json({message: "Tenant already exist!! Please login"})
+    }
+
+    try {
+        const newTenant = new Tenant({
+            firstName,
+            lastName,
+            email,
+            password,
+            otp,
+            referalCode,
+            survey: surveyInputField,
+            terms,
+            role: "tenant"
+        });
+
+        await newTenant.save();
+        return res.status(201).json({
+            message: "New tenant created Successfully",
+            user: newTenant
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+//login Landlord or Tenant
+export const loginUser = async (req, res) => {
+    const {firstName, LastName, Password, confirmPassword, surveyInputField, terms} = req.body;
+
+    if (!firstName || !LastName || !Password || !confirmPassword || surveyInputField || !terms) {
+        return res.status(400).json({message: "Kindly fill all fields required"})
+    }
+
+    //check if user exists in DB
+    const user = await User.findOne({firstName, LastName, Password, confirmPassword, surveyInputField, terms});
+    if (!user) {
+        return res.status(404).json({message: "User not found. Please signup"})
+    }
+
+    //Generate JWT token
+    const token = jwt.sign(
+        { _id: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+    );
+
+    return res.status(200).json({
+        message: "User logged in successfully",
+        user,
+        token,
+    });
 };
 
 //Get one User
@@ -91,6 +202,32 @@ export const deleteUser = async (req, res) => {
             message: "Something went wrong",
             error: error.message
         });
+    }
+};
+
+//create Otp
+export const createOtp = async (req, res) => {
+    const {email, otp} = req.body;
+
+    if (!email || !otp) {
+        return res.status(400).json({message: "Kindly provide email and otp"})
+    }
+
+    try {
+        const newOtp = new Otp({
+            email,
+            otp
+        });
+
+        await newOtp.save();
+        return res.status(201).json({
+            message: "New OTP created Successfully",
+            otp: newOtp
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong", error: error.message });
     }
 };
 
