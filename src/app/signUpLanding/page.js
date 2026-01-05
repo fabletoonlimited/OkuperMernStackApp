@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect} from 'react'
 import Link from 'next/link';
+import Image from 'next/image';
 
 const page = () => {
     const [selectResidencyStatus, setSelectResidencyStatus] = useState(null);
@@ -57,6 +58,9 @@ const page = () => {
         value: user,
         label: whoIsUsingPlatform[user]
     }));
+
+    const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = 'dfdzbuk0c';
+    const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
 
   return (
@@ -172,7 +176,7 @@ const page = () => {
 
                 {/* RIGHT BANNER IMAGES */}
                 <img
-                    src="/bannerlady.png"
+                    src={BASE_URL + '/bannerlady_uzwewr'}
                     alt="bannerlady"
                     className={'bannerLady md:h-auto h-60 md:w-155 w-75 bottom-[-315px] md:bottom-[-721px]'}
                     style={{position: 'absolute', height: 'auto'}}

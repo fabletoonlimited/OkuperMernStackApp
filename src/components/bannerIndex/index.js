@@ -8,6 +8,9 @@ import userIcon from "../../../public/user.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadset, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
+// import { Link } from "lucide-react";
+import Link from "next/link";
+import React from "react";
 
 function Banner() {
   const router = useRouter();
@@ -62,25 +65,30 @@ function Banner() {
 
           {/* Buttons */}
           <div className="mt-15 md:mt-6 flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
-            <button className="bg-blue-950 flex text-white px-22 md:px-8 gap-2 pt-3 md:py-3 
-            rounded-md text-md md:text-base hover:bg-blue-300  hover:text-[#0E1D48] transition">
-            <Image
-            className="self-start mb-2 md:mb-0"
-            src={homeIcon}
-            alt="houseIcon"
-            width={25}
-            height={25}/>Got a vacant home?
-            </button>
-
-            <button className="bg-white text-blue-950 flex gap-3 md:px-8 px-22 pt-3 
-            md:py-3 rounded-md text-md md:text-base hover:bg-amber-200 transition">
+            <Link href='/signUpLanding'>
+              <button className="bg-blue-950 flex text-white px-22 md:px-8 gap-2 pt-3 md:py-3 
+              rounded-md text-md md:text-base hover:bg-blue-300  hover:text-[#0E1D48] transition">
               <Image
               className="self-start mb-2 md:mb-0"
-              src={userIcon}
+              src={homeIcon}
               alt="houseIcon"
-              width={22}
-              height={24}/>Looking for a home?
-            </button>
+              width={25}
+              height={25}/>Got a vacant home?
+              </button>
+            </Link>
+
+            <Link href='/rent'>
+              <button className="bg-white text-blue-950 flex gap-3 md:px-8 px-22 pt-3 md:py-3 rounded-md text-md md:text-base hover:bg-amber-200 transition">
+                <Image
+                className="self-start mb-2 md:mb-0"
+                src={userIcon}
+                alt="houseIcon"
+                width={22}
+                height={24}
+                />
+                  Looking for a home?
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -99,9 +107,15 @@ function Banner() {
           "All communications securely happens within the platform."
         ].map((text, index) => (
 
-          <div key={index} className="w-full md:max-w-[280px] h-250px md:h-[250px] bg-sky-100 
-              rounded-xl px-10 md:px-5.5 py-10 md:py-6 pt-10 shadow-md flex-shrink-0 hover:bg-amber-200 pointer-cursor transition">
-            <FontAwesomeIcon icon={faCircleCheck} className="text-[#0E1D48] text-5xl md:text-3xl mb-2"/>
+          <div key={index} 
+            className="w-full md:max-w-[280px] h-250px md:h-[250px] bg-sky-100 
+            rounded-xl px-10 md:px-5.5 py-10 md:py-6 pt-10 shadow-md flex-shrink-0 hover:bg-amber-200 transition"
+            style={{cursor: 'pointer'}}
+          >
+            <FontAwesomeIcon 
+              icon={faCircleCheck} 
+              className="text-[#0E1D48] text-5xl md:text-3xl mb-2"
+            />
               <p className="font-semibold text-2xl md:text-md text-left md:text-left">
                 {text}
               </p>
