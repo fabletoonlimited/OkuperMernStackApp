@@ -1,5 +1,5 @@
 import React from 'react'
-import PropExpandedNav from '../../components/propExpandedNav'
+import PropExpandedNav from '../../components/propExpandedNav/index.js'
 
 const index = () => {
   return (
