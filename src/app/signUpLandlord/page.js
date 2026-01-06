@@ -82,7 +82,7 @@ const page = () => {
                 
             {/*SignUp Btn*/}
             <div className="landlordSignUpSection mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-                <Link href='/signInLandlord'>
+                <Link href='/otpVerificationLandlord'> 
                     <button 
                     className='landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30'> Sign Up </button>
                 </Link>

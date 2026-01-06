@@ -3,6 +3,8 @@ import User from "../models/userModel.js"
 import Landlord from "../models/landlordModel.js";
 import Tenant from "../models/tenantModel.js";
 import Otp from "../models/otpModel.js";
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Create User
 export const createUser = async (req, res) => {
@@ -34,119 +36,6 @@ export const createUser = async (req, res) => {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong", error: error.message });
     }
-};
-
-//Signup Landlord
-export const signupLandlord = async (req, res) => {
-    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
-
-    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
-        return res.status(400).json({message: "Kindly fill all fields required"})
-    }
-
-    //check if landlord exists in DB
-    const existingUser = await Landlord.findOne({email});
-    if (existingUser) {
-        return res.status(400).json({message: "Landlord already exist!! Please login"})
-    }
-
-    try {
-        const newLandlord = new Landlord({
-            firstName,
-            lastName,
-            email,
-            password,
-            otp,
-            referalCode,
-            survey: surveyInputField,
-            terms,
-            role: "landlord"
-        });
-
-        await newLandlord.save();
-        return res.status(201).json({
-            message: "New Landlord created Successfully",
-            user: newLandlord
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Something went wrong", error: error.message });
-    }
-};
-
-//Signup Tenant
-export const signupTenant = async (req, res) => {
-    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
-
-    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
-        return res.status(400).json({message: "Kindly fill all fields required"})
-    }
-
-    //check if landlord exists in DB
-    const existingUser = await Tenant.findOne({email});
-    if (existingUser) {
-        return res.status(400).json({message: "Tenant already exist!! Please login"})
-    }
-
-    try {
-        const newTenant = new Tenant({
-            firstName,
-            lastName,
-            email,
-            password,
-            otp,
-            referalCode,
-            survey: surveyInputField,
-            terms,
-            role: "tenant"
-        });
-
-        await newTenant.save();
-        return res.status(201).json({
-            message: "New tenant created Successfully",
-            user: newTenant
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Something went wrong", error: error.message });
-    }
-};
-
-//login Landlord or Tenant
-export const loginUser = async (req, res) => {
-    const {firstName, LastName, Password, confirmPassword, surveyInputField, terms} = req.body;
-
-    if (!firstName || !LastName || !Password || !confirmPassword || surveyInputField || !terms) {
-        return res.status(400).json({message: "Kindly fill all fields required"})
-    }
-
-    //check if user exists in DB
-    const user = await User.findOne({firstName, LastName, Password, confirmPassword, surveyInputField, terms});
-    if (!user) {
-        return res.status(404).json({message: "User not found. Please signup"})
-    }
-
-    //Generate JWT token
-    const token = jwt.sign(
-        { _id: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
-    );
-
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    return res.status(200).json({
-        message: "User logged in successfully",
-        user,
-        token,
-    });
 };
 
 //Get one User
@@ -210,6 +99,41 @@ export const deleteUser = async (req, res) => {
             error: error.message
         });
     }
+};
+
+//login Landlord or Tenant
+export const loginUser = async (req, res) => {
+    const {firstName, LastName, Password, confirmPassword, surveyInputField, terms} = req.body;
+
+    if (!firstName || !LastName || !Password || !confirmPassword || surveyInputField || !terms) {
+        return res.status(400).json({message: "Kindly fill all fields required"})
+    }
+
+    //check if user exists in DB
+    const user = await User.findOne({firstName, LastName, Password, confirmPassword, surveyInputField, terms});
+    if (!user) {
+        return res.status(404).json({message: "User not found. Please signup"})
+    }
+
+    //Generate JWT token
+    const token = jwt.sign(
+        { _id: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.status(200).json({
+        message: "User logged in successfully",
+        user,
+        token,
+    });
 };
 
 //create Otp

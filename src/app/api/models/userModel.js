@@ -3,11 +3,13 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     residencyStatus: {
         type: String,
-        enum: ["Citizen", "Permanent Resident", "Work Permit", "Student Visa", "Visitors Visa"]
+        enum: ["Citizen", "Permanent Resident", "Work Permit", "Student Visa", "Visitors Visa"],
+        required: true
     },
     whoIsUsingPlatform: {
         type: String,
-        enum: ["Myself", "Someone else"]
+        enum: ["Myself", "Someone else"],
+        required: true
     },
     role: {
         type: String,

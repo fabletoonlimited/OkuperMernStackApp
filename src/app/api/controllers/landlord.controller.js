@@ -2,39 +2,77 @@ import Landlord from "../models/landlordModel.js";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
-export const createLandlord = async (req, res) => {
-    const {firstName, lastName, password, survey, agreement} = req.body
-    const email = req.verifiedEmail;
 
-    if (!firstName || !lastName || !email || !password || !survey || !agreement) {
-        return res.json ({message: "All fields required"})
+//Signup Landlord
+export const signupLandlord = async (req, res) => {
+    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
+
+    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
+        return res.status(400).json({message: "Kindly fill all fields required"})
     }
-        
+
+    //check if landlord exists in DB
+    const existingUser = await Landlord.findOne({email});
+    if (existingUser) {
+        return res.status(400).json({message: "Landlord already exist!! Please login"})
+    }
+
     try {
-        const existingLandlord = await Landlord.findOne({email});
-        if(existingLandlord) {
-            return res.status(400).json({message: "Landlord already exist, please sign in"})
+        const newLandlord = new Landlord({
+            firstName,
+            lastName,
+            email,
+            password,
+            otp,
+            referalCode,
+            survey: surveyInputField,
+            terms,
+            role: "landlord"
+        });
+
+        await newLandlord.save();
+
+        //send welcome email to landlord
+        try {
+            await resend.emails.send({
+                from: 'onboarding@resend.dev', // Use your verified domain
+                to: email,
+                subject: 'Welcome to Okuper!',
+                html: `
+                  <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h1 style="color: #003399;">Welcome to Okuper, ${firstName}!</h1>
+                    <p>Thank you for joining Okuper - your trusted platform for renting and buying homes directly.</p>
+                    <p>No agents. No hidden fees. Just verified people and real homes.</p>
+                    <br/>
+                    <p>Get started by:</p>
+                    <ul>
+                      <li>Completing your profile</li>
+                      <li>Listing your properties</li>
+                      <li>Managing tenant inquiries</li>
+                    </ul>
+                    <br/>
+                    <p>If you have any questions, feel free to contact our support team.</p>
+                    <br/>
+                    <p>Best regards,<br/>The Okuper Team</p>
+                  </div>
+                `,
+            });
         }
 
-        //Create Landlord
-        const newLandlord = new Landlord({
-            firstName, 
-            lastName, 
-            email, 
-            password, 
-            survey, 
-            agreement, 
-        })
+        catch (emailError) {
+            console.error("Failed to send welcome email:", emailError);
+        }
 
-        //Save Landlord to DB
-        const savedLandlord = await newLandlord.save();
-        const {password: _, ...landlordData} = savedLandlord._doc;
-        res.status(201).json(landlordData);
+        return res.status(201).json({
+            message: "New Landlord created Successfully",
+            user: newLandlord
+        });
+
     } catch (error) {
-        console.error("Error creating landlord:", error);
-        return res.status(500).json({message:"something went wrong"});
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong", error: error.message });
     }
-}
+};
 
 export const loginLandlord = async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect, use} from 'react'
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -62,7 +62,26 @@ const page = () => {
     const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = 'dfdzbuk0c';
     const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
+    const[backendUserData, setBackendUserData] = useState(null);
+        useEffect(() => {
+            const fetchUserData = async () => {
+                try {
+                    const response = await fetch('http://localhost:3001/api/user/getAllUsers', {
+                        credentials: 'include',
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const data = await response.json();
+                    setBackendUserData(data);
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
+            };
 
+            fetchUserData();
+        }, []);
 
   return (
     <>
