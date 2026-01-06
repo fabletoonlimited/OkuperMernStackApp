@@ -2,7 +2,7 @@
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar/index.js";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter/index.js";
 import React from 'react'
-import UploadSection from "../../components/uploadSection/index.js";
+import PropertyUploadLanding from "../../components/PropertyUploadLanding/index.js";
 
 const page = () => {
   return (
@@ -27,7 +27,7 @@ const page = () => {
                   Please use the form below to upload two FREE your property.
               </p>
           </div>
-          <UploadSection />
+          <PropertyUploadLanding />
           <LandlordDashboardFooter />
       </div>
   );

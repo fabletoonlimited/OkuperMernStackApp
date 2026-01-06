@@ -1,26 +1,27 @@
 // src/components/Banner.jsx or Banner.tsx
 import Image from "next/image";
 import Banner1 from "./Banner_2.png";
-import Model1 from "./bannerboy.png";
 import Icon from "../../../public/houseIcon.png";
 import homeIcon from "../../../public/Home_Icon.png"
 import userIcon from "../../../public/user.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadset, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
-// import { Link } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 function Banner() {
   const router = useRouter();
 
+  const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = 'dfdzbuk0c';
+  const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+
   return (
     <div className="relative w-full md:bg-transparent bg-white px-10 md:px-0 mb-10 md:mb-8 z-10">
       {/* Model Image */}
       <div className="absolute bottom-45 left-[33%] transform -translate-x-1/2 z-30 hidden md:block">
-        <Image
-          src={Model1}
+        <img
+          src= {BASE_URL + '/bannerboy_eygggt'}
           alt="bannerModel"
           className="h-[537px] w-auto object-contain"
         />
@@ -28,8 +29,8 @@ function Banner() {
 
       <div className="relative w-full min-h-[470px] md:h-[480px] ">
         {/* Background Image */}
-        <Image
-          src={Banner1}
+        <img
+          src={BASE_URL + '/Banner_2_o4ie3w'}
           alt="Banner1"
           fill
           className="object-cover"

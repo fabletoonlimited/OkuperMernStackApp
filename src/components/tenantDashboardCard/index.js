@@ -13,7 +13,7 @@ const index = () => {
         >
             <h4 className='font-black md:text-2xl text-xl md:leading-7 mb-3'>Your profile</h4>
               <p className='md:text-justify'>Your profile information is 50% complete</p>
-            <Link href="./" className='bg-blue-900 rounded-xl md:p-2 p-3  text-white text-sm'>
+            <Link href="/verification" className='bg-blue-900 rounded-xl md:p-2 p-3  text-white text-sm'>
               <button className='md:p-8 md:m-0 mt-4 cursor-pointer'>Update Your profile </button>
             </Link>
                         

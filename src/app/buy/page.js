@@ -1,12 +1,9 @@
-import Footer from '@/components/footer';
-import Nav from '../../components/nav'
+import React from "react";
 
 function Buy() {
     return(
         <div>
-            <Nav />
             test 
-            <Footer />
         </div>
     );
 };

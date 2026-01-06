@@ -11,15 +11,15 @@ function FilterNavbarIndex() {
   const [query, setQuery] = useState("");
 
   const inputStyle =
-    "w-40 h-10 border rounded-lg px-3 text-white outline-none focus:ring-2 focus:ring-blue-500";
+    "w-40 h-10 border rounded-lg px-3 text-blue-900 bg-white outline-none focus:ring-2 focus:ring-blue-500";
   
   const inputStyle2 =
-    "w-40 h-10 rounded-lg px-3 text-blue-800 outline-none focus:ring-2 focus:ring-blue-500";
+    "w-40 h-10 rounded-lg px-3 text-blue-800 outline-none bg-white focus:ring-2 focus:ring-blue-500";
 
   return (
     <>
       {/* 🔵 Filters Section */}
-      <div className="w-full bg-blue-900 text-white px-13 py-6">
+      <div className="md:w-full w-full bg-blue-900 text-white px-13 py-6">
         <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-28 flex-wrap">
           {/* Search Input */}
           <div>
@@ -102,8 +102,8 @@ function FilterNavbarIndex() {
       {/* 🟡 Sort Outside Blue Box */}
       <div className="flex items-center mt-6 px-12 pb-2 text-md font-bold text-gray-700 justify-end">
         <div>
-          Sort{" "}
-          <select
+          Sort:{" "}
+          <select 
             value={sort}
             onChange={(e) => setSort(e.target.value)}
             className={inputStyle2}>

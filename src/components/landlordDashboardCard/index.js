@@ -17,7 +17,7 @@ const index = () => {
                       Your profile information is 50% complete
                   </p>
                   <Link
-                      href="./"
+                      href="/verification"
                       className="bg-blue-900 rounded-xl md:p-2 p-3  text-white ">
                       <button className="md:p-8 md:m-0 mt-3 text-sm  cursor-pointer">
                           Update Your profile{" "}

@@ -48,10 +48,10 @@ const index = () => {
                       Start uploading
                   </button>
                   {/* Modal Component */}
-                  <SubscriptionModal2
-                      isOpen={isOpen}
-                      onClose={() => setIsOpen(false)}
-                  />
+                    <SubscriptionModal2
+                        isOpen={isOpen}
+                        onClose={() => setIsOpen(false)}
+                    />
               </div>
           </div>
       </div>

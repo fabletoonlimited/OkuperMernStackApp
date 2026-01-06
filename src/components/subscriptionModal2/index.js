@@ -25,8 +25,8 @@ const index = ({ isOpen, onClose }) => {
                   <h2>Error</h2>
                   <p className="text-sm">You are on a free subscription</p>
                   <p>
-                      Please upgrade your plan to a premium plan to view your
-                      profile
+                      Please upgrade your plan to a premium plan to
+                      upload more properties.
                   </p> 
                   <div className="rounded-2">
                       <button className="bg-blue-700 p-4 cursor-pointer">Subscibe Now</button>
