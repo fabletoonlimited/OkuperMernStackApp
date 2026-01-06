@@ -1,27 +1,26 @@
 import mongoose from "mongoose";
 
-const otpSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true,
+const otpSchema = new mongoose.Schema(
+  {
+    verifyOtp: { type: String, default: "" },
+    verifyOtpExpireAt: { type: Number, default: 0 },
+    isAccountVerified: { type: Boolean, default: false },
+    resetOtp: { type: String, default: "" },
+    resetOtpExpireAt: { type: Number, default: 0 },
+
+    tenant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tenant",
+      required: false,
     },
-
-    otp: {
-        type: String,
-        required: true,
+    landlord: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Landlord",
+      required: false,
     },
-
-    createdAt: {
-        type: Date,
-        default: Date.now,
-        expires: 300,
-    },
-
-    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: false},
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: false},
-
-}, {timestamps: true} 
+  },
+  { timestamps: true }
 );
-   
+
 const Otp = mongoose.model("Otp", otpSchema);
 export default Otp;

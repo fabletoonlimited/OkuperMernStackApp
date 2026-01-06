@@ -7,11 +7,10 @@ const landlordSchema = new mongoose.Schema({
     lastName: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
-    otp: {type: String, required: true},
     referalCode: {type: String, required: false},
     survey: {type: String},
     terms: {type: Boolean, required: false},
-    forgotPasswordToken: {type: String},
+    // forgotPasswordToken: {type: String},
 
     role: {
         type: String, 
