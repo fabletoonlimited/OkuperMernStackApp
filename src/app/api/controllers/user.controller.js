@@ -6,21 +6,21 @@ import Otp from "../models/otpModel.js";
 
 //Create User
 export const createUser = async (req, res) => {
-    const {selection1, selection2, role} = req.body;
+    const {residencyStatus, whoIsUsingPlatform, role} = req.body;
 
-    if (!selection1 || !selection2 || !role) {
+    if (!residencyStatus || !whoIsUsingPlatform || !role) {
         return res.status(400).json({message: "Kindly select all fields required"})
     }
 
     //check if user exists in DB
-    const existingUser = await User.findOne({selection1, selection2, role});
+    const existingUser = await User.findOne({residencyStatus, whoIsUsingPlatform, role});
     if (existingUser) {
         return res.status(400).json({message: "User already exist!!"})
     }
     try {
         const newUser = new User({
-        selection1,
-        selection2,
+        residencyStatus, 
+        whoIsUsingPlatform, 
         role
     }); 
     
@@ -134,6 +134,13 @@ export const loginUser = async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
     );
+
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     return res.status(200).json({
         message: "User logged in successfully",
