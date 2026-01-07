@@ -2,6 +2,7 @@ import { Link } from 'lucide-react'
 import React from 'react'
 
 const index = () => {
+    
   return (
     <div className='otp-form'>
         <div className='header-form'>
