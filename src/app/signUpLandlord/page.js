@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import OtpModal from "@/components/otpLandlord";
+import OtpLandlord from "@/components/otpLandlord";
 
 const page = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +11,7 @@ const page = () => {
     password: "",
     survey: "",
   });
-  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showOtpLandlord, setShowOtpLandlord ] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleInputChange = (e) => {
@@ -39,7 +39,7 @@ const page = () => {
 
       if (response.ok) {
         // Show OTP modal
-        setShowOtpModal(true);
+        setShowOtpLandlord (true);
       } else {
         alert("Failed to send OTP. Please try again.");
       }
@@ -189,9 +189,9 @@ const page = () => {
         </div>
 
         {/* OTP Modal */}
-        <OtpModal
-          isOpen={showOtpModal}
-          onClose={() => setShowOtpModal(false)}
+        <OtpLandlord 
+          isOpen={showOtpLandlord }
+          onClose={() => setShowOtpLandlord (false)}
           email={formData.email}
           onVerify={handleOtpVerification}
         />

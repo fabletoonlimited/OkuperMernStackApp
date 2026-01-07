@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import OtpModal from "@/components/otpLandlord";
+import OtpTenant from "@/components/otpTenant";
 
 const page = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +12,7 @@ const page = () => {
     password: "",
     survey: "",
   });
-  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showOtpTenant, setShowOtpTenant] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleInputChange = (e) => {
@@ -40,7 +40,7 @@ const page = () => {
 
       if (response.ok) {
         // Show OTP modal
-        setShowOtpModal(true);
+        setShowOtpTenant(true);
       } else {
         alert("Failed to send OTP. Please try again.");
       }
@@ -190,9 +190,9 @@ const page = () => {
         </div>
 
         {/* OTP Modal */}
-        <OtpModal
-          isOpen={showOtpModal}
-          onClose={() => setShowOtpModal(false)}
+        <OtpTenant
+          isOpen={showOtpTenant}
+          onClose={() => setShowOtpTenant(false)}
           email={formData.email}
           onVerify={handleOtpVerification}
         />
