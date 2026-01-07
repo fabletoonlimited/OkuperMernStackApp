@@ -27,8 +27,8 @@ const page = () => {
                     marginTop: '20px',
                     marginLeft: '50px',
                     paddingBottom: '80px'
-                    }}
-            >
+                    }}>
+
                     {/*First Name*/}
                     <p style={{paddingTop: 40, marginBottom: 30}}>First Name</p>  
                     <input 

@@ -66,9 +66,9 @@ const page = () => {
         useEffect(() => {
             const fetchUserData = async () => {
                 try {
-                    const response = await fetch('http://localhost:3001/api/user/getAllUsers', {
+                    const response = await fetch('http://localhost:5001/api/user/', {
                         credentials: 'include',
-                        method: 'GET',
+                        method: 'Post',
                         headers: {
                             'Content-Type': 'application/json',
                         },
