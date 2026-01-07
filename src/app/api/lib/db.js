@@ -1,16 +1,27 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const connectDB = async () => {
-    if (mongoose.connection.readyState >=1) {
-        console.log('Already connected to DB');
-        return;
-        }
-    try {
-    await mongoose.connect(process.env.MONGO_URL);
-    console.log('Connected to Database');
-  } catch (error) {
-    console.log('Error connecting to DB:', error);
+const MONGO_URL = process.env.MONGO_URL;
+
+if (!MONGO_URL) {
+  throw new Error("MONGO_URL not defined");
+}
+
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+export async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGO_URL).then((mongoose) => {
+      console.log("✅ MongoDB connected");
+      return mongoose;
+    });
   }
-};
 
-export default connectDB;
+  cached.conn = await cached.promise;
+  return cached.conn;
+}

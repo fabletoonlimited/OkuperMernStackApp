@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js"
 import Landlord from "../models/landlordModel.js";
@@ -7,17 +8,17 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Create User
-export const createUser = async (req, res) => {
+export const createUser = async (req) => {
     const {residencyStatus, whoIsUsingPlatform, role} = req.body;
 
     if (!residencyStatus || !whoIsUsingPlatform || !role) {
-        return res.status(400).json({message: "Kindly select all fields required"})
+        return res.NextResponse.json({message: "Kindly select all fields required"})
     }
 
     //check if user exists in DB
     const existingUser = await User.findOne({residencyStatus, whoIsUsingPlatform, role});
     if (existingUser) {
-        return res.status(400).json({message: "User already exist!!"})
+        return res.NextResponse.json({message: "User already exist!!"})
     }
     try {
         const newUser = new User({

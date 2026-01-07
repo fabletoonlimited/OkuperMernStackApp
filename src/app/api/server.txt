@@ -1,5 +1,5 @@
-import express from "express";
-import tenant from "./tenant/route.js"
+// import express from "express";
+import tenant from "./tenant/route.js";
 import landlord from "../api/landlord/route.js";
 import admin from "../api/admin/route.js"
 import user from "../api/user/route.js"

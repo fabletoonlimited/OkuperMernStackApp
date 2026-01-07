@@ -1,8 +1,17 @@
-import express from "express"
-import { requestOtp } from "../controllers/otpController.js"
+import { requestOtp, verifyOtp } from "../controllers/otpController.js"
+import { NextResponse } from "next/server";
 
-const route = express.Router()
+export async function POST(req) {
+    const { searchParams } = new URL(req.url);
+    const action = searchParams.get("action");
 
-route.post("/request-otp", requestOtp);
-
-export default route
+    if (action === "requestOtp") {
+        return requestOtp(req);
+    } else if (action === "verifyOtp") {
+        return verifyOtp(req);
+    } else {
+        return NextResponse.json(
+            { message: "Invalid action" }, 
+            { status: 400 });
+    }
+}

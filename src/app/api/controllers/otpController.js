@@ -1,15 +1,16 @@
 // otpController.js
+import { NextResponse } from "next/server";
 import Otp from "../models/otpModel.js";
 import { Resend } from "resend";
 
 //1====================CreateOTP=========================//
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const requestOtp = async (req, res) => {
+export const requestOtp = async (req) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.status(400).json({ message: "Email required" });
+    return NextResponse.json({ message: "Email required" });
   }
 
   try {
@@ -44,13 +45,13 @@ export const verifyOtp = async (req, res, next) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
-    return res.status(400).json({ message: "Email and OTP required" });
+    return NextResponse.json({ message: "Email and OTP required" });
   }
 
   try {
     const otpRecord = await Otp.findOne({ email, otp });
     if (!otpRecord) {
-      return res.status(400).json({ error: "Invalid or expired OTP" });
+      return NextResponse.json({ error: "Invalid or expired OTP" });
     }
 
     // Success → delete OTP so it can’t be reused
