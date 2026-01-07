@@ -2,7 +2,7 @@ import { Link } from 'lucide-react'
 import React from 'react'
 
 const index = () => {
-    
+
   return (
     <div className='otp-form'>
         <div className='header-form'>
@@ -12,12 +12,12 @@ const index = () => {
 
         <form action={"javascript:void(0)"}>
             <div clas="otp-input-wrap">
-                <input type="text" class = "code-input" required=""  />
-                <input type="text" class = "code-input" required=""  />
-                <input type="text" class = "code-input" required=""  />
-                <input type="text" class = "code-input" required=""  />
-                <input type="text" class = "code-input" required=""  />
-                <input type="text" class = "code-input" required=""  />
+                <input type="text" class = "code-input" required="" maxLength={1}  />
+                <input type="text" class = "code-input" required=""  maxLength={1} />
+                <input type="text" class = "code-input" required=""  maxLength={1}/>
+                <input type="text" class = "code-input" required=""  maxLength={1} />
+                <input type="text" class = "code-input" required=""  maxLength={1} />
+                <input type="text" class = "code-input" required=""  maxLength={1} />
             </div>
         </form>
         <Link href="/signUpLandlord" className="mb-4 text-blue-700 underline">
