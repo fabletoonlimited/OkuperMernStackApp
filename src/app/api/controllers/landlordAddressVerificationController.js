@@ -1,5 +1,5 @@
 import AddressVerification from "../models/addressVerification.js";
-import { streamUpload } from "../lib/streamUpload.js";
+import { streamUpload } from "../../lib/streamUpload.js";
 
 // Create a new address with utility bill
 export const createAddress = async (req, res) => {
