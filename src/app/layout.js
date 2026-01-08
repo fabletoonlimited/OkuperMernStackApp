@@ -6,6 +6,8 @@ import "./Homepage.css"
 import Nav from "../components/nav"
 import Footer from "../components/footer"
 import { Geist, Geist_Mono } from "next/font/google";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +34,16 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {!shouldHideLayout && <Nav />}
         {children}
+
+        {/* Toast container */}
+        <ToastContainer
+        position="top-center"
+        autoClose={4000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        />
         {!shouldHideLayout && <Footer />}
       </body>
     </html>

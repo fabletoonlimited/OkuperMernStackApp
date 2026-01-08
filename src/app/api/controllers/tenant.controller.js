@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken"
 export const signupTenant = async (req, res) => {
     const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
 
-    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
+    if (!firstName || !lastName || !email || !password || !surveyInputField || !terms) {
         return res.status(400).json({message: "Kindly fill all fields required"})
     }
 

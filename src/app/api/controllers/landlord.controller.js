@@ -5,34 +5,47 @@ import jwt from "jsonwebtoken"
 
 //Signup Landlord
 export const signupLandlord = async (req, res) => {
-    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
+    const {firstName, lastName, email, password, referalCode, surveyInputField, terms} = req.body;
 
-    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
-        return res.status(400).json({message: "Kindly fill all fields required"})
+    if (!firstName || !lastName || !email || !password || !surveyInputField || terms !== true) {
+        return res.status(400).json({message: "Please fill all required fields and accept terms"})
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (password.length < 8) {
+        return res.status(400).json({
+            message: "Password must be at least 8 characters"
+        })
     }
 
     //check if landlord exists in DB
-    const existingUser = await Landlord.findOne({email});
+    const existingUser = await Landlord.findOne({trimmedEmail});
     if (existingUser) {
         return res.status(400).json({message: "Landlord already exist!! Please login"})
     }
+
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000);
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
     try {
         const newLandlord = new Landlord({
             firstName,
             lastName,
-            email,
+            email: trimmedEmail,
             password,
-            otp,
             referalCode,
             survey: surveyInputField,
             terms,
+            otp: {code: otpCode, expiresAt: otpExpiry},
+            isVerified: false,
             role: "landlord"
         });
 
         await newLandlord.save();
 
-        //send welcome email to landlord
+        //send welcome email and otp to landlord
         try {
             await resend.emails.send({
                 from: 'onboarding@resend.dev', // Use your verified domain

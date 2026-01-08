@@ -18,9 +18,6 @@ const otpSchema = new mongoose.Schema(
       ref: "Landlord",
       required: false,
     },
-    
-    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: false},
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: false},
   },
   { timestamps: true }
 );

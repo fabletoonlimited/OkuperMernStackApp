@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 
@@ -11,7 +12,7 @@ const page = () => {
     password: "",
     survey: "",
   });
-  const [showOtpLandlord, setShowOtpLandlord ] = useState(false);
+  const [showOtpLandlord, setShowOtpLandlord] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleInputChange = (e) => {
@@ -23,9 +24,20 @@ const page = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+// Added form validation for user to fill all required fields
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.survey
+    ) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
     if (!termsAccepted) {
-      alert("Please accept the terms and conditions");
+      toast.error("Please accept the terms and conditions");
       return;
     }
 
@@ -39,7 +51,7 @@ const page = () => {
 
       if (response.ok) {
         // Show OTP modal
-        setShowOtpLandlord (true);
+        setShowOtpLandlord(true);
       } else {
         alert("Failed to send OTP. Please try again.");
       }
@@ -189,9 +201,9 @@ const page = () => {
         </div>
 
         {/* OTP Modal */}
-        <OtpLandlord 
-          isOpen={showOtpLandlord }
-          onClose={() => setShowOtpLandlord (false)}
+        <OtpLandlord
+          isOpen={showOtpLandlord}
+          onClose={() => setShowOtpLandlord(false)}
           email={formData.email}
           onVerify={handleOtpVerification}
         />
