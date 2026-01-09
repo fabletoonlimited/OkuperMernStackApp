@@ -27,6 +27,9 @@ const otpSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+otpSchema.index({ user: 1, purpose: 1, used: 1}, { unique: true, partialFilterExpression: { used: false } });
+otpSchema.index({ expiresAt: 1}, { expireAfterSeconds: 0});
+
 const Otp = mongoose.models.Otp || mongoose.model("Otp", otpSchema);
 export default Otp;
 
@@ -40,6 +43,9 @@ export default Otp;
  * User submits OTP - Verify it using OTP model
  * Mark OTP as 'used: true' and activate user
  * 
- * Purpose handles both verifyOtp and resetOtp
- * Used keeps track of used OTPs
+ * Purpose handles both verifyAccount Otp and resePassword otp
+ * Used keeps track of used OTPs - Osita said it good for auditing and security
+ * 
+ * The indexes prevent creating multiple active OTPs for the same user.
+ * The expireAfterSeconds: 0 automatically deletes expired OTPs
  */

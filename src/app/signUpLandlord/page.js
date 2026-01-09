@@ -41,6 +41,23 @@ const page = () => {
       return;
     }
 
+    if (!email.includes("@")) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    // Send OTP
+    try {
+      const response = awa
+    } catch (error) {
+      
+    }
+
     const response = await fetch("/api/landlord", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
