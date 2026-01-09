@@ -41,42 +41,50 @@ const page = () => {
       return;
     }
 
-    try {
-      // Send OTP to user's email
-      const response = await fetch("/api/otp/request-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
-      });
+    const response = await fetch("/api/landlord", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
 
-      if (response.ok) {
-        // Show OTP modal
-        setShowOtpLandlord(true);
-      } else {
-        alert("Failed to send OTP. Please try again.");
+    const data = await response.json();
+
+    // try {
+    //   // Send OTP to user's email
+    //   const response = await fetch("/api/otp?action=requestOtp", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ email: formData.email }),
+    //   });
+
+      if (!response.ok) {
+        alert(data.message);
+        return;
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again.");
-    }
+
+      setShowOtpLandlord(true);
+        
   };
 
-  const handleOtpVerification = async () => {
+  const handleOtpVerification = async (otp) => {
     // After OTP is verified, create the user account
-    try {
-      const response = await fetch("/api/landlord", {
+      const response = await fetch("/api/otp?action=verifyOtp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          email: formData.email,
+        }),
       });
 
-      if (response.ok) {
-        // Redirect to sign in or dashboard
-        window.location.href = "/signInLandlord";
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message)
+        return;
       }
-    } catch (error) {
-      console.error("Error creating account:", error);
-    }
+
+      // Redirect to sign in or dashboard
+      window.location.href = "/signInLandlord";
   };
 
   return (

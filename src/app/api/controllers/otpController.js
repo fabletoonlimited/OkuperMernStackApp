@@ -7,10 +7,12 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const requestOtp = async (req) => {
-  const { email } = req.body;
+  const { email, userId, userType } = await req.json();
 
-  if (!email) {
-    return NextResponse.json({ message: "Email required" });
+  if (!email || !userId || !userType) {
+    return NextResponse.json({
+      message: "Email, userId and userType required",
+    });
   }
 
   try {
@@ -18,52 +20,79 @@ export const requestOtp = async (req) => {
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Save OTP in DB (auto-expire in 5 mins via your schema)
-    await Otp.create({ email, otp: otpCode });
-
-    // Send OTP via Resend
-    const { data, error } = await resend.emails.send({
-      from: process.env.SEND_OTP_FROM, 
-      to: email,
-      subject: "Your OTP Code",
-      html: `Your OTP code is <strong>${otpCode}</strong>. It expires in 5 minutes.`
+    await Otp.create({
+      code: otpCode,
+      purpose: "verifyAccount",
+      userType,
+      user: userId,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      used: false,
     });
 
-    if (error) {
-      console.error("Resend send email error:", error);
-      return res.status(500).json({ message: "Failed to send OTP email" });
-    }
+    // Send OTP via Resend
+    await resend.emails.send({
+      from: process.env.SEND_OTP_FROM,
+      to: email,
+      subject: "Your OTP Code",
+      html: `Your OTP code is <strong>${otpCode}</strong>. It expires in 5 minutes.`,
+    });
 
-    res.status(200).json({ message: "OTP sent successfully" });
+    return NextResponse.json(
+      { message: "OTP sent successfully" },
+      { status: 200 }
+    );
+
+    // if (error) {
+    //   console.error("Resend send email error:", error);
+    //   return res.status(500).json({ message: "Failed to send OTP email" });
+    // }
+
+    // res.status(200).json({ message: "OTP sent successfully" });
   } catch (err) {
     console.error("OTP request error:", err);
-    res.status(500).json({ message: "Server error" });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 };
 
 //2====================VerifyOTP=========================//
-export const verifyOtp = async (req, res, next) => {
-  const { email, otp } = req.body;
+export const verifyOtp = async (req) => {
+  const { userId, userType, code } = await req.json();
 
-  if (!email || !otp) {
-    return NextResponse.json({ message: "Email and OTP required" });
+  if (!userId || !userType || !code) {
+    return NextResponse.json(
+      { message: "UserId, userType, and OTP required" },
+      { status: 400 }
+    );
   }
 
   try {
-    const otpRecord = await Otp.findOne({ email, otp });
+    const otpRecord = await Otp.findOne({
+      user: userId,
+      userType,
+      code,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    });
     if (!otpRecord) {
-      return NextResponse.json({ error: "Invalid or expired OTP" });
+      return NextResponse.json({ error: "Invalid or expired OTP" }, { status: 400 });
     }
 
-    // Success → delete OTP so it can’t be reused
-    await Otp.deleteOne({ _id: otpRecord._id });
+    // // Success → delete OTP so it can’t be reused
+    // await Otp.deleteOne({ _id: otpRecord._id });
 
-    // Attach verified email to request for next controller
-    req.verifiedEmail = email;
+    // Mark as used
+    otpRecord.used = true;
+    await otpRecord.save();
 
-    // Continue to createLandlord
-    next();
+    return NextResponse.json({ message: 'OTP verified successfully' }, { status: 200 })
+
+    // // Attach verified email to request for next controller
+    // req.verifiedEmail = email;
+
+    // // Continue to createLandlord
+    // next();
   } catch (error) {
     console.error("OTP verification error:", error);
-    res.status(500).json({ message: "Server error" });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 };

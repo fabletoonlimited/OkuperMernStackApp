@@ -2,6 +2,7 @@
 import React, { useState, useEffect} from 'react'
 import Link from 'next/link';
 import { href } from 'react-router-dom';
+import OtpLandlord from "@/components/otpLandlord"
 
        
 
