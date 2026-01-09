@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-/* ===============================
-   CONFIG
-================================ */
 const PUBLIC_ROUTES = [
+   "/api/user",
     "/api/admin/login",
     "/api/admin/signup",
-    "/api/user",
     "/api/tenant/signup",
     "/api/tenant/login",
     "/api/landlord/signup",
@@ -17,7 +14,7 @@ const PUBLIC_ROUTES = [
 ];
 
 const ALLOWED_ORIGINS = [
-  "http://localhost:5001",
+  "http://localhost:3000",
   "https://okuper.onrender.app",
 ];
 
@@ -26,20 +23,20 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 /* ===============================
    MIDDLEWARE
 ================================ */
+
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
+
+  // Make sure origin is declared!
   const origin = req.headers.get("origin");
 
-  /* -------- LOGGING -------- */
-  console.log(
-    `[${new Date().toISOString()}] ${req.method} ${pathname}`
-  );
-
-  /* -------- CORS -------- */
   const res = NextResponse.next();
 
-  if (ALLOWED_ORIGINS.includes(origin)) {
+  // CORS
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
     res.headers.set("Access-Control-Allow-Origin", origin);
+  } else {
+    res.headers.set("Access-Control-Allow-Origin", "*");
   }
 
   res.headers.set("Access-Control-Allow-Credentials", "true");
@@ -53,7 +50,7 @@ export async function middleware(req) {
   );
 
   if (req.method === "OPTIONS") {
-    return new NextResponse(null, { status: 204, headers: res.headers });
+    return res;
   }
 
   /* -------- AUTH -------- */

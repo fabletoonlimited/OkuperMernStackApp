@@ -18,8 +18,6 @@ const page = () => {
     }
     }, [selectResidencyStatus]);
 
-
-
     const residencyStatus = {
         selectOne: "Select One",
         citizen: "Citizen",
@@ -37,7 +35,7 @@ const page = () => {
 
     const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
     const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
-    const [errorWhoIsUsingPlatform, setErrorWhoisUsingPaltform] = useState(null);
+    const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
 
     useEffect(() => {
     if (!selectWhoIsUsingPlatform || selectWhoIsUsingPlatform === "selectOne") {
@@ -50,7 +48,7 @@ const page = () => {
 
     const whoIsUsingPlatform = {
         myself: "myself",
-        someoneElse: "someone Else"
+        someoneElse: "someoneElse"
     };
 
     const enumWhoIsUsingPlatformValues = ["myself", "someoneElse"];
@@ -70,10 +68,10 @@ const page = () => {
         return;
     }
 
-  if (!selectWhoIsUsingPlatform) {
-    toast.error("Please select who is using the platform");
-    return;
-  }
+    if (!selectWhoIsUsingPlatform) {
+        toast.error("Please select who is using the platform");
+        return;
+    }
 
         const residencyMap = {
             citizen: "Citizen",
@@ -93,8 +91,13 @@ const page = () => {
             }),
         });
 
-        const data = await response.json();
-
+        let data;
+        try { 
+            data = await response.json();
+        } catch (error) {
+            throw new Error("server error: Please try again later");
+        }
+        
         if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
         }
@@ -114,14 +117,13 @@ const page = () => {
     }
 };
 
-
   return (
     <>
         <h1 className='font-bold text-4xl' style={{paddingLeft: 50, marginTop: 70}}>Sign Up</h1>
 
         {/*Residency Status*/}
         <div className='signUpLoandingContainer md:flex-col col mt-10 mb-10'>
-              <ToastContainer position="top-right" autoClose={3000} />
+              <ToastContainer position="top-center" autoClose={3000} />
 
             <div className='residencyStatusSection text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10' 
                 style={{ 
@@ -185,11 +187,11 @@ const page = () => {
 
                         <button 
                             className= {`rounded-lg md:p-5 p-2 md:px-7 px-0 border-2 md:w-74 w-55 text-2xl text-center cursor-pointer '
-                                ${selectWhoIsUsingPlatform === 'someone else' 
+                                ${selectWhoIsUsingPlatform === 'someoneElse' 
                                 ? ' text-blue-950 border-blue-950 bg-blue-400' 
                                 : 'text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white'
                             }`}
-                            onClick={() => setSelectWhoIsUsingPlatform('someone else')}> 
+                            onClick={() => setSelectWhoIsUsingPlatform('someoneElse')}> 
                             Someone Else 
                         </button>
                     </>
@@ -202,7 +204,7 @@ const page = () => {
                 </div>
                 
                 {/*SignUpAs*/}
-                <div className='whoIsUsingThePlatform mt-10 md:mb-50 mb-30 md:mr:20 ml-12 md:ml:20 md:flex-row flex-col' style={{ display: 'flex', gap: '20px' }}>
+                <div className='whoIsUsingPlatform mt-10 md:mb-50 mb-30 md:mr:20 ml-12 md:ml:20 md:flex-row flex-col' style={{ display: 'flex', gap: '20px' }}>
                     <button 
                         onClick={() => createUser("tenant")}
                         className='signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:w-60 border-1px solid #ccc text-2xl text-center cursor-pointer'> 
