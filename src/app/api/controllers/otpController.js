@@ -1,69 +1,98 @@
-// otpController.js
-import { NextResponse } from "next/server";
-import Otp from "../models/otpModel.js";
+import Otp from "@/app/api/models/otpModel.js";
+import Landlord from "@/app/models/landlordModel.js";
+import Tenant from "@/app/models/tenantModel.js";
 import { Resend } from "resend";
+
 
 //1====================CreateOTP=========================//
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const requestOtp = async (req) => {
-  const { email } = req.body;
+export async function createOtpController (data) {
+  const { email } = data;
 
   if (!email) {
-    return NextResponse.json({ message: "Email required" });
+    throw new Error ( "Email required" );
   }
 
-  try {
+ //Existing Email
+    const existingTenant = await Tenant.findOne({email});
+    const Landlord = await Landlord.findOne({email});
+
+    if (existingTenant || existingLandlord) {
+      return {
+        exists: "true",
+        message: "Email already exists",
+      };
+    }
+
+    //Remove previous OTP for this email
+    await Otp.deleteMany({ email });
+
     // Generate random 6-digit OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save OTP in DB (auto-expire in 5 mins via your schema)
-    await Otp.create({ email, otp: otpCode });
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
-    // Send OTP via Resend
-    const { data, error } = await resend.emails.send({
+    const newOtp = new Otp({
+      email,
+      otp: otpCode,
+      expiresAt,
+    });
+
+    await newOtp.save();
+
+  // Send OTP via Resend
+    const { error } = await resend.emails.send({
       from: process.env.SEND_OTP_FROM, 
       to: email,
       subject: "Your OTP Code",
-      html: `Your OTP code is <strong>${otpCode}</strong>. It expires in 5 minutes.`
-    });
+      html: 
+        `
+        <p>Your OTP code is <strong>${otpCode}</strong>.<p>
+        <p>It expires in 5 minutes.<p>
+        <p>Warm Regards, <br/>Okuper Technologies Limited</p>
+        `
+      });
 
     if (error) {
-      console.error("Resend send email error:", error);
-      return res.status(500).json({ message: "Failed to send OTP email" });
+     throw new Error("Resend send email error")
     }
 
-    res.status(200).json({ message: "OTP sent successfully" });
-  } catch (err) {
-    console.error("OTP request error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+    return {
+      success: true,
+      message: "OTP sent successfully"
+    };
+  };
+
 
 //2====================VerifyOTP=========================//
-export const verifyOtp = async (req, res, next) => {
-  const { email, otp } = req.body;
+export async function verifyOtpController(data) {
+  const { email, otp } = data;
 
   if (!email || !otp) {
-    return NextResponse.json({ message: "Email and OTP required" });
+    throw new Error("Email and OTP are required");
   }
 
-  try {
-    const otpRecord = await Otp.findOne({ email, otp });
-    if (!otpRecord) {
-      return NextResponse.json({ error: "Invalid or expired OTP" });
-    }
+  const otpRecord = await Otp.findOne({ email, otp });
 
-    // Success → delete OTP so it can’t be reused
+  if (!otpRecord) {
+    throw new Error("Invalid or expired OTP");
+  }
+
+  // Optional expiry check
+  if (otpRecord.expiresAt && otpRecord.expiresAt < new Date()) {
     await Otp.deleteOne({ _id: otpRecord._id });
-
-    // Attach verified email to request for next controller
-    req.verifiedEmail = email;
-
-    // Continue to createLandlord
-    next();
-  } catch (error) {
-    console.error("OTP verification error:", error);
-    res.status(500).json({ message: "Server error" });
+    throw new Error("OTP has expired");
   }
-};
+
+  // OTP is valid → delete it
+  await Otp.deleteOne({ _id: otpRecord._id });
+
+  // Return verified data
+  return {
+    success: true,
+    email,
+  };
+}
+
+

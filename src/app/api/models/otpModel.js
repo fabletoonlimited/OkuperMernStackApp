@@ -1,29 +1,25 @@
-import mongoose from "mongoose";
+import {mongoose} from "@/app/lib/mongoose";
 
 const otpSchema = new mongoose.Schema(
   {
-    verifyOtp: { type: String, default: "" },
-    verifyOtpExpireAt: { type: Number, default: 0 },
-    isAccountVerified: { type: Boolean, default: false },
-    resetOtp: { type: String, default: "" },
-    resetOtpExpireAt: { type: Number, default: 0 },
+    email: {
+      type: String,
+      required: true
+    },
+    otp: {
+      type: String,
+      required: true
+    },
+    expiresAt: {
+      type: Date,
+      required: true
+    },
 
-    tenant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Tenant",
-      required: false,
-    },
-    landlord: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Landlord",
-      required: false,
-    },
-    
-    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: false},
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: false},
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"},
+    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord"},
   },
-  { timestamps: true }
+  
+  { timestamps: true }, otpSchema.index({expiresAt: 1}, { expiresAfterSeconds: 0})
 );
 
-const Otp = mongoose.model("Otp", otpSchema);
-export default Otp;
+export default mongoose.models.Otp || mongoose.model("Otp", otpSchema);

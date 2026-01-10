@@ -1,10 +1,13 @@
 "use client";
 import React, { useState, useEffect} from 'react'
+import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 
 const page = () => {
+    const router = useRouter()
+    
     const [selectResidencyStatus, setSelectResidencyStatus] = useState(null);
     const [showResidencyStatus, setShowResidencyStatus] = useState(false);
     const [error, setError] = useState(null);
@@ -17,6 +20,20 @@ const page = () => {
         setError(null);
     }
     }, [selectResidencyStatus]);
+
+       useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        const role = localStorage.getItem("role");
+
+        if (!userId || !role) return;
+
+        // Redirects
+        router.replace(
+        role === "tenant"
+            ? `/signUpTenant?userId=${userId}`
+            : `/signUpLandlord?userId=${userId}`
+        );
+    }, [router]);
 
     const residencyStatus = {
         selectOne: "Select One",
@@ -102,14 +119,27 @@ const page = () => {
         throw new Error(data.message || "Failed to create user");
         }
 
-        toast.success("User created successfully");
+        //Normalize response (New / Existing)
+        const userId = data.user?._id || data.userId;
+        const userRole = data.user?.role || data.role;
 
-        // Redirect after success
-        if (role === "tenant") {
-        window.location.href = `/signUpTenant?userId=${data.user._id}`;
-        } else {
-        window.location.href = `/signUpLandlord?userId=${data.user._id}`;
-        }
+        //Store for resume
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("role", userRole);
+
+
+        toast.success(
+            data.exists
+                ? "Welcome back! Resuming signup…"
+                : "User created successfully"
+        );
+
+    // ✅ Redirect
+    router.replace(
+      userRole === "tenant"
+        ? `/signUpTenant?userId=${userId}`
+        : `/signUpLandlord?userId=${userId}`
+    );
 
     } catch (err) {
         console.error(err);
