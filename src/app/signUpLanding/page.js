@@ -1,24 +1,39 @@
 "use client";
-import React, { useState, useEffect, use} from 'react'
-import Link from 'next/link';
-import Image from 'next/image';
+import React, { useState, useEffect} from 'react'
+import { useRouter } from 'next/navigation';
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+
 
 const page = () => {
+    const router = useRouter()
+    
     const [selectResidencyStatus, setSelectResidencyStatus] = useState(null);
     const [showResidencyStatus, setShowResidencyStatus] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // if (selectResidencyStatus && Array.isArray(selectResidencyStatus) &&selectResidencyStatus > 0) {
-    if (selectResidencyStatus && Array.isArray(selectResidencyStatus) && selectResidencyStatus.length !== 'selectOne') {
+    if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+        setShowResidencyStatus(true);
+    } else {
         setShowResidencyStatus(false);
-        setSelectResidencyStatus("selectOne");
-        setError('Please select a valid residency status.');
-        } else {
-            setShowResidencyStatus(true);
-        }
+        setError(null);
+    }
     }, [selectResidencyStatus]);
 
+       useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        const role = localStorage.getItem("role");
+
+        if (!userId || !role) return;
+
+        // Redirects
+        router.replace(
+        role === "tenant"
+            ? `/signUpTenant?userId=${userId}`
+            : `/signUpLandlord?userId=${userId}`
+        );
+    }, [router]);
 
     const residencyStatus = {
         selectOne: "Select One",
@@ -37,20 +52,20 @@ const page = () => {
 
     const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
     const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
-    const [errorWhoIsUsingPlatform, setErrorWhoisUsingPaltform] = useState(null);
+    const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
+
     useEffect(() => {
-    if (selectWhoIsUsingPlatform && Array.isArray(selectWhoIsUsingPlatform) && selectWhoIsUsingPlatform.length > 0) {
-        setSelectWhoIsUsingPlatform("");
+    if (!selectWhoIsUsingPlatform || selectWhoIsUsingPlatform === "selectOne") {
+        setShowWhoIsUsingPlatform(true);
+    } else {
         setShowWhoIsUsingPlatform(false);
-        setErrorWhoisUsingPaltform('Please select who is using the platform.');
-        } else {
-            setShowWhoIsUsingPlatform(true);
-        }
+        setError(null);
+    }
     }, [selectWhoIsUsingPlatform]);
 
     const whoIsUsingPlatform = {
-        myself: "Myself",
-        someoneElse: "Someone else"
+        myself: "myself",
+        someoneElse: "someoneElse"
     };
 
     const enumWhoIsUsingPlatformValues = ["myself", "someoneElse"];
@@ -62,26 +77,75 @@ const page = () => {
     const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = 'dfdzbuk0c';
     const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-    const[backendUserData, setBackendUserData] = useState(null);
-        useEffect(() => {
-            const fetchUserData = async () => {
-                try {
-                    const response = await fetch('http://localhost:5001/api/user/', {
-                        credentials: 'include',
-                        method: 'Post',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    const data = await response.json();
-                    setBackendUserData(data);
-                } catch (error) {
-                    console.error('Error fetching user data:', error);
-                }
-            };
 
-            fetchUserData();
-        }, []);
+    const createUser = async (role) => {
+    try {
+        if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+        toast.error("Please select your residency status");
+        return;
+    }
+
+    if (!selectWhoIsUsingPlatform) {
+        toast.error("Please select who is using the platform");
+        return;
+    }
+
+        const residencyMap = {
+            citizen: "Citizen",
+            permanentResident: "Permanent Resident",
+            workPermit: "Work Permit",
+            studentVisa: "Student Visa",
+            visitorVisa: "Visitor Visa",
+        };
+
+        const response = await fetch('/api/user', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            residencyStatus: residencyMap[selectResidencyStatus],
+            whoIsUsingPlatform: selectWhoIsUsingPlatform,
+            role, // "tenant" or "landlord"
+            }),
+        });
+
+        let data;
+        try { 
+            data = await response.json();
+        } catch (error) {
+            throw new Error("server error: Please try again later");
+        }
+        
+        if (!response.ok) {
+        throw new Error(data.message || "Failed to create user");
+        }
+
+        //Normalize response (New / Existing)
+        const userId = data.user?._id || data.userId;
+        const userRole = data.user?.role || data.role;
+
+        //Store for resume
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("role", userRole);
+
+
+        toast.success(
+            data.exists
+                ? "Welcome back! Resuming signup…"
+                : "User created successfully"
+        );
+
+    // ✅ Redirect
+    router.replace(
+      userRole === "tenant"
+        ? `/signUpTenant?userId=${userId}`
+        : `/signUpLandlord?userId=${userId}`
+    );
+
+    } catch (err) {
+        console.error(err);
+        toast.error(err.message);
+    }
+};
 
   return (
     <>
@@ -89,6 +153,8 @@ const page = () => {
 
         {/*Residency Status*/}
         <div className='signUpLoandingContainer md:flex-col col mt-10 mb-10'>
+              <ToastContainer position="top-center" autoClose={3000} />
+
             <div className='residencyStatusSection text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10' 
                 style={{ 
                     display: 'flex', 
@@ -133,51 +199,54 @@ const page = () => {
                     {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}   
                 </div>
                 {/*Who is Button*/}
-                    <div 
-                    className ='whoIsUsingThePlatform mt-10 mb-15 ml-12  md:pr-10 pr-10 md:items-center' 
+                <div 
+                    className ='whoIsUsingThePlatform mt-10 mb-15 ml-12 md:pr-10 pr-10 md:items-center' 
                     style={{ display: 'flex', gap: '20px' }}
-                    >
-                    {showWhoIsUsingPlatform && (
-                        <>
+                >
+                {showWhoIsUsingPlatform && (
+                    <>
                         <button 
                             className={`rounded-lg md:p-5 p-2 md:px-15 px-0 border-2 md:w-60 w-30 text-2xl text-center cursor-pointer 
-                                ${selectWhoIsUsingPlatform === 'Myself' 
+                                ${selectWhoIsUsingPlatform === 'myself' 
                                 ? 'text-blue-950 border-blue-950 bg-blue-400'
                                 : 'text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white'
                             }`}
-                            onClick={() => setSelectWhoIsUsingPlatform('Myself')}
-                        > 
+                            onClick={() => setSelectWhoIsUsingPlatform('myself')}> 
                             Myself 
                         </button>
 
                         <button 
                             className= {`rounded-lg md:p-5 p-2 md:px-7 px-0 border-2 md:w-74 w-55 text-2xl text-center cursor-pointer '
-                                ${selectWhoIsUsingPlatform === 'Someone else' 
+                                ${selectWhoIsUsingPlatform === 'someoneElse' 
                                 ? ' text-blue-950 border-blue-950 bg-blue-400' 
                                 : 'text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white'
                             }`}
-                            onClick={() => setSelectWhoIsUsingPlatform('Someone else')}
-                        > Someone else </button>
-                        </>
+                            onClick={() => setSelectWhoIsUsingPlatform('someoneElse')}> 
+                            Someone Else 
+                        </button>
+                    </>
                     )}
                     {errorWhoIsUsingPlatform && 
                         <p style={{ color: 'red', marginTop: '10px' }}>
                             {errorWhoIsUsingPlatform}
                         </p>
                     }   
-                    </div>
+                </div>
                 
-                    {/*SignUpAs*/}
-                    <div className='whoIsUsingThePlatform mt-10 md:mb-50 mb-30 md:mr:20 ml-12 md:ml:20 md:flex-row flex-col' style={{ display: 'flex', gap: '20px' }}>
-                    <Link href='/signUpTenant'>
-                        <button 
-                        className='signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:w-60 border-1px solid #ccc text-2xl text-center cursor-pointer'> Sign Up as Tenant </button>
-                    </Link>
-
-                    <Link href='/signUpLandlord'>
-                        <button 
-                        className='signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:65 border-1px solid #ccc text-2xl text-center cursor-pointer'> Sign Up as Landlord </button>
-                    </Link>
+                {/*SignUpAs*/}
+                <div className='whoIsUsingPlatform mt-10 md:mb-50 mb-30 md:mr:20 ml-12 md:ml:20 md:flex-row flex-col' style={{ display: 'flex', gap: '20px' }}>
+                    <button 
+                        onClick={() => createUser("tenant")}
+                        className='signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:w-60 border-1px solid #ccc text-2xl text-center cursor-pointer'> 
+                            Sign Up as Tenant 
+                    </button>
+            
+                    <button 
+                        onClick={() => createUser("landlord")}
+                        className='signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:65 border-1px solid #ccc text-2xl text-center cursor-pointer'> 
+                        Sign Up as Landlord
+                    </button>
+                </div>
             </div>
 
         {/*Banner Section*/}
@@ -211,7 +280,6 @@ const page = () => {
         </div>
 
         {/*End of Banner Section*/}
-        </div>
         
     </>
   )

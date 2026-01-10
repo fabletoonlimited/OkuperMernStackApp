@@ -1,7 +1,7 @@
 import express from 'express';
 import {createAddress, getAddress, updateAddress, deleteAddress} from '../../api/controllers/tenantAddressVerificationController.js'
 import {authenticateTenant} from '../middlewares/tenantMiddleware.js'
-import upload from "../lib/multer.js";
+import upload from "../../lib/multer.js";
 
 const route = express.Router();
 

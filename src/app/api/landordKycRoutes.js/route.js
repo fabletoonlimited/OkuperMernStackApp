@@ -1,7 +1,7 @@
 import express from 'express';
 import { submitLandlordKyc, getLandlordKyc } from '@/app/api/controllers/landlordKycController.js';
 import {authenticateLandlord} from '@/app/api/middlewares/landlordMiddleware.js';
-import upload from '../lib/multer.js';
+import upload from '../../lib/multer.js';
 
 const route = express.Router();
 

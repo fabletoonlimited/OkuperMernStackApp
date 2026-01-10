@@ -6,8 +6,9 @@ import "./Homepage.css"
 import Nav from "../components/nav"
 import Footer from "../components/footer"
 import { Geist, Geist_Mono } from "next/font/google";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
