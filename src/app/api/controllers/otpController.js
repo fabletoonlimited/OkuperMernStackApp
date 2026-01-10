@@ -1,96 +1,101 @@
 // otpController.js
 import { NextResponse } from "next/server";
-import Otp from "../models/otpModel.js";
 import { Resend } from "resend";
+import { generateOtp, verifyOtp } from "../lib/otpService.js";
+import Tenant from "../models/tenantModel.js";
+import Landlord from "../models/landlordModel.js";
 
 //1====================CreateOTP=========================//
-const resend = new Resend(process.env.RESEND_API_KEY);
+// generateOtp handles old OTP invalidation, new OTP creation, and expiration
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null; //Resend saftey fallback to prevent silent crashes
 
-export const requestOtp = async (req) => {
-  const { email, userId, userType } = await req.json();
-
-  if (!email || !userId || !userType) {
-    return NextResponse.json({
-      message: "Email, userId and userType required",
-    });
-  }
-
+export const requestOtp = async (body) => {
   try {
-    // Generate random 6-digit OTP
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    let { email, userId, userType } = body;
 
-    // Save OTP in DB (auto-expire in 5 mins via your schema)
-    await Otp.create({
-      code: otpCode,
-      purpose: "verifyAccount",
-      userType,
-      user: userId,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      used: false,
-    });
+    if (!email || !userType) {
+      return NextResponse.json(
+        {
+          message: "Email and userType required",
+        },
+        { status: 400 }
+      );
+    }
 
-    // Send OTP via Resend
-    await resend.emails.send({
-      from: process.env.SEND_OTP_FROM,
-      to: email,
-      subject: "Your OTP Code",
-      html: `Your OTP code is <strong>${otpCode}</strong>. It expires in 5 minutes.`,
-    });
+    // If userId is missing (e.g. resend OTP), try to find it
+    if (!userId) {
+      if (userType === "Landlord") {
+        const user = await Landlord.findOne({ email });
+        if (user) userId = user._id;
+      } else if (userType === "Tenant") {
+        const user = await Tenant.findOne({ email });
+        if (user) userId = user._id;
+      }
+    }
+
+    const otp = await generateOtp(email, "verifyAccount", userType, userId);
+
+    // Safety check for Resend
+    if (resend) {
+      await resend.emails.send({
+        from: process.env.SEND_OTP_FROM || "onboarding@resend.dev",
+        to: email,
+        subject: "Verify your account",
+        html: `Your OTP code is <strong>${otp.code}</strong>. It expires in 5 minutes.`,
+      });
+    } else {
+      // Fallback for local development
+      console.warn(
+        "RESEND_API_KEY is missing. OTP for",
+        email,
+        "is:",
+        otp.code
+      );
+    }
 
     return NextResponse.json(
       { message: "OTP sent successfully" },
       { status: 200 }
     );
-
-    // if (error) {
-    //   console.error("Resend send email error:", error);
-    //   return res.status(500).json({ message: "Failed to send OTP email" });
-    // }
-
-    // res.status(200).json({ message: "OTP sent successfully" });
-  } catch (err) {
-    console.error("OTP request error:", err);
+  } catch (error) {
+    console.error("OTP request error:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 };
 
 //2====================VerifyOTP=========================//
-export const verifyOtp = async (req) => {
-  const { userId, userType, code } = await req.json();
-
-  if (!userId || !userType || !code) {
-    return NextResponse.json(
-      { message: "UserId, userType, and OTP required" },
-      { status: 400 }
-    );
-  }
-
+export const verifyOtpCode = async (body) => {
   try {
-    const otpRecord = await Otp.findOne({
-      user: userId,
-      userType,
-      code,
-      used: false,
-      expiresAt: { $gt: new Date() },
-    });
-    if (!otpRecord) {
-      return NextResponse.json({ error: "Invalid or expired OTP" }, { status: 400 });
+    const { email, code } = body;
+
+    if (!email || !code) {
+      return NextResponse.json(
+        { message: "Email and OTP code required" },
+        { status: 400 }
+      );
     }
 
-    // // Success → delete OTP so it can’t be reused
-    // await Otp.deleteOne({ _id: otpRecord._id });
+    const otp = await verifyOtp(email, code, "verifyAccount");
 
-    // Mark as used
-    otpRecord.used = true;
-    await otpRecord.save();
+    if (!otp) {
+      return NextResponse.json(
+        { message: "Invalid or expired OTP" },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ message: 'OTP verified successfully' }, { status: 200 })
+    if (otp.userType === "Landlord") {
+      await Landlord.findByIdAndUpdate(otp.user, { isVerified: true });
+    } else if (otp.userType === "Tenant") {
+      await Tenant.findByIdAndUpdate(otp.user, { isVerified: true });
+    }
 
-    // // Attach verified email to request for next controller
-    // req.verifiedEmail = email;
-
-    // // Continue to createLandlord
-    // next();
+    return NextResponse.json(
+      { message: "OTP verified successfully", userType: otp.userType },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("OTP verification error:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });

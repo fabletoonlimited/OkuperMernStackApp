@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 
-const page = () => {
+const Page = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -24,7 +24,12 @@ const page = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-// Added form validation for user to fill all required fields
+
+    // Debug: Log form data to see what's missing
+    console.log("Form Data:", formData);
+    console.log("Terms Accepted:", termsAccepted);
+
+    // Added form validation for user to fill all required fields
     if (
       !formData.firstName ||
       !formData.lastName ||
@@ -32,7 +37,7 @@ const page = () => {
       !formData.password ||
       !formData.survey
     ) {
-      toast.error("Please fill in all fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -41,67 +46,62 @@ const page = () => {
       return;
     }
 
-    if (!email.includes("@")) {
+    if (!formData.email.includes("@")) {
       toast.error("Please enter a valid email");
       return;
     }
 
-    if (password.length < 8) {
+    if (formData.password.length < 8) {
       toast.error("Password must be at least 8 characters");
       return;
     }
 
-    // Send OTP
-    try {
-      const response = awa
-    } catch (error) {
-      
-    }
+    const payload = {
+      ...formData,
+      terms: termsAccepted,
+    };
+
+    console.log("Sending payload:", payload);
 
     const response = await fetch("/api/landlord", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
 
-    // try {
-    //   // Send OTP to user's email
-    //   const response = await fetch("/api/otp?action=requestOtp", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ email: formData.email }),
-    //   });
+    if (!response.ok) {
+      toast.error(data.message || "Something went wrong");
+      return;
+    }
 
-      if (!response.ok) {
-        alert(data.message);
-        return;
-      }
-
-      setShowOtpLandlord(true);
-        
+    toast.success(
+      "Account created! Please verify your email with the OTP sent."
+    );
+    setShowOtpLandlord(true);
   };
 
   const handleOtpVerification = async (otp) => {
     // After OTP is verified, create the user account
-      const response = await fetch("/api/otp?action=verifyOtp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-        }),
-      });
+    const response = await fetch("/api/otp?action=verifyOtp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        code: otp,
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        alert(data.message)
-        return;
-      }
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
 
-      // Redirect to sign in or dashboard
-      window.location.href = "/signInLandlord";
+    // Redirect to sign in or dashboard
+    window.location.href = "/signInLandlord";
   };
 
   return (
@@ -278,4 +278,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
