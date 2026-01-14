@@ -1,116 +1,92 @@
 import Landlord from "../models/landlordModel.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { generateOtp } from "../lib/otpService.js";
-import { generateReferralCode } from "../lib/referralCodeService.js";
-import { Resend } from "resend";
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-  console.log("RESEND API KEY:", process.env.RESEND_API_KEY);
-  console.log("RESEND INITIALIZED:", !!resend);
-
-  console.log("RESEND LOADED", !!resend)
 
 //Signup Landlord
-export async function createLandlordController(data) {
-  const { firstName, lastName, email, password, survey, terms } = data;
+export const signupLandlord = async (req, res) => {
+    const {firstName, lastName, email, password, otp, referalCode, surveyInputField, terms} = req.body;
 
-  if (!firstName || !lastName || !email || !password || !survey) {
-    throw new Error("Please fill all required fields");
-  }
+    if (!firstName || !lastName || !email || !password || surveyInputField || !terms) {
+        return res.status(400).json({message: "Kindly fill all fields required"})
+    }
 
-  if (terms !== true) {
-    throw new Error("Please accept the terms and conditions");
-  }
+    //check if landlord exists in DB
+    const existingUser = await Landlord.findOne({email});
+    if (existingUser) {
+        return res.status(400).json({message: "Landlord already exist!! Please login"})
+    }
 
-  const trimmedEmail = email.trim().toLowerCase();
+    try {
+        const newLandlord = new Landlord({
+            firstName,
+            lastName,
+            email,
+            password,
+            otp,
+            referalCode,
+            survey: surveyInputField,
+            terms,
+            role: "landlord"
+        });
 
-  if (password.length < 8) {
-    return { message: "Password must be at least 8 characters" };
-  }
+        await newLandlord.save();
 
-  const existingLandlord = await Landlord.findOne({ email: trimmedEmail });
-  if (existingLandlord) {
-    return {
-      exists: true,
-      message: "Landlord already exists. Please login.",
-    };
-  }
+        //send welcome email to landlord
+        try {
+            await resend.emails.send({
+                from: 'onboarding@resend.dev', // Use your verified domain
+                to: email,
+                subject: 'Welcome to Okuper!',
+                html: `
+                  <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h1 style="color: #003399;">Welcome to Okuper, ${firstName}!</h1>
+                    <p>Thank you for joining Okuper - your trusted platform for renting and buying homes directly.</p>
+                    <p>No agents. No hidden fees. Just verified people and real homes.</p>
+                    <br/>
+                    <p>Get started by:</p>
+                    <ul>
+                      <li>Completing your profile</li>
+                      <li>Listing your properties</li>
+                      <li>Managing tenant inquiries</li>
+                    </ul>
+                    <br/>
+                    <p>If you have any questions, feel free to contact our support team.</p>
+                    <br/>
+                    <p>Best regards,<br/>The Okuper Team</p>
+                  </div>
+                `,
+            });
+        }
 
-  const newLandlord = new Landlord({
-    firstName,
-    lastName,
-    email: trimmedEmail,
-    password,
-    survey,
-    terms,
-    isVerified: false,
-    role: "landlord",
-  });
+        catch (emailError) {
+            console.error("Failed to send welcome email:", emailError);
+        }
 
+        return res.status(201).json({
+            message: "New Landlord created Successfully",
+            user: newLandlord
+        });
 
-  // ✅ CORRECT PARALLEL CALLS
-  const [referralCode, otp] = await Promise.all([
-    generateReferralCode(
-      trimmedEmail,
-      "verifiedAccount",
-      "Landlord",
-      newLandlord._id
-    ),
-    generateOtp(
-      trimmedEmail,
-      "verifyAccount",
-      "Landlord",
-      newLandlord._id
-    ),
-  ]);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
 
-  newLandlord.referralCode = referralCode._id;
-  newLandlord.otp = otp._id;
-  
-  await newLandlord.save();
+export const loginLandlord = async (req, res) => {
+    try {
+    const {email, password} = req.body;
 
-  // Send email
-  if (!resend) {
-   throw new Error("Resend is not configured")
-  }
-    await resend.emails.send({
-      from: process.env.SEND_OTP_FROM || "onboarding@resend.dev",
-      to: trimmedEmail,
-      subject: "Welcome to Okuper!",
-      html: `
-        <h2>Welcome to Okuper, ${firstName}!</h2>
-        <p>Your verification code is <strong>${otp.code}</strong></p>
-        <p>Your referral code is <strong>${referralCode.code}</strong></p>
-        <p>It expires in 5 minutes.<p><br/><br/>
-        <p>Warm Regards, <br/>Okuper Technologies Limited</p>
-        `,
-    });
-
-  return {
-    success: true,
-    message: "New landlord created successfully",
-    landlordId: newLandlord._id,
-  };
-}
-
-export async function loginLandlordController (data) {
-  try {
-    const { email, password } = data;
-    const trimmedEmail = email.trim().toLowerCase();
-
-    const landlord = await Landlord.findOne({ email: trimmedEmail });
-    if (!landlord || !password) {
-      throw new Error ("Invalid credentials");
+    const landlord = await Landlord.findOne({email});
+    if(!landlord) {
+        return res.status(400).json({error: "Invalid credentials"})
     }
 
     const isMatch = bcrypt.compareSync(password, landlord.password);
-    if (!isMatch) {
-      throw new Error ("invalid password");
-    }
+    if(!isMatch) {
+        return res.status(401).json({error: "invalid password"})
+    };
 
     //create a token
     const token = jwt.sign(
@@ -119,113 +95,110 @@ export async function loginLandlordController (data) {
       { expiresIn: "1d" } //1day
     );
 
-    return {
-      success: true,
-      landlord: {
-        id: landlord._id,
-        name: `${landlord.firstName} ${landlord.lastName}`,
-        email: landlord.email,
-      },
-      token,
-    };
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1day
+    res.cookie ("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 *1000 // 1day
     });
 
-    return response;
-  } catch (error) {
-    throw new Error (error.message || "Login failed");
-  }
-};
-
-export async function getLandlordController (data) {
-  const { _id } = data;
-
-  const landlord = await Landlord.findById(_id)
-    .populate("user")
-    .populate("landlordKyc")
-    .populate("landlordDashboard")
-    .populate("property")
-    .populate("savedHomes")
-    .populate("messages")
-    .populate("homeInterest");
-
-    return {
+    return res.status(200).json({
         landlord: {
-          id: landlord._id,
-          name: `${landlord.firstName} ${landlord.lastName}`,
-          email: landlord.email,
-        },
-        token,
-    };
+        id: landlord._id,
+        name:`${landlord.firstName} ${landlord.lastName}`,
+        email: landlord.email
+        }
+    });
+
+    } catch (err) {
+        console.error("Login Error:", err.message);
+        res.status(500).json({ message: "Server error" });
+    }
 };
 
-export async function getAllLandlordController () {
-  const landlords = await Landlord.find()
-    .select("-password")
-    .populate("user")
-    .populate("landlordKyc")
-    .populate("landlordDashboard")
-    .populate("property")
-    .populate("savedHomes")
-    .populate("messages")
-    .populate("homeInterest");
+export const getLandlord = async (req, res) => {
+    const {_id} = req.landlord;
 
-  return {
-    message: "All landlords successfully pulled",
-    success: true,
-    landlord: landlords,
-  }
+    const landlord = await Landlord
+    .findById(_id)
+    .populate("User")
+    .populate("Otp")
+    .populate("LandlordKyc")
+    .populate("LandlordDashboard")
+    .populate("Property")
+
+    return res.json(landlord);
 };
 
-export async function updateLandlordController(data) {
-  const { _id, firstName, lastName, email } = data;
+export const getAllLandlord = async (req, res) => {
+    try {
+        const allLandlord = await Landlord
+        .find()
+        .select("-password")
+        .findById(_id)
+        .populate("User")
+        .populate("Otp")
+        .populate("LandlordKyc")
+        .populate("LandlordDashboard")
+        .populate("Property")
+        
+        return res.json(allLandlord);
 
-  const landlord = await Landlord.findByIdAndUpdate(
-    _id,
-    { firstName, lastName, email },
-    { new: true, runValidators: true }
-  ).select("-password");
+    } catch (error) {
+        res.json({message: "error getting landlord"})
+    }
+};
 
-  if (!landlord) {
-    return {
-      success: false,
-      message: "Landlord not found",
-    };
-  }
+export const updateLandlord = async (req, res) => {
+    const { _id } = req.body;
+    try {
+        const {firstName, lastName, email} = req.body
 
-  return {
-    success: true,
-    landlord,
-  };
+        // only self-update or admin
+        if (req.landlord._id !== req.params.id && !req.admin) {
+        return res.status(403).json({ success: false, message: "You are unauthorized" });
+        }
+    
+        const landlord = await Landlord.findByIdAndUpdate
+            (req.params.id,
+            { firstName, lastName, email },
+            { new: true, runValidators: true })
+            
+            .select("-password");
+
+            if (!landlord) 
+                return res.status(404).json({ success: false, message: "Landlord not found" });
+
+            res.status(200).json({ 
+                success: true, 
+                message: "Landlord updated successfully",landlord });
+                
+    } catch (error) {
+        return res.send("something went wrong");
+    }
+};
+
+export const deleteLandlord = async (req, res) => {
+    const { _id} = req.query;
+
+    try {
+        const deleteLandlord = await Landlord.findByIdAndDelete
+        (_id);
+        return res.json(deleteLandlord);
+    } catch (error) {
+        console.error("Delete error:", error);
+        return res.status(500).json({ error: "Cannot delete Landlord" });    
+    }
 }
 
-
-export async function deleteLandlordController (data)  {
-  const _id = data;
-
-  const deletedLandlord = await Landlord.findByIdAndDelete(_id);    if (!deletedLandlord) {
-    throw new Error("Landlord not found")
-  };
-    
-  return {
-    success: true,
-    message: "Landlord deleted successfully"
-  };
-};
-
 // ================== ARRAY UPLOAD ==================
-// export const arrayUpload = async (req, res, next) => {
-//   try {
-//     const uploads = await Promise.all(
-//       req.files.map((file) => streamUpload(file.buffer, "images"))
-//     );
-//     return res.json({ message: "Upload successful", uploads });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const arrayUpload = async (req, res, next) => {
+  try {
+    const uploads = await Promise.all(
+      req.files.map((file) => streamUpload(file.buffer, "images"))
+    );
+    return res.json({ message: "Upload successful", uploads });
+  } catch (error) {
+    next(error);
+  }
+};

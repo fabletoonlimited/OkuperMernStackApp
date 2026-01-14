@@ -1,9 +1,8 @@
-import express from 'express';
+import { NextResponse } from "next/server";
 
-const route = express.Router();
-
-route.get('/', (req, res) => {
-  res.status(200).json({ message: 'API is working properly' });
-});
-
-export default route;
+export async function GET() {
+  return NextResponse.json(
+    { message: "API is working properly" },
+    { status: 200 }
+  );
+}

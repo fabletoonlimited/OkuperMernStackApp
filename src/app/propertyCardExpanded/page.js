@@ -67,15 +67,51 @@ const Index = () => {
     ];
 
     return (
-        <div>
+        <div className="w-auto">
             <PropExpandedNav />
 
             <div className="property-card-expanded px-4 md:px-12">
                 {/* IMAGE GRID */}
-                <div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 md:gap-6 mt-14">
+                {/* IMAGE GRID */}
+                <div className="mt-14">
+                    {/* MAIN IMAGE (MOBILE) */}
+                    <div className="relative w-full aspect-[5/3] overflow-hidden rounded-lg cursor-pointer md:hidden border-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <img
+                            src={images[0]}
+                            alt="property"
+                            className="w-full h-full object-cover"
+                            onClick={() => setSelectedImage(images[0])}
+                        />
+
+                        {/* Overlay Icon */}
+                        <div className="absolute top-2 left-2 z-10">
+                            <FontAwesomeIcon
+                                icon={faCheckCircle}
+                                className="text-3xl text-blue-300/95 rounded-full p-1"
+                            />
+                        </div>
+                    </div>
+
+                    {/* MOBILE THUMBNAILS */}
+                    <div className="grid grid-cols-4 gap-2 mt-3 md:hidden">
+                        {images.slice(1, 5).map((img, i) => (
+                            <div
+                                key={i}
+                                className="aspect-[5/3] overflow-hidden rounded-md cursor-pointer border-2 shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <img
+                                    src={img}
+                                    alt="property"
+                                    className="w-full h-full object-cover"
+                                    onClick={() => setSelectedImage(img)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* DESKTOP GRID */}
+                    <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-6">
                         {/* Main Image */}
-                        <div className="relative md:col-span-2 md:row-span-2 w-full aspect-[5/3] overflow-hidden rounded-lg cursor-pointer">
+                        <div className="relative col-span-2 row-span-2 aspect-[5/3] overflow-hidden rounded-lg cursor-pointer border-2 shadow-xl hover:shadow-2xl transition-shadow duration-300">
                             <img
                                 src={images[0]}
                                 alt="property"
@@ -83,88 +119,68 @@ const Index = () => {
                                 onClick={() => setSelectedImage(images[0])}
                             />
 
-                            {/* Overlay Icon */}
                             <div className="absolute top-2 left-2 z-10">
                                 <FontAwesomeIcon
                                     icon={faCheckCircle}
-                                    onClick={() => {
-                                        
-                                    }}
-                                    className="text-3xl text-blue-300/95  rounded-full p-1"
+                                    className="text-3xl text-blue-300/95 rounded-full p-1"
                                 />
                             </div>
                         </div>
 
                         {/* Other Images */}
-                        {[1, 2, 3, 4].map((_, i) => (
+                        {images.slice(1).map((img, i) => (
                             <div
                                 key={i}
-                                className="relative w-96 aspect-[5/3] overflow-hidden rounded-lg cursor-pointer">
+                                className="aspect-[5/3] overflow-hidden rounded-lg cursor-pointer border-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
                                 <img
-                                    src={images[i]}
+                                    src={img}
                                     alt="property"
                                     className="w-full h-full object-cover"
-                                    onClick={() => setSelectedImage(images[i])}
+                                    onClick={() => setSelectedImage(img)}
                                 />
                             </div>
                         ))}
                     </div>
-
-                    {/* Lightbox */}
-                    {selectedImage && (
-                        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-                            {/* Close button */}
-                            <button
-                                className="absolute top-5 right-5 text-white text-3xl font-bold z-60 hover:text-gray-300"
-                                onClick={() => setSelectedImage(null)}>
-                                &times;
-                            </button>
-
-                            <img
-                                src={selectedImage}
-                                alt="enlarged property"
-                                className="max-w-[90%] max-h-[90%] rounded-lg shadow-lg transform scale-95 transition-transform duration-300 ease-in-out hover:scale-100"
-                            />
-                        </div>
-                    )}
                 </div>
-                );
+
                 {/* PROPERTY DETAILS */}
-                <div className="flex flex-col md:flex-row justify-between mt-6 gap-6">
-                    <div className="w-full md:flex-1 p-4 rounded-lg">
-                        <h2 className="font-bold text-4xl mb-1">
+                <div className="flex flex-col md:flex-row justify-between mt-6 gap-6 items-center ">
+                    <div className="w-full md:flex-1 p-4 rounded-lg ml-2 md:ml-0">
+                        <h2 className="font-bold text-4xl md:text-4xl mb-1">
                             4 Bedroom Flat with BQ
                         </h2>
-                        <h4 className="text-blue-950 text-lg md:text-2xl mb-2">
+                        <h4 className="text-blue-950 text-2xl md:text-2xl md:mb-2 mb-5">
                             Adelabu, Surulere, Lagos
                         </h4>
-                        <span className="text-3xl md:text-5xl font-bold mt-11">
+                        <span className="text-7xl md:text-5xl md:font-bold font-medium">
                             ₦5,500,000
                         </span>
-                        <p className="text-black text-sm md:text-lg mt-1">
+                        <p className="text- md:text-lg md:mt-1 mt-2">
                             Price is base rent and doesn't require fees
                         </p>
 
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            <button className="px-10 py-1 bg-gray-100 text-sm md:text-2xl border-1 border-black">
+                        <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
+                            <button className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-black">
                                 Bungalow building
                             </button>
-                            <button className="px-10 py-1 bg-gray-100 text-sm md:text-2xl border-1 border-black">
+                            <button className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-black">
                                 3 Bed | 2 Toilet
                             </button>
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-start border-1 border-black p-6 rounded-lg w-full md:w-96">
-                        <button
-                            className="bg-blue-950 hover:bg-blue-700 transition duration-300 ease-in-out
-                            text-white px-6 py-3 rounded-md text-lg md:text-xl
-                            font-semibold w-full">
-                            Request to apply
-                        </button>
+                    <div className="flex flex-col md:items-center border-1 border-gray-700 md:border-1 md:p-6 rounded-lg w-full md:w-96 p-11 h-80 ">
+                        <div className="items-start md:items-start">
+                            <button
+                                className="bg-blue-950 hover:bg-blue-700 transition duration-300 ease-in-out
+                            text-white md:px-20 md:py-3 rounded-sm md:rounded-md text-3xl md:text-xl  
+                            md:font-semibold font-medium md:w-full w-full px-6 py-3 ">
+                                Request to apply
+                            </button>
+                        </div>
 
                         <div className="flex flex-col  mt-4 gap-3 w-full">
-                            <h5 className="text-xl md:text-2xl ">Rate</h5>
+                            <h5 className="text-3xl md:text-2xl ">Rate</h5>
                             <img
                                 src="/property-image.jpg"
                                 alt="rate"
@@ -173,11 +189,12 @@ const Index = () => {
                         </div>
                     </div>
                 </div>
+
                 {/* LISTED BY / AD CARD */}
-                <div className="mt-10 flex flex-col md:flex-row justify-between items-start gap-6">
+                <div className="mt-14 flex flex-row md:flex-row md:justify-between justify-around items-start gap-6">
                     {/* Listed by */}
-                    <div className="w-full md:flex-1">
-                        <h2 className="text-2xl md:text-3xl font-medium mb-3">
+                    <div className="w-full md:flex-1 md:ml-3">
+                        <h2 className="text-4xl md:text-3xl font-medium mb-3">
                             Listed by
                         </h2>
                         <div className="flex items-center gap-4">
@@ -187,25 +204,28 @@ const Index = () => {
                             />
 
                             <div>
-                                <h3 className="text-lg md:text-2xl">
+                                <h3 className="text-2xl md:text-2xl">
                                     Username
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm md:text-base">
+                                    <span className="text-green-700 md:text-base">
                                         Verified
                                     </span>
                                     <FontAwesomeIcon
                                         icon={faCircleInfo}
-                                        style={{ fontSize: "10px" }}
+                                        style={{
+                                            fontSize: "10px",
+                                            color: "darkgreen",
+                                        }}
                                     />
                                 </div>
                             </div>
                         </div>
-                        <hr className="mt-4 md:mt-6" />
+                        <hr className="md:mt-6 text-gray-300" />
                     </div>
 
                     {/* Ad Card */}
-                    <div className="w-full md:w-96 bg-gradient-to-br from-blue-800 to-blue-700 text-white p-6 md:p-8 text-center">
+                    <div className="w-full md:w-96 bg-gradient-to-br from-blue-800 to-blue-700 text-white p-6 md:p-8 text-center rounded-md">
                         <h4 className="text-2xl md:text-4xl font-bold">
                             WorkmanHQ!
                         </h4>
@@ -222,13 +242,13 @@ const Index = () => {
                 </div>
                 {/* FEATURES */}
                 <div className="mt-12">
-                    <h2 className="text-4xl md:text-6xl font-semibold mb-6 text-center md:text-left">
+                    <h2 className="text-5xl md:text-6xl font-medium md:font-semibold mb-6 md:text-start text-start ">
                         Features
                     </h2>
 
                     {["Building amenities", "Unit features"].map((title, i) => (
-                        <div key={i} className="mt-8">
-                            <h3 className="text-2xl md:text-3xl text-blue-950 mb-4 border-1 p-2">
+                        <div key={i} className="mt-9">
+                            <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 border-1 p-2">
                                 {title}
                             </h3>
                             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -236,8 +256,10 @@ const Index = () => {
                                     <li
                                         key={j}
                                         className="flex items-center gap-3 bg-gray-100 p-3">
-                                        <span className="text-2xl">●</span>
-                                        <span className="text-sm md:text-lg">
+                                        <span className="md:text-2xl text-2xl">
+                                            ●
+                                        </span>
+                                        <span className="text-2xl md:text-lg">
                                             {title}
                                         </span>
                                     </li>
@@ -259,8 +281,8 @@ const Index = () => {
                 </div>
                 {/* REQUEST TO APPLY FORM */}
                 <div className="mt-10 flex flex-col md:flex-row gap-6">
-                    <form className="flex-1 p-4 md:p-6 rounded-lg border md:border-0">
-                        <h3 className="text-2xl md:text-3xl font-semibold mb-4">
+                    <form className="flex-1 p-4 md:p-6 rounded-lg md:border-0">
+                        <h3 className="text-3xl md:text-3xl md:font-semibold font-medium mb-4">
                             Request to apply
                         </h3>
 
@@ -323,14 +345,19 @@ const Index = () => {
                                 style={{ fontSize: "46px" }}
                             />
                             <div>
-                                <h3 className="text-lg md:text-2xl">
+                                <h3 className="text-2xl md:text-2xl">
                                     Username
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm">Verified</span>
+                                    <span className="text-green-700">
+                                        Verified
+                                    </span>
                                     <FontAwesomeIcon
                                         icon={faCircleInfo}
-                                        style={{ fontSize: "10px" }}
+                                        style={{
+                                            fontSize: "10px",
+                                            color: "lightgreen",
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -345,7 +372,7 @@ const Index = () => {
                             Get Started
                         </button>
 
-                        <div className="text-center mt-6 md:mt-2">
+                        <div className="text-center mt-24 md:mt-2 ">
                             <h4 className="text-2xl font-bold">WorkmanHQ!</h4>
                             <p className="mb-46 font-light leading-snug text-2xl md:text-base">
                                 Don't let pests control you.
@@ -368,12 +395,14 @@ const Index = () => {
                     </button>
                 </div>
                 {/* Trending Section */}
-                <section className="max-w-7xl mx-auto px-10 md:px-4 py-2 mt-7">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-3xl font-medium m-0">
+                <section className="max-w-7xl mx-auto px-4 md:px-10 py-6 mt-7">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-3xl font-bold md:font-medium">
                             Nearby Apartments
                         </h3>
-                        <div className="hidden md:flex gap-4 m-0">
+
+                        {/* Desktop arrows only */}
+                        <div className="hidden md:flex gap-4">
                             <FaChevronCircleLeft
                                 color={hoverLeft ? "#003399" : "#e4e5e9"}
                                 size={40}
@@ -392,11 +421,22 @@ const Index = () => {
                             />
                         </div>
                     </div>
-                    {/*Carousel*/}
+
+                    {/* Carousel */}
                     <div
                         ref={trendingRef}
-                        className="flex -ml-28 md:-ml--16 gap-4 overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide ">
-                        <TrendingRentIndexCarousel rent={mixedItems} />
+                        className="
+      grid
+      place-items-center
+      md:block
+      overflow-hidden
+      md:overflow-x-auto
+      scroll-smooth
+      scrollbar-hide
+    ">
+                        <div className="flex gap-4 md:flex-nowrap">
+                            <TrendingRentIndexCarousel rent={mixedItems} />
+                        </div>
                     </div>
                 </section>
             </div>

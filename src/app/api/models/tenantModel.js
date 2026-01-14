@@ -2,7 +2,8 @@
 import {mongoose} from "@/app/lib/mongoose.js"
 import bcrypt from "bcryptjs"
 
-const tenantSchema = new mongoose.Schema({
+const tenantSchema = new mongoose.Schema(
+  {
     firstName: { type: String, required: true },
     lastName: {type: String, required: true},
     email: {type: String, required: true, unique: true},

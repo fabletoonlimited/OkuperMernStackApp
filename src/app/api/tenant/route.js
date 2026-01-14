@@ -5,19 +5,35 @@ import { createTenant, loginTenant, getTenant, getAllTenant, updateTenant, delet
 import { NextResponse } from "next/server";
 
 
-// Route to authenticate Landlords
+    // Dispatch based on fields: Signup has firstName, Login does not
+    if (body.firstName) {
+      return await signupTenant(req, body);
+    } else {
+      return await loginTenant(req, body);
+    }
+  } catch (error) {
+    return NextResponse.json({ message: "Invalid request" }, { status: 400 });
+  }
+}
 
-route.post('/signup', verifyOtp, createTenant);
-route.post('/login', loginTenant);
+export async function GET(req) {
+  await connectDB();
+  const { searchParams } = new URL(req.url);
+  const type = searchParams.get("type");
 
-route.get('/getTenant', authenticateTenant, getTenant);
-route.get('/allTenant', authenticateTenant, getAllTenant);
-route.put('/:id', authenticateTenant, updateTenant);
-route.delete('/:id', authenticateTenant, deleteTenant);
+  const auth = await authenticateTenant(req);
+  if (auth.error) return auth.response;
 
-//Protected Route
-route.get('/:id', authenticateTenant, (req, res) => {
-res.status(200).json({ message: 'Welcome to the Tenant Dashboard' })});
+  if (type === "all") {
+    return await getAllTenant(req);
+  } else {
+    return await getTenant(req, auth.tenant);
+  }
+}
 
-
-export default route;
+export async function DELETE(req) {
+  await connectDB();
+  const auth = await authenticateTenant(req);
+  if (auth.error) return auth.response;
+  return await deleteTenant(req);
+}

@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 
-const page = () => {
+const Page = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -11,7 +12,7 @@ const page = () => {
     password: "",
     survey: "",
   });
-  const [showOtpLandlord, setShowOtpLandlord ] = useState(false);
+  const [showOtpLandlord, setShowOtpLandlord] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleInputChange = (e) => {
@@ -58,24 +59,63 @@ const page = () => {
       console.error("Error:", error);
       alert("An error occurred. Please try again.");
     }
+
+    if (!formData.email.includes("@")) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    const payload = {
+      ...formData,
+      terms: termsAccepted,
+    };
+
+    console.log("Sending payload:", payload);
+
+    const response = await fetch("/api/landlord", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message || "Something went wrong");
+      return;
+    }
+
+    toast.success(
+      "Account created! Please verify your email with the OTP sent."
+    );
+    setShowOtpLandlord(true);
   };
 
-  const handleOtpVerification = async () => {
+  const handleOtpVerification = async (otp) => {
     // After OTP is verified, create the user account
-    try {
-      const response = await fetch("/api/landlord", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+    const response = await fetch("/api/otp?action=verifyOtp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        code: otp,
+      }),
+    });
 
-      if (response.ok) {
-        // Redirect to sign in or dashboard
-        window.location.href = "/signInLandlord";
-      }
-    } catch (error) {
-      console.error("Error creating account:", error);
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
     }
+
+    // Redirect to sign in or dashboard
+    window.location.href = "/signInLandlord";
   };
 
   return (
@@ -197,9 +237,9 @@ const page = () => {
         </div>
 
         {/* OTP Modal */}
-        <OtpLandlord 
-          isOpen={showOtpLandlord }
-          onClose={() => setShowOtpLandlord (false)}
+        <OtpLandlord
+          isOpen={showOtpLandlord}
+          onClose={() => setShowOtpLandlord(false)}
           email={formData.email}
           onVerify={handleOtpVerification}
         />
@@ -249,4 +289,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

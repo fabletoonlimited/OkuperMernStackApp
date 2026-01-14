@@ -2,7 +2,8 @@
 import {mongoose} from "@/app/lib/mongoose.js"
 import bcrypt from "bcryptjs"
 
-const landlordSchema = new mongoose.Schema({
+const landlordSchema = new mongoose.Schema(
+  {
     firstName: { type: String, required: true },
     lastName: {type: String, required: true},
     email: {type: String, required: true, unique: true},
@@ -27,7 +28,21 @@ const landlordSchema = new mongoose.Schema({
     messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
 
-}, {timestamps: true});
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
+    landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc" },
+    landlordDashboard: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LandlordDashboard",
+    },
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
+  },
+  { timestamps: true }
+);
 
 //Password pre-hashing middleware
 landlordSchema.pre("save", async function(next) {

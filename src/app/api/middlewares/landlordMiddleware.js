@@ -1,12 +1,21 @@
 import jwt from "jsonwebtoken";
 import Landlord from "../models/landlordModel.js";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 // 1. Authenticate landlord
-export const authenticateLandlord = async (req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+export const authenticateLandlord = async (req) => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
 
   if (!token) {
-    return res.status(401).json({ message: "No token provided" });
+    return {
+      error: true,
+      response: NextResponse.json(
+        { message: "No token provided" },
+        { status: 401 }
+      ),
+    };
   }
 
   try {
@@ -14,18 +23,30 @@ export const authenticateLandlord = async (req, res, next) => {
     const landlord = await Landlord.findById(decoded.id);
 
     if (!landlord) {
-      return res.status(401).json({ message: "Landlorrd not found" });
+      return {
+        error: true,
+        response: NextResponse.json(
+          { message: "Landlord not found" },
+          { status: 401 }
+        ),
+      };
     }
 
-    req.landlord= {
-      _id: landlord._id,
-      email: landlord.email,
-      admin: landlord.admin || false,
+    return {
+      error: false,
+      landlord: {
+        _id: landlord._id,
+        email: landlord.email,
+        admin: landlord.admin || false,
+      },
     };
-
-    next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return {
+      error: true,
+      response: NextResponse.json(
+        { message: "Invalid or expired token" },
+        { status: 401 }
+      ),
+    };
   }
 };
-
