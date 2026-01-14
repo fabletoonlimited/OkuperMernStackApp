@@ -9,6 +9,8 @@ import TrendingRentIndexCarousel from "../../components/trendingRentIndexCarouse
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import Footer from "../../components/footer";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import StarRating from "@/components/starRating/starRating";
+
 const Index = () => {
     const [hoverLeft, setHoverLeft] = useState(false);
     const [hoverRight, setHoverRight] = useState(false);
@@ -144,32 +146,32 @@ const Index = () => {
                 </div>
 
                 {/* PROPERTY DETAILS */}
-                <div className="flex flex-col md:flex-row justify-between mt-6 gap-6 items-center ">
+                <div className="flex flex-col md:flex-row justify-between mt-4 gap-6 items-center ">
                     <div className="w-full md:flex-1 p-4 rounded-lg ml-2 md:ml-0">
-                        <h2 className="font-bold text-4xl md:text-4xl mb-1">
+                        <h2 className="font-bold text-2xl md:text-4xl mb-1">
                             4 Bedroom Flat with BQ
                         </h2>
                         <h4 className="text-blue-950 text-2xl md:text-2xl md:mb-2 mb-5">
-                            Adelabu, Surulere, Lagos
+                            Adelabu, Surulere, Lagos.
                         </h4>
-                        <span className="text-7xl md:text-5xl md:font-bold font-medium">
+                        <span className="text-5xl md:text-5xl md:font-bold font-black">
                             ₦5,500,000
                         </span>
-                        <p className="text- md:text-lg md:mt-1 mt-2">
-                            Price is base rent and doesn't require fees
+                        <p className="text-lg md:mt-1 mt-2 text-blue-900">
+                            Price is base rent and doesn't require fees.
                         </p>
 
                         <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
-                            <button className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-black">
+                            <div className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-blue-950">
                                 Bungalow building
-                            </button>
-                            <button className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-black">
+                            </div>
+                            <div className="md:px-16 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-20.5 py-4 border-blue-950">
                                 3 Bed | 2 Toilet
-                            </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col md:items-center border-1 border-gray-700 md:border-1 md:p-6 rounded-lg w-full md:w-96 p-11 h-80 ">
+                    <div className="md:flex flex-col md:items-center border-1 border-blue-950 md:border-1 md:p-6 rounded-lg w-full md:w-96 p-11 h-70 mt-14">
                         <div className="items-start md:items-start">
                             <button
                                 className="bg-blue-950 hover:bg-blue-700 transition duration-300 ease-in-out
@@ -178,20 +180,18 @@ const Index = () => {
                                 Request to apply
                             </button>
                         </div>
-
-                        <div className="flex flex-col  mt-4 gap-3 w-full">
+                        {/*star rating*/}
+                        <div className="flex flex-col  mt-4 mb-4 gap-3 w-full">
                             <h5 className="text-3xl md:text-2xl ">Rate</h5>
-                            <img
-                                src="/property-image.jpg"
-                                alt="rate"
-                                className="w-full h-24 md:w-full md:h-28 object-cover rounded-md mt-2  border-1 "
-                            />
+                            <div className="h-16 ">
+                                <StarRating />
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* LISTED BY / AD CARD */}
-                <div className="mt-14 flex flex-row md:flex-row md:justify-between justify-around items-start gap-6">
+                <div className="mt-14 flex md:flex-row md:justify-between justify-around items-start gap-6">
                     {/* Listed by */}
                     <div className="w-full md:flex-1 md:ml-3">
                         <h2 className="text-4xl md:text-3xl font-medium mb-3">
@@ -200,7 +200,7 @@ const Index = () => {
                         <div className="flex items-center gap-4">
                             <FontAwesomeIcon
                                 icon={faCircleUser}
-                                style={{ fontSize: "46px" }}
+                                style={{ fontSize: "46px",background:"gray"  }}
                             />
 
                             <div>
@@ -220,8 +220,8 @@ const Index = () => {
                                     />
                                 </div>
                             </div>
+                            <hr className="mt-4 md:mt-6 text-gray-300" />
                         </div>
-                        <hr className="md:mt-6 text-gray-300" />
                     </div>
 
                     {/* Ad Card */}
@@ -265,12 +265,14 @@ const Index = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <hr className="mt-4 md:mt-6" />
                         </div>
                     ))}
                 </div>
+                <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 p-2 mt-9">
+                    Neighborhood: Postcode
+                </h3>
                 {/* MAP */}
-                <div className="mt-10 w-full max-w-full md:max-w-5xl mx-auto h-[300px] md:h-[400px] rounded-xl overflow-hidden border shadow-sm">
+                <div className="mt-8 w-full max-w-full md:max-w-5xl mx-auto h-[300px] md:h-[400px] rounded-sm overflow-hidden border shadow-sm">
                     <iframe
                         title="Property location map"
                         src="https://www.google.com/maps?q=Adelabu%20Surulere%20Lagos&output=embed"
@@ -279,10 +281,33 @@ const Index = () => {
                         referrerPolicy="no-referrer-when-downgrade"
                     />
                 </div>
+
+                {["Nearby Places"].map((title, i) => (
+                    <div key={i} className="mt-9">
+                        <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 p-2">
+                            {title}
+                        </h3>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            {Array.from({ length: 4 }).map((_, j) => (
+                                <li
+                                    key={j}
+                                    className="flex items-center gap-3 bg-gray-100 p-3">
+                                    <span className="md:text-2xl text-2xl">
+                                        ●
+                                    </span>
+                                    <span className="text-2xl md:text-lg">
+                                        {title}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                        <hr className="mt-4 md:mt-6 text-gray-300" />
+                    </div>
+                ))}
                 {/* REQUEST TO APPLY FORM */}
                 <div className="mt-10 flex flex-col md:flex-row gap-6">
                     <form className="flex-1 p-4 md:p-6 rounded-lg md:border-0">
-                        <h3 className="text-3xl md:text-3xl md:font-semibold font-medium mb-4">
+                        <h3 className="text-3xl md:text-3xl md:font-medium font-medium mb-4">
                             Request to apply
                         </h3>
 
@@ -331,7 +356,7 @@ const Index = () => {
                         </div>
 
                         <button
-                            className="mt-4 w-full md:w-full px-6 py-3 text-2xl font-medium text-white bg-blue-900 rounded-lg shadow-md 
+                            className="mt-4 w-full md:w-full px-6 py-3 text-2xl font-medium text-white bg-blue-950 rounded-lg shadow-md 
                    hover:bg-blue-700 transition duration-300 ease-in-out">
                             Send request to apply
                         </button>
@@ -365,7 +390,7 @@ const Index = () => {
                     </form>
 
                     {/* SIDE CARD */}
-                    <div className="w-full md:w-80 bg-gradient-to-br from-blue-800 to-blue-700 text-white p-6 rounded-xl shadow-md flex flex-col items-center justify-around">
+                    <div className="w-full md:w-80 bg-blue-800 text-white p-6 rounded-xl shadow-md flex flex-col items-center justify-around">
                         <button
                             className="border-2 border-white px-6 hover:bg-blue-800 hover:scale-95 transition duration-300 ease-in-out
                             py-3 rounded-2xl font-semibold text-xl mt-20 w-full">
