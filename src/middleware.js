@@ -4,13 +4,12 @@ import { jwtVerify } from "jose";
 const PUBLIC_ROUTES = [
    "/api/user",
     "/api/admin/login",
-    "/api/admin/signup",
-    "/api/tenant/signup",
-    "/api/tenant/login",
-    "/api/landlord/signup",
-    "/api/landlord/login",
-    "/api/otp/requestOtp",
-    "/api/otp/verifyOtp"
+    "/api/admin/",
+    "/api/tenant/",
+    "/api/tenant/loginTenant",
+    "/api/landlord",
+    "/api/landlord/loginLandlord",
+    "/api/otp"
 ];
 
 const ALLOWED_ORIGINS = [

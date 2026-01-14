@@ -1,9 +1,9 @@
-import express from "express";
-import {authenticateTenant} from "../middlewares/tenantMiddleware";
-import { verifyOtp } from "../controllers/otpController.js";
-import { createTenant, loginTenant, getTenant, getAllTenant, updateTenant, deleteTenant } from "../controllers/tenant.controller.js";
+export const runtime = "nodejs";
 
-const route = express.Router();
+import dbConnect from "@/app/lib/mongoose";
+import { createTenant, loginTenant, getTenant, getAllTenant, updateTenant, deleteTenant } from "../controllers/tenant.controller.js";
+import { NextResponse } from "next/server";
+
 
 // Route to authenticate Landlords
 

@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { mongoose } from "@/app/lib/mongoose";
 
-const landlordKycSchema = new mongoose.Schema({
+const tenantKycSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: true,
@@ -78,7 +78,7 @@ const landlordKycSchema = new mongoose.Schema({
     companyEmail: {
         type: String,
     },
-    currentHomeAddress: {
+    currentAddress: {
         type: String,
         required: true,
     },
@@ -97,14 +97,15 @@ const landlordKycSchema = new mongoose.Schema({
     zipCode: {
         type: String,
     },
-    
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: 'Landlord', required: true },
-    landlordDashboard: { type: mongoose.Schema.Types.ObjectId, ref: 'LandlordDashboard', required: true},
+
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+    tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: 'TenantDashboard', required: true},
     addressVerification: { type: mongoose.Schema.Types.ObjectId, ref: 'AddressVerification', required: false},
+    
 
 }, {timestamps: true}
 );
 
-const LandlordKyc = mongoose.model('LandlordKyc', landlordKycSchema);
-export default LandlordKyc;
+const TenantKyc = mongoose.model('TenantKyc', tenantKycSchema);
+export default TenantKyc;

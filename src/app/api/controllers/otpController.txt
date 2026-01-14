@@ -1,7 +1,8 @@
 import Otp from "@/app/api/models/otpModel.js";
-import Landlord from "@/app/models/landlordModel.js";
-import Tenant from "@/app/models/tenantModel.js";
+import Landlord from "../models/landlordModel.js";
+import Tenant from "../models/tenantModel.js";
 import { Resend } from "resend";
+// import { generateOtp, verifyOtp } from "../lib/otpService.js";
 
 
 //1====================CreateOTP=========================//
@@ -16,7 +17,7 @@ export async function createOtpController (data) {
 
  //Existing Email
     const existingTenant = await Tenant.findOne({email});
-    const Landlord = await Landlord.findOne({email});
+    const existingLandlord = await Landlord.findOne({email});
 
     if (existingTenant || existingLandlord) {
       return {
@@ -94,5 +95,4 @@ export async function verifyOtpController(data) {
     email,
   };
 }
-
 

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -35,7 +36,7 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
     try {
       // Call your verification API
-      const response = await fetch("/api/verifyOtp", {
+      const response = await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode }),
@@ -56,7 +57,7 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
   const handleResend = async () => {
     // Call your resend OTP API
     try {
-      await fetch("/api/otp/requestOtp", {
+      await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

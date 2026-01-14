@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import Otp from "./otpModel.js";
+// import mongoose from "mongoose";
+import {mongoose} from "@/app/lib/mongoose.js"
 import bcrypt from "bcryptjs"
 
 const landlordSchema = new mongoose.Schema({
@@ -7,39 +7,33 @@ const landlordSchema = new mongoose.Schema({
     lastName: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
-    referalCode: {type: String, required: false},
     survey: {type: String},
-    terms: {type: Boolean, required: false},
+    terms: {type: Boolean, required: true},
     // forgotPasswordToken: {type: String},
+
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
 
     role: {
         type: String, 
-        default: "landlord"
+        default: "Landlord"
     },
     
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
-    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: true},
     landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc"},
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
+    messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
 
 }, {timestamps: true});
 
 //Password pre-hashing middleware
 landlordSchema.pre("save", async function(next) {
-    const hashedPassword = bcrypt.hashSync(this.password, 10)
-    this.password = hashedPassword;
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-//otp verification middleware can be added here
-landlordSchema.pre("save", async function(next) {
-    const otpRecord = await Otp.findById(this.otp);
-    if (!otpRecord || otpRecord.code !== this.otp) {
-        throw new Error("Invalid OTP");
-    }
-    next();
-});
-
-const Landlord = mongoose.model("Landlord", landlordSchema);
-export default Landlord;
+export default mongoose.models.Landlord || mongoose.model("Landlord", landlordSchema);

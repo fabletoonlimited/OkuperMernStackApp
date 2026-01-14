@@ -1,9 +1,9 @@
 // import mongoose from "mongoose";
 import {mongoose} from "@/app/lib/mongoose.js"
 
-const otpSchema = new mongoose.Schema(
+const referralCodeSchema = new mongoose.Schema(
   {
-    action: {
+     action: {
       type: String,
       required: true
     },
@@ -11,8 +11,6 @@ const otpSchema = new mongoose.Schema(
       type: String,
       required: true,
       index: true,
-      lowercase: true,
-      trim: true
     },
 
     code: {
@@ -33,17 +31,13 @@ const otpSchema = new mongoose.Schema(
 
     user: {
       type: mongoose.Schema.Types.ObjectId,
+      refPath: "userType",
       required: false,
     },
 
     used: {
       type: Boolean,
       default: false,
-    },
-
-    expiresAt: {
-      type: Date,
-      required: true,
     },
 
     // tenant: { type: mongoose.Schema.Types.ObjectId, ref: "tenant", required: false},
@@ -53,8 +47,4 @@ const otpSchema = new mongoose.Schema(
 );
 
 
-// ✅ TTL index — MUST be after schema creation
-otpSchema.index({ email: 1, purpose: 1, userType: 1, used: 1 }, {partialFilterExpression: {used: false}});
-otpSchema.index({ expiresAt: 1 }, { expiresAfterSeconds: 0 });
-
-export default mongoose.models.Otp || mongoose.model("Otp", otpSchema);
+export default mongoose.models.ReferralCode || mongoose.model("ReferralCode", referralCodeSchema);

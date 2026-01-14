@@ -1,151 +1,175 @@
 "use client";
-import React, { useState, useEffect} from 'react'
-import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const page = () => {
-    const router = useRouter()
-    
-    const [selectResidencyStatus, setSelectResidencyStatus] = useState(null);
-    const [showResidencyStatus, setShowResidencyStatus] = useState(false);
-    const [error, setError] = useState(null);
+  const router = useRouter();
 
-    useEffect(() => {
+  /* =======================
+     STATE
+  ======================= */
+  const [selectResidencyStatus, setSelectResidencyStatus] = useState(null);
+  const [showResidencyStatus, setShowResidencyStatus] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
+  const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
+  const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
+
+  /* =======================
+     EFFECTS
+  ======================= */
+
+  // Residency dropdown
+  useEffect(() => {
     if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
-        setShowResidencyStatus(true);
+      setShowResidencyStatus(true);
     } else {
-        setShowResidencyStatus(false);
-        setError(null);
+      setShowResidencyStatus(false);
+      setError(null);
     }
-    }, [selectResidencyStatus]);
+  }, [selectResidencyStatus]);
 
-       useEffect(() => {
-        const userId = localStorage.getItem("userId");
-        const role = localStorage.getItem("role");
+  // Who-is-using-platform buttons
+  useEffect(() => {
+    if (!selectWhoIsUsingPlatform) {
+      setShowWhoIsUsingPlatform(true);
+    } else {
+      setShowWhoIsUsingPlatform(false);
+      setErrorWhoisUsingPlatform(null);
+    }
+  }, [selectWhoIsUsingPlatform]);
 
-        if (!userId || !role) return;
+  // ✅ Resume signup safely (FIXED)
+  useEffect(() => {
+    const resumeSignup = async () => {
+      const userId = localStorage.getItem("userId");
+      const role = localStorage.getItem("role");
 
-        // Redirects
+      if (!userId || !role) return;
+
+      try {
+        const res = await fetch(`/api/user?id=${userId}`);
+
+        if (!res.ok) {
+          localStorage.removeItem("userId");
+          localStorage.removeItem("role");
+          return;
+        }
+
         router.replace(
-        role === "tenant"
+          role === "tenant"
             ? `/signUpTenant?userId=${userId}`
             : `/signUpLandlord?userId=${userId}`
         );
-    }, [router]);
+      } catch {
+        // silent fail
+      }
+    };
 
-    const residencyStatus = {
-        selectOne: "Select One",
+    resumeSignup();
+  }, [router]);
+
+  /* =======================
+     CONSTANTS
+  ======================= */
+
+  const residencyStatus = {
+    selectOne: "Select One",
+    citizen: "Citizen",
+    permanentResident: "Permanent Resident",
+    workPermit: "Work Permit",
+    studentVisa: "Student Visa",
+    visitorVisa: "Visitor Visa",
+  };
+
+  const enumValues = [
+    "selectOne",
+    "citizen",
+    "permanentResident",
+    "workPermit",
+    "studentVisa",
+    "visitorVisa",
+  ];
+
+  const translated = enumValues.map((residency) => ({
+    value: residency,
+    label: residencyStatus[residency],
+  }));
+
+  const whoIsUsingPlatform = {
+    myself: "myself",
+    someoneElse: "someoneElse",
+  };
+
+  const enumWhoIsUsingPlatformValues = ["myself", "someoneElse"];
+
+  const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
+  const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+  /* =======================
+     CREATE USER
+  ======================= */
+
+  const createUser = async (role) => {
+    try {
+      if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+        toast.error("Please select your residency status");
+        return;
+      }
+
+      if (!selectWhoIsUsingPlatform) {
+        toast.error("Please select who is using the platform");
+        return;
+      }
+
+      const residencyMap = {
         citizen: "Citizen",
         permanentResident: "Permanent Resident",
         workPermit: "Work Permit",
         studentVisa: "Student Visa",
-        visitorVisa: "Visitor Visa"
-    };
+        visitorVisa: "Visitor Visa",
+      };
 
-    const enumValues = ["selectOne", "citizen", "permanentResident", "workPermit", "studentVisa", "visitorVisa"];
-    const translated = enumValues.map(residency => ({
-        value: residency,
-        label: residencyStatus[residency]
-    }));
-
-    const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
-    const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
-    const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
-
-    useEffect(() => {
-    if (!selectWhoIsUsingPlatform || selectWhoIsUsingPlatform === "selectOne") {
-        setShowWhoIsUsingPlatform(true);
-    } else {
-        setShowWhoIsUsingPlatform(false);
-        setError(null);
-    }
-    }, [selectWhoIsUsingPlatform]);
-
-    const whoIsUsingPlatform = {
-        myself: "myself",
-        someoneElse: "someoneElse"
-    };
-
-    const enumWhoIsUsingPlatformValues = ["myself", "someoneElse"];
-    const translatedWhoIsUsingPlatform = enumWhoIsUsingPlatformValues.map(user => ({
-        value: user,
-        label: whoIsUsingPlatform[user]
-    }));
-
-    const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = 'dfdzbuk0c';
-    const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
-
-
-    const createUser = async (role) => {
-    try {
-        if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
-        toast.error("Please select your residency status");
-        return;
-    }
-
-    if (!selectWhoIsUsingPlatform) {
-        toast.error("Please select who is using the platform");
-        return;
-    }
-
-        const residencyMap = {
-            citizen: "Citizen",
-            permanentResident: "Permanent Resident",
-            workPermit: "Work Permit",
-            studentVisa: "Student Visa",
-            visitorVisa: "Visitor Visa",
-        };
-
-        const response = await fetch('/api/user', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            residencyStatus: residencyMap[selectResidencyStatus],
-            whoIsUsingPlatform: selectWhoIsUsingPlatform,
-            role, // "tenant" or "landlord"
-            }),
-        });
+          residencyStatus: residencyMap[selectResidencyStatus],
+          whoIsUsingPlatform: selectWhoIsUsingPlatform,
+          role,
+        }),
+      });
 
-        let data;
-        try { 
-            data = await response.json();
-        } catch (error) {
-            throw new Error("server error: Please try again later");
-        }
-        
-        if (!response.ok) {
+      const data = await response.json();
+
+      if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
-        }
+      }
 
-        //Normalize response (New / Existing)
-        const userId = data.user?._id || data.userId;
-        const userRole = data.user?.role || data.role;
+      const userId = data.user._id;
+      const userRole = data.user.role;
 
-        //Store for resume
-        localStorage.setItem("userId", userId);
-        localStorage.setItem("role", userRole);
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("role", userRole);
 
+      toast.success(
+        data.exists
+          ? "Welcome back! Resuming signup…"
+          : "User created successfully"
+      );
 
-        toast.success(
-            data.exists
-                ? "Welcome back! Resuming signup…"
-                : "User created successfully"
-        );
-
-    // ✅ Redirect
-    router.replace(
-      userRole === "tenant"
-        ? `/signUpTenant?userId=${userId}`
-        : `/signUpLandlord?userId=${userId}`
-    );
-
+      router.replace(
+        userRole === "tenant"
+          ? `/signUpTenant?userId=${userId}`
+          : `/signUpLandlord?userId=${userId}`
+      );
     } catch (err) {
-        console.error(err);
-        toast.error(err.message);
+      toast.error(err.message);
     }
-};
+  };
 
   return (
     <>

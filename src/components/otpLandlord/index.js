@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+// import Link from "next/link";
+// import { verify } from "jsonwebtoken";
 
 const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -35,18 +37,25 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
     try {
       // Call your verification API
-      const response = await fetch("/api/verifyOtp", {
+      const response = await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: otpCode }),
+        body: JSON.stringify({ 
+          email, 
+          code: otpCode,
+          purpose: "verifyAccount",
+          userType: "Landlord"
+        }),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || "Invalid OTP. Please try again.");
+        return;
+      } 
         onVerify();
-      } else {
-        setError("Invalid OTP. Please try again.");
-      }
-    } catch (err) {
+    } catch {
       setError("Verification failed. Please try again.");
     } finally {
       setLoading(false);
@@ -56,10 +65,15 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
   const handleResend = async () => {
     // Call your resend OTP API
     try {
-      await fetch("/api/otp/requestOtp", {
+      await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          action: "generateOtp",
+          email,
+          purpose: "verifyAccount",
+          userType: "Landlord"
+        }),
       });
       alert("OTP resent successfully!");
     } catch (err) {
@@ -69,7 +83,7 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-xl relative">
+      <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl relative">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -117,15 +131,13 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
 
           {/* Verify Button */}
-          <Link href="/signUpLandlord" className="mb-4 text-blue-700 underline">
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-950 hover:bg-blue-800 text-white p-3 rounded-lg text-lg font-semibold disabled:opacity-50"
-          >
+            className="w-full bg-blue-950 hover:bg-blue-800 text-white p-3 rounded-lg text-lg font-semibold disabled:opacity-50">
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
-          </Link>
+          
           
         </form>
 
@@ -134,8 +146,7 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
           Didn't receive the code?{" "}
           <button
             onClick={handleResend}
-            className="text-blue-600 hover:underline font-semibold"
-          >
+            className="text-blue-600 hover:underline font-semibold">
             Resend OTP
           </button>
         </p>

@@ -1,36 +1,40 @@
-import mongoose from "mongoose";
-import bcrypt from "bcrypt"
+// import mongoose from "mongoose";
+import {mongoose} from "@/app/lib/mongoose.js"
+import bcrypt from "bcryptjs"
 
 const tenantSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
-    otp: {type: String, required: true},
-    referalCode: {type: String, required: false},
     survey: {type: String},
-    terms: {type: Boolean, required: false},
-    forgotPasswordToken: {type: String},
+    terms: {type: Boolean, required: true},
+    // forgotPasswordToken: {type: String},
+
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
 
     role: {
         type: String, 
-        default: "tenant"
+        default: "Tenant"
     },
 
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
-    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: true},
-    tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc", required: false},
+    tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc"},
     tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
+    messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     
 }, {timestamps: true});
 
 // Password hashing
 tenantSchema.pre("save", async function(next) {
-    const hashedPassword = bcrypt.hashSync(this.password, 10)
-    this.password = hashedPassword;
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-const Tenant= mongoose.model("Tenant", tenantSchema);
-export default Tenant;
+
+export default mongoose.models.Tenant || mongoose.model("Tenant", tenantSchema);

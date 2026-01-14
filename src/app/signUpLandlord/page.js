@@ -24,6 +24,11 @@ const page = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
+     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      alert("Please fill all required fields");
+      return;
+    }
+
     if (!termsAccepted) {
       alert("Please accept the terms and conditions");
       return;
@@ -31,18 +36,24 @@ const page = () => {
 
     try {
       // Send OTP to user's email
-      const response = await fetch("/api/otp/request-otp", {
+      const response = await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
+        body: JSON.stringify({ 
+          action: "generateOtp",
+          email: formData.email,
+          purpose: "verifyAccount",
+          userType: "Landlord",
+        }),
       });
 
-      if (response.ok) {
-        // Show OTP modal
-        setShowOtpLandlord (true);
-      } else {
-        alert("Failed to send OTP. Please try again.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Failed to send OTP");
+      return;
       }
+      setShowOtpLandlord (true);
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred. Please try again.");
@@ -179,10 +190,7 @@ const page = () => {
 
         {/*SignUp Btn*/}
         <div className="landlordSignUpSection mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <button
-            onClick={handleSignUp}
-            className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
-          >
+          <button onClick={handleSignUp} className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
             {" "}
             Sign Up{" "}
           </button>

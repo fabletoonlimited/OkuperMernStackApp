@@ -1,28 +1,23 @@
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
 import dbConnect from "@/app/lib/mongoose";
-import {createUserController, getUserController, getAllUserController, deleteUserController} from "../controllers/user.controller";
+import {createUserController,getUserController,getAllUserController,deleteUserController} from "../controllers/user.controller.js";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req) {
-  console.log('➡️ POST /api/user hit');
+  console.log("➡️ POST /api/user hit");
 
   try {
-    console.log('1️⃣ connecting to DB...');
+    console.log("1️⃣ connecting to DB...");
     await dbConnect();
-    console.log('2️⃣ DB connected');
-;
+    console.log("2️⃣ DB connected");
     const body = await req.json();
-    console.log('4️⃣ body:', body);  
+    console.log("4️⃣ body:", body);
 
     if (!body.role || !body.residencyStatus || !body.whoIsUsingPlatform) {
-      return NextResponse.json(
-        { message: "Invalid user" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Invalid user" }, { status: 400 });
     }
-
 
     const result = await createUserController(body);
 
@@ -34,7 +29,6 @@ export async function POST(req) {
       { message: error.message || "Server error" },
       { status: 500 }
     );
-    
   }
 }
 
@@ -52,7 +46,6 @@ export async function GET(request) {
 
     const user = await getAllUserController();
     return NextResponse.json(user, { status: 200 });
-
   } catch (err) {
     return NextResponse.json({ message: err.message }, { status: 500 });
   }
@@ -66,14 +59,14 @@ export async function DELETE(request) {
     const id = searchParams.get("id");
 
     if (!id) {
-    return NextResponse.json(
-      { message: "User ID is required" }, 
-      { status: 400 });
-  }
+      return NextResponse.json(
+        { message: "User ID is required" },
+        { status: 400 }
+      );
+    }
 
     const result = await deleteUserController(id);
     return NextResponse.json(result, { status: 200 });
-
   } catch (err) {
     return NextResponse.json({ message: err.message }, { status: 500 });
   }
