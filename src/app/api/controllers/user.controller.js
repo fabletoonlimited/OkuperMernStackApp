@@ -44,7 +44,7 @@ export async function createUserController(data) {
     exists: false,
     message: "New User created Successfully",
     user: {
-      _id: newUser._id,
+      _idd: newUser._id,
       role: newUser.role,
     },
   };

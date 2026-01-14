@@ -10,7 +10,10 @@ export async function POST(req) {
     await dbConnect();
     const body = await req.json();
 
+    console.log("LANDLORD BODY:", body);
+
     const requiredFields = [
+      "userId",
       "firstName",
       "lastName",
       "email",

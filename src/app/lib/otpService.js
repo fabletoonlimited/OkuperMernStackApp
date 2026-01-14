@@ -1,11 +1,6 @@
 import crypto from "crypto";
 import Otp from "../../app/api/models/otpModel";
-import {Resend } from "resend"
 
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 // =====================
 // Generate OTP
 // =====================

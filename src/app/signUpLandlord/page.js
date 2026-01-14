@@ -1,9 +1,16 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 
+
 const page = () => {
+
+  const searchParams = useSearchParams();
+
+  const residencyStatus = searchParams.get("residencyStatus");
+  const whoIsUsingPlatform = searchParams.get("whoIsUsingPlatform");
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -61,17 +68,53 @@ const page = () => {
   };
 
   const handleOtpVerification = async () => {
-    // After OTP is verified, create the user account
+    if(!residencyStatus || !whoIsUsingPlatform) {
+      alert("Signup data missing. Please restart signup");
+      return;
+    }
     try {
+      //Create a USER
+      const userRes = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          residencyStatus,
+          whoIsUsingPlatform,
+          role: "landlord"
+        }),
+      });
+
+      const user = await userRes.json();
+
+      if (!userRes.ok) {
+      alert(user.message || "Failed to create user");
+      return;
+    }
+
+    //create landlord
       const response = await fetch("/api/landlord", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          userId: user._id,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          survey: formData.survey,
+          terms: true,
+        }),
       });
+
+      const landlord = await response.json();
 
       if (response.ok) {
         // Redirect to sign in or dashboard
         window.location.href = "/signInLandlord";
+      }
+
+      if (!response.ok) {
+        alert(landlord.message || "Failed to create Landlord")
       }
     } catch (error) {
       console.error("Error creating account:", error);

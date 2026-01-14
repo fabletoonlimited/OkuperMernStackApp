@@ -14,9 +14,10 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["Tenant", "Landlord"],
+        enum: ["tenant", "landlord", "admin"],
         required: true
     },
+    
 
 }, {timestamps: true});
 

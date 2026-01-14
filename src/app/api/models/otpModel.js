@@ -27,7 +27,7 @@ const otpSchema = new mongoose.Schema(
 
     userType: {
       type: String,
-      enum: ["Tenant", "Landlord"],
+      enum: ["tenant", "landlord", "admin"],
       required: true,
     },
 

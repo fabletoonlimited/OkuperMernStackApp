@@ -1,8 +1,8 @@
-import Landlord from "../models/landlordModel.js";
+import Landlord from "../../api/models/landlordModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateOtp } from "../lib/otpService.js";
-import { generateReferralCode } from "../lib/referralCodeService.js";
+import { generateOtp } from "@/app/lib/otpService.js";
+import { generateReferralCode } from "@/app/lib/referralCodeService.js";
 import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY
@@ -16,10 +16,14 @@ const resend = process.env.RESEND_API_KEY
 
 //Signup Landlord
 export async function createLandlordController(data) {
-  const { firstName, lastName, email, password, survey, terms } = data;
+  const { firstName, lastName, email, password, survey, terms, userId } = data;
 
-  if (!firstName || !lastName || !email || !password || !survey) {
+  if (!firstName || !lastName || !email || !password) {
     throw new Error("Please fill all required fields");
+  }
+
+   if(!userId) {
+    throw new Error("User is required to create landlord")
   }
 
   if (terms !== true) {
@@ -41,6 +45,7 @@ export async function createLandlordController(data) {
   }
 
   const newLandlord = new Landlord({
+    user: userId,
     firstName,
     lastName,
     email: trimmedEmail,
