@@ -31,11 +31,8 @@ const otpSchema = new mongoose.Schema(
       required: true,
     },
 
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: false,
-    },
-
+    user: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    
     used: {
       type: Boolean,
       default: false,

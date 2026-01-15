@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     
+    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord"},
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"},
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin"}
 
 }, {timestamps: true});
 
