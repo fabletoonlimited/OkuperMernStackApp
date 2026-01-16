@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useRef } from "react";
 import PropExpandedNav from "../../components/propExpandedNav";
+import { faBed, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FaBed } from "@fortawesome/free-solid-svg-icons";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
@@ -162,11 +165,17 @@ const Index = () => {
                         </p>
 
                         <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
-                            <div className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-blue-950">
-                                Bungalow building
+                            <div className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-blue-950 flex  justify-between gap-3">
+                                <div>
+                                    <FontAwesomeIcon icon={faHouse} />
+                                </div>
+                                <div> Bungalow building</div>
                             </div>
-                            <div className="md:px-16 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-20.5 py-4 border-blue-950">
-                                3 Bed | 2 Toilet
+                            <div className="md:px-16 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-20.5 py-4 border-blue- flex  justify-between gap-3 ">
+                                <div>
+                                    <FontAwesomeIcon icon={faBed} />
+                                </div>
+                                <div> 3 Bed | 2 Toilet</div>
                             </div>
                         </div>
                     </div>
@@ -184,7 +193,12 @@ const Index = () => {
                         <div className="flex flex-col  mt-4 mb-4 gap-3 w-full">
                             <h5 className="text-3xl md:text-2xl ">Rate</h5>
                             <div className="h-16 ">
-                                <StarRating />
+                                <StarRating
+                                    style={{
+                                        transform: "scale(2)",
+                                        transformOrigin: "left",
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>
@@ -199,8 +213,8 @@ const Index = () => {
                         </h2>
                         <div className="flex items-center gap-4">
                             <FontAwesomeIcon
-                                icon={faCircleUser}
-                                style={{ fontSize: "46px",background:"gray"  }}
+                                icon={faUser}
+                                className="text-[28px] bg-gray-200 p-3 rounded-full"
                             />
 
                             <div>
@@ -208,14 +222,17 @@ const Index = () => {
                                     Username
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-green-700 md:text-base">
+                                    <span className="text-green-600 font-light md:text-base">
                                         Verified
                                     </span>
                                     <FontAwesomeIcon
                                         icon={faCircleInfo}
                                         style={{
                                             fontSize: "10px",
-                                            color: "darkgreen",
+                                            background: "white",
+                                            borderRadius: "50%",
+                                            padding: "2px",
+                                            color: "lightgreen",
                                         }}
                                     />
                                 </div>
@@ -225,7 +242,7 @@ const Index = () => {
                     </div>
 
                     {/* Ad Card */}
-                    <div className="w-full md:w-96 bg-gradient-to-br from-blue-800 to-blue-700 text-white p-6 md:p-8 text-center rounded-md">
+                    <div className="w-full md:w-96 bg-blue-900 text-white p-6 md:p-8 text-center rounded-md">
                         <h4 className="text-2xl md:text-4xl font-bold">
                             WorkmanHQ!
                         </h4>
@@ -242,13 +259,13 @@ const Index = () => {
                 </div>
                 {/* FEATURES */}
                 <div className="mt-12">
-                    <h2 className="text-5xl md:text-6xl font-medium md:font-semibold mb-6 md:text-start text-start ">
+                    <h2 className="text-5xl text-black  md:text-6xl font-medium md:font-medium mb-6 md:text-start text-start ">
                         Features
                     </h2>
 
                     {["Building amenities", "Unit features"].map((title, i) => (
                         <div key={i} className="mt-9">
-                            <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 border-1 p-2">
+                            <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 border-1 p-2 pl-10">
                                 {title}
                             </h3>
                             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -256,10 +273,10 @@ const Index = () => {
                                     <li
                                         key={j}
                                         className="flex items-center gap-3 bg-gray-100 p-3">
-                                        <span className="md:text-2xl text-2xl">
+                                        <span className="md:text-2xl text-black text-2xl">
                                             ●
                                         </span>
-                                        <span className="text-2xl md:text-lg">
+                                        <span className="text-2xl text-black md:text-lg">
                                             {title}
                                         </span>
                                     </li>
@@ -292,10 +309,10 @@ const Index = () => {
                                 <li
                                     key={j}
                                     className="flex items-center gap-3 bg-gray-100 p-3">
-                                    <span className="md:text-2xl text-2xl">
+                                    <span className="md:text-2xl text-black text-2xl">
                                         ●
                                     </span>
-                                    <span className="text-2xl md:text-lg">
+                                    <span className="text-2xl text-black md:text-lg">
                                         {title}
                                     </span>
                                 </li>
@@ -366,21 +383,24 @@ const Index = () => {
                         </div>
                         <div className="flex items-center gap-4">
                             <FontAwesomeIcon
-                                icon={faCircleUser}
-                                style={{ fontSize: "46px" }}
+                                icon={faUser}
+                                className="text-[28px] bg-gray-200 p-3 rounded-full"
                             />
                             <div>
-                                <h3 className="text-2xl md:text-2xl">
+                                <h3 className="text-2xl text-black md:text-2xl">
                                     Username
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-green-700">
+                                    <span className="text-green-600 font-light">
                                         Verified
                                     </span>
                                     <FontAwesomeIcon
                                         icon={faCircleInfo}
                                         style={{
                                             fontSize: "10px",
+                                            background: "white",
+                                            borderRadius: "50%",
+                                            padding: "2px",
                                             color: "lightgreen",
                                         }}
                                     />
@@ -422,7 +442,7 @@ const Index = () => {
                 {/* Trending Section */}
                 <section className="max-w-7xl mx-auto px-4 md:px-10 py-6 mt-7">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-3xl font-bold md:font-medium">
+                        <h3 className="text-3xl text-black font-bold md:font-medium">
                             Nearby Apartments
                         </h3>
 
@@ -471,4 +491,3 @@ const Index = () => {
 };
 
 export default Index;
- 
