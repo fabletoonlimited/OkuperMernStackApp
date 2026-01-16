@@ -1,9 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { toast } from "react-toastify"
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 
@@ -29,7 +29,7 @@ const page = () => {
   // 🔒 HARD GUARD — PREVENT BROKEN FLOW
   useEffect(() => {
     if (!userId) return;
-    if(!residencyStatus || !whoIsUsingPlatform) {
+    if (!residencyStatus || !whoIsUsingPlatform) {
       setError("Signup flow is invalid. Please restart signup.");
     }
   }, [userId, residencyStatus, whoIsUsingPlatform]);
@@ -45,37 +45,37 @@ const page = () => {
     e.preventDefault();
     setError("");
 
-    if(!userId) {
+    if (!userId) {
       setError("Signup flow is invalid. Please restart signup.");
       return;
     }
 
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) 
-      {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password
+    ) {
       setError("Please fill all required fields");
       return;
-      }
+    }
+
+    if (!formData.email.includes("@")) {
+      setError("Please enter a valid email");
+      return;
+    }
+
+    // if (formData.password.length < 8) {
+    //   setError("Password must be at least 8 characters");
+    //   return;
+    // }
 
     if (!termsAccepted) {
-      alert("Please accept the terms and conditions");
+      setError("Please accept the terms and conditions");
       return;
     }
 
     try {
-
-      // const user = await userRes.json();
-
-      // if (!userRes.ok) {
-      //   setError(user.message || "Failed to create user");
-      //   return;
-      // }
-
-      // const userId = user.user?._id;
-      // if (!userId) {
-      //  setError("User creation failed");
-      //   return;
-      // }
-
       // Create landlord
       const landlordRes = await fetch("/api/landlord", {
         method: "POST",
@@ -87,7 +87,7 @@ const page = () => {
           email: formData.email,
           password: formData.password,
           survey: formData.survey,
-          terms: true,
+          terms: termsAccepted,
         }),
       });
 
@@ -98,67 +98,38 @@ const page = () => {
         return;
       }
 
+      // Generate and send OTP
       const otpRes = await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-        action: "generate",
-        email: formData.email,
-        userType:["tenant", "landlord", "admin"]
-      }),
-    });
+          action: "generate",
+          email: formData.email,
+          purpose: "verifyAccount",
+          userType: "landlord",
+        }),
+      });
 
-    if (!otpRes.ok) {
-      setError("Failed to generate OTP");
-      return;
-    }
+      if (!otpRes.ok) {
+        setError("Failed to generate OTP. Please try again.");
+        return;
+      }
 
-    // ✅ OPEN OTP MODAL
+      const otpData = await otpRes.json();
+      console.log("OTP sent to email:", formData.email);
+
+      // Open OTP modal
       setShowOtpLandlord(true);
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      setError("Something went wrong. Please try again.");
     }
-
-    if (!formData.email.includes("@")) {
-      toast.error("Please enter a valid email");
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters");
-      return;
-    }
-
-    const payload = {
-      ...formData,
-      terms: termsAccepted,
-    };
-
-    console.log("Sending payload:", payload);
-
-    const response = await fetch("/api/landlord", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      toast.error(data.message || "Something went wrong");
-      return;
-    }
-
-    toast.success(
-      "Account created! Please verify your email with the OTP sent."
-    );
-    setShowOtpLandlord(true);
   };
-
 
   const handleOtpVerification = async (otpCode) => {
     if (!otpCode) return;
+
+    console.log("Verifying OTP:", otpCode, "for email:", formData.email);
 
     try {
       const res = await fetch("/api/otp", {
@@ -168,22 +139,41 @@ const page = () => {
           action: "verify",
           email: formData.email,
           code: otpCode,
-          userType: "Landlord",
+          purpose: "verifyAccount",
+          userType: "landlord",
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message || "Invalid OTP or expired");
-        return;
+        console.error("OTP verification failed:", data);
+        toast.error(data.message || "Invalid OTP or expired");
+        throw new Error(data.message || "Invalid OTP");
       }
 
-      alert("Account verified successfully 🎉");
-      setShowOtpLandlord(false);
+      // Update landlord to verified
+      const updateRes = await fetch("/api/landlord", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          isVerified: true,
+        }),
+      });
+
+      if (updateRes.ok) {
+        toast.success("Account verified successfully! 🎉");
+        setShowOtpLandlord(false);
+
+        // Redirect to landlord dashboard or login
+        setTimeout(() => {
+          router.push("/landlordDashboard");
+        }, 2000);
+      }
     } catch (err) {
       console.error(err);
-      alert("OTP verification failed");
+      toast.error("OTP verification failed");
     }
   };
   return (
@@ -195,9 +185,9 @@ const page = () => {
         Signup as Landlord
       </h1>
 
-      {error && (
-        <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>
-      )}
+      <ToastContainer position="top-center" autoClose={3000} />
+
+      {error && <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>}
 
       {/*SignUp Form*/}
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">
@@ -302,24 +292,15 @@ const page = () => {
 
         {/*SignUp Btn*/}
         <div className="landlordSignUpSection mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <button 
-          onClick={handleSignUp} 
-          email={formData.email}
-          className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
+          <button
+            onClick={handleSignUp}
+            email={formData.email}
+            className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
+          >
             {" "}
             Sign Up{" "}
           </button>
         </div>
-
- {/* OTP MODAL */}
-    {showOtpLandlord && (
-      <OtpLandlord
-        isOpen
-        onClose={() => setShowOtpLandlord(false)}
-        email={formData?.email ?? ""}
-        onVerify={handleOtpVerification}
-      />
-      )}
 
         {/*Banner Section*/}
         <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-290 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
@@ -362,9 +343,18 @@ const page = () => {
         </div>
         {/*End of Banner Section*/}
       </div>
+
+      {/* OTP MODAL */}
+      {showOtpLandlord && (
+        <OtpLandlord
+          isOpen={true}
+          onClose={() => setShowOtpLandlord(false)}
+          email={formData?.email ?? ""}
+          onVerify={handleOtpVerification}
+        />
+      )}
     </>
   );
 };
-
 
 export default page;

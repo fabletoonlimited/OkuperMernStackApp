@@ -124,21 +124,6 @@ const page = () => {
        CREATE USER
     ======================= */
   
-    const createUser = async (role) => {
-      try {
-        if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
-          toast.error("Please select your residency status");
-          return;
-        }
-  
-        if (!selectWhoIsUsingPlatform) {
-          toast.error("Please select who is using the platform");
-          return;
-        }
-
-<<<<<<< HEAD
-        const response = await fetch("/api/user", {
-=======
   const createUser = async (role) => {
     try {
       if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
@@ -163,7 +148,6 @@ const page = () => {
       const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
       const response = await fetch("/api/user", {
->>>>>>> bdab594e401629856e06a1716f552a7e265cd107
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -322,9 +306,6 @@ const page = () => {
             Sign Up as Tenant
           </button>
 
-<<<<<<< HEAD
-export default page
-=======
           <button
             onClick={() => createUser("landlord")}
             className="signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:65 border-1px solid #ccc text-2xl text-center cursor-pointer"
@@ -381,4 +362,3 @@ export default page
 };
 
 export default page;
->>>>>>> bdab594e401629856e06a1716f552a7e265cd107

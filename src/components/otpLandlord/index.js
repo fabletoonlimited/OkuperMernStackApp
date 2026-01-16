@@ -31,12 +31,11 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
     setLoading(true);
     setError("");
-    
+
     try {
-    await onVerify(otpCode);
-    
+      await onVerify(otpCode);
     } catch (err) {
-        setError(err.message || "OTP verification failed");
+      setError(err.message || "OTP verification failed");
     } finally {
       setLoading(false);
     }
@@ -51,7 +50,7 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
           action: "generate",
           email,
           purpose: "verifyAccount",
-          userType: "Landlord",
+          userType: "landlord",
         }),
       });
 
@@ -62,16 +61,26 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
         return;
       }
 
-      alert("OTP resent successfully");
+      setOtp(["", "", "", "", "", ""]);
+      setError("");
+      alert("OTP resent successfully! Check your email.");
     } catch {
       setError("Failed to resend OTP");
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-2xl">×</button>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
+      style={{ pointerEvents: "auto" }}
+    >
+      <div
+        className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-2xl">
+          ×
+        </button>
 
         <h2 className="text-3xl font-bold text-center mb-2">Verify Email</h2>
         <p className="text-center mb-6">{email}</p>
@@ -94,7 +103,8 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-950 text-white p-3 rounded">
+            className="w-full bg-blue-950 text-white p-3 rounded"
+          >
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
         </form>

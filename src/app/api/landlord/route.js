@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
-import { createLandlordController, getLandlordController, getAllLandlordController, updateLandlordController, deleteLandlordController} from "../controllers/landlord.controller.js";
+import Landlord from "../models/landlordModel.js";
 
 // CREATE LANDLORD
 export async function POST(req) {
@@ -11,61 +11,59 @@ export async function POST(req) {
 
     const body = await req.json();
     
-    const {firstName, lastName, email, password, survey, terms, isVerified} = body;
+    const {userId, firstName, lastName, email, password, survey, terms} = body;
 
     if (!userId || !firstName || !lastName || !email || !password || !terms) {
       return NextResponse.json(
         { message: "Missing required fields" },
-        { status: 401 }
+        { status: 400 }
       );
     }
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    //Check if userId Exists in DB
-     const existingUserById = await dbConnect.user.findUnique({
-      where: {userId: userId}
-    });
-    if (existingUserById) {
-      return NextResponse.json(
-        { message: "User does not belong to this Landlord"}, { status: 401 }
-      );
-    }
     //Check if landlord Email Exists in DB
-    const existingLandlordEmail = await dbConnect.landlord.findUnique({
-      where: {email: trimmedEmail}
-    });
-    if (existingLandlordEmail) {
+    const existingLandlord = await Landlord.findOne({ email: trimmedEmail });
+    
+    if (existingLandlord) {
       return NextResponse.json(
-        { message: "Email already exists in Database, Please sign in" }, { status: 401 }
+        { message: "Email already exists in Database, Please sign in" }, 
+        { status: 400 }
       );
     }
 
     //create New Landlord
-    const newLandlord = await createLandlordController.create({
-      data: {
-        user: userId, 
-        firstName, 
-        lastName, 
-        email: trimmedEmail, 
-        password, 
-        terms,
-        isVerified: false,
-        role: "landlord",
-      }
-    })
-
-    await newLandlord.save()
+    const newLandlord = await Landlord.create({
+      user: userId, 
+      firstName, 
+      lastName, 
+      email: trimmedEmail, 
+      password, 
+      survey,
+      terms,
+      isVerified: false,
+      role: "landlord",
+    });
 
     return NextResponse.json(
-      {success: true},
-      { landlord: newLandlord, message: "Landlord created sucessfully!"}, 
+      { 
+        success: true,
+        landlord: {
+          _id: newLandlord._id,
+          firstName: newLandlord.firstName,
+          lastName: newLandlord.lastName,
+          email: newLandlord.email,
+          isVerified: newLandlord.isVerified
+        }, 
+        message: "Landlord created successfully!"
+      }, 
       {status: 201}
-  );
+    );
 
   } catch (error) {
+    console.error("Landlord creation error:", error);
     return NextResponse.json(
-      { message: "Server error, something went wrong" },
+      { message: error.message || "Server error, something went wrong" },
       { status: 500 }
     );
   }
@@ -78,9 +76,10 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const email = searchParams.get("email");
 
     if (id) {
-      const landlord = await getLandlordController({ _id: id });
+      const landlord = await Landlord.findById(id).select("-password");
 
       if (!landlord) {
         return NextResponse.json(
@@ -92,7 +91,20 @@ export async function GET(request) {
       return NextResponse.json(landlord, { status: 200 });
     }
 
-    const landlords = await getAllLandlordController();
+    if (email) {
+      const landlord = await Landlord.findOne({ email }).select("-password");
+
+      if (!landlord) {
+        return NextResponse.json(
+          { message: "Landlord not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(landlord, { status: 200 });
+    }
+
+    const landlords = await Landlord.find().select("-password");
     return NextResponse.json(landlords, { status: 200 });
 
   } catch (err) {
@@ -109,15 +121,38 @@ export async function PUT(request) {
     await dbConnect();
     const body = await request.json();
 
-    if (!body || !body._id) {
+    const { email, _id, ...updateData } = body;
+
+    if (!_id && !email) {
       return NextResponse.json(
-        { message: "Landlord ID is required" },
+        { message: "Landlord ID or email is required" },
         { status: 400 }
       );
     }
 
-    const result = await updateLandlordController(body);
-    return NextResponse.json(result, { status: 200 });
+    const query = _id ? { _id } : { email };
+    
+    const updatedLandlord = await Landlord.findOneAndUpdate(
+      query,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedLandlord) {
+      return NextResponse.json(
+        { message: "Landlord not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { 
+        success: true, 
+        landlord: updatedLandlord,
+        message: "Landlord updated successfully" 
+      }, 
+      { status: 200 }
+    );
 
   } catch (error) {
     console.error("❌ API ERROR:", error);
@@ -143,8 +178,19 @@ export async function DELETE(request) {
       );
     }
 
-    const result = await deleteLandlordController(id);
-    return NextResponse.json(result, { status: 200 });
+    const deletedLandlord = await Landlord.findByIdAndDelete(id);
+
+    if (!deletedLandlord) {
+      return NextResponse.json(
+        { message: "Landlord not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, message: "Landlord deleted successfully" }, 
+      { status: 200 }
+    );
 
   } catch (err) {
     return NextResponse.json(

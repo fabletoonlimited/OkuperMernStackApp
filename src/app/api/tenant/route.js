@@ -5,23 +5,21 @@ import { createTenant, loginTenant, getTenant, getAllTenant, updateTenant, delet
 import { NextResponse } from "next/server";
 
 
+export async function POST(req) {
+  try {
+    await dbConnect();
+    const body = await req.json();
+
     // Dispatch based on fields: Signup has firstName, Login does not
     if (body.firstName) {
       return await signupTenant(req, body);
     } else {
       return await loginTenant(req, body);
     }
-<<<<<<< HEAD
   } catch (error) {
     return NextResponse.json({ message: "Invalid request" }, { status: 400 });
   }
 }
-=======
-//   } catch (error) {
-//     return NextResponse.json({ message: "Invalid request" }, { status: 400 });
-//   }
-// }
->>>>>>> bdab594e401629856e06a1716f552a7e265cd107
 
 export async function GET(req) {
   await connectDB();
