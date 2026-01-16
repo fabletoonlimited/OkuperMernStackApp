@@ -5,6 +5,7 @@ const otpSchema = new mongoose.Schema(
   {
     action: {
       type: String,
+      enum:["generate", "verify", "passwordReset"],
       required: true
     },
     email: {
@@ -20,18 +21,11 @@ const otpSchema = new mongoose.Schema(
       required: true,
     },
 
-    purpose: {
-      type: String,
-      required: true,
-    },
-
     userType: {
       type: String,
       enum: ["tenant", "landlord", "admin"],
       required: true,
     },
-
-    user: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     
     used: {
       type: Boolean,
@@ -42,16 +36,19 @@ const otpSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-
-    // tenant: { type: mongoose.Schema.Types.ObjectId, ref: "tenant", required: false},
-    // landlord: { type: mongoose.Schema.Types.ObjectId, ref: "landlord", required: false},
   },
   { timestamps: true }
 );
 
 
 // ✅ TTL index — MUST be after schema creation
-otpSchema.index({ email: 1, purpose: 1, userType: 1, used: 1 }, {partialFilterExpression: {used: false}});
+otpSchema.index(
+  { email: 1, userType: 1, used: 1 }, 
+  {
+    name: "otp_active_email_userType",
+    partialFilterExpression: { used: false },
+  }
+);
 otpSchema.index({ expiresAt: 1 }, { expiresAfterSeconds: 0 });
 
 export default mongoose.models.Otp || mongoose.model("Otp", otpSchema);

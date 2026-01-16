@@ -1,4 +1,4 @@
-import User from "@/app/api/models/userModel.js";
+import User from "../models/userModel.js"
 
 // Create User
 export async function createUserController(data) {
@@ -44,7 +44,7 @@ export async function createUserController(data) {
     exists: false,
     message: "New User created Successfully",
     user: {
-      _idd: newUser._id,
+      _id: newUser._id,
       role: newUser.role,
     },
   };
@@ -54,13 +54,16 @@ export async function getUserController(userId) {
   if (!userId) {
     throw new Error("User ID is required");
   }
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new Error("Invalid user ID");
+  }
 
   const { default: User } = await import("../models/userModel.js");
 
   const user = await User.findById(userId)
-    .populate("tenant")
-    .populate("landlord")
-    .populate("otp");
+    .populate("Tenant")
+    .populate("Landlord")
+    .populate("Admin")
 
   if (!user) {
     throw new Error("User not found");

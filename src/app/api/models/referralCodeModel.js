@@ -5,6 +5,7 @@ const referralCodeSchema = new mongoose.Schema(
   {
      action: {
       type: String,
+      enum: ["generatereferralCode", "verifyreferralCode"],
       required: true
     },
     email: {
@@ -18,33 +19,21 @@ const referralCodeSchema = new mongoose.Schema(
       required: true,
     },
 
-    purpose: {
-      type: String,
-      required: true,
-    },
-
     userType: {
       type: String,
-      enum: ["Tenant", "Landlord"],
+      enum: ["tenant", "landlord", "admin"],
       required: true,
-    },
-
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      refPath: "userType",
-      required: false,
     },
 
     used: {
       type: Boolean,
       default: false,
-    },
-
-    // tenant: { type: mongoose.Schema.Types.ObjectId, ref: "tenant", required: false},
-    // landlord: { type: mongoose.Schema.Types.ObjectId, ref: "landlord", required: false},
+    }
   },
   { timestamps: true }
 );
 
+// ✅ TTL index — MUST be after schema creation
+// otpSchema.index({ email: 1, userType: 1, used: 1 }, {partialFilterExpression: {used: false}});
 
 export default mongoose.models.ReferralCode || mongoose.model("ReferralCode", referralCodeSchema);

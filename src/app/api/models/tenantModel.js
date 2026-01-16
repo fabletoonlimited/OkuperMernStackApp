@@ -36,5 +36,4 @@ tenantSchema.pre("save", async function(next) {
     next();
 });
 
-
 export default mongoose.models.Tenant || mongoose.model("Tenant", tenantSchema);

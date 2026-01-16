@@ -85,6 +85,15 @@ const page = () => {
     visitorVisa: "Visitor Visa",
   };
 
+
+  const residencyMap = {
+    citizen: "Citizen",
+    permanentResident: "Permanent Resident",
+    workPermit: "Work Permit",
+    studentVisa: "Student Visa",
+    visitorVisa: "Visitor Visa",
+  };
+
   const enumValues = [
     "selectOne",
     "citizen",
@@ -109,31 +118,24 @@ const page = () => {
   const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
   const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
+
   /* =======================
-     CREATE USER
-  ======================= */
+       CREATE USER
+    ======================= */
+  
+    const createUser = async (role) => {
+      try {
+        if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+          toast.error("Please select your residency status");
+          return;
+        }
+  
+        if (!selectWhoIsUsingPlatform) {
+          toast.error("Please select who is using the platform");
+          return;
+        }
 
-  const createUser = async (role) => {
-    try {
-      if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
-        toast.error("Please select your residency status");
-        return;
-      }
-
-      if (!selectWhoIsUsingPlatform) {
-        toast.error("Please select who is using the platform");
-        return;
-      }
-
-      const residencyMap = {
-        citizen: "Citizen",
-        permanentResident: "Permanent Resident",
-        workPermit: "Work Permit",
-        studentVisa: "Student Visa",
-        visitorVisa: "Visitor Visa",
-      };
-
-      const response = await fetch("/api/user", {
+        const response = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -143,33 +145,33 @@ const page = () => {
         }),
       });
 
-      const data = await response.json();
-
+        const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
       }
 
-      const userId = data.user._id;
-      const userRole = data.user.role;
-
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("role", userRole);
-
-      toast.success(
-        data.exists
-          ? "Welcome back! Resuming signup…"
-          : "User created successfully"
-      );
-
-      router.replace(
-        userRole === "tenant"
-          ? `/signUpTenant?userId=${userId}`
-          : `/signUpLandlord?userId=${userId}`
-      );
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
+    const userId = data._id || data.user?._id;
+          const userRole = data.role || data.user?.role;
+    
+          localStorage.setItem("userId", userId);
+          localStorage.setItem("role", userRole);
+    
+          toast.success(
+            data.exists
+              ? "Welcome back! Resuming signup…"
+              : "User created successfully"
+          );
+    
+          router.replace(
+            userRole === "tenant"
+              ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+              : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+          );
+        } catch (err) {
+          toast.error(err.message);
+        }
+      };
+    
 
   return (
     <>

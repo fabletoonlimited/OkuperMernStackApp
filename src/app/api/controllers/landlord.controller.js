@@ -1,4 +1,5 @@
-import Landlord from "../../api/models/landlordModel.js";
+import Landlord from "../models/landlordModel.js";
+import User from "../models/userModel.js"
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateOtp } from "@/app/lib/otpService.js";
@@ -16,11 +17,16 @@ const resend = process.env.RESEND_API_KEY
 
 //Signup Landlord
 export async function createLandlordController(data) {
-  const { firstName, lastName, email, password, survey, terms, userId } = data;
+  const { firstName, lastName, email, password, survey, terms, role, userId } = data;
 
   if (!firstName || !lastName || !email || !password) {
     throw new Error("Please fill all required fields");
   }
+
+  const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      throw new Error("User does not exist");
+    }
 
    if(!userId) {
     throw new Error("User is required to create landlord")
@@ -30,21 +36,25 @@ export async function createLandlordController(data) {
     throw new Error("Please accept the terms and conditions");
   }
 
-  const trimmedEmail = email.trim().toLowerCase();
-
   if (password.length < 8) {
     return { message: "Password must be at least 8 characters" };
   }
 
-  const existingLandlord = await Landlord.findOne({ email: trimmedEmail });
-  if (existingLandlord) {
-    return {
-      exists: true,
-      message: "Landlord already exists. Please login.",
-    };
+  const trimmedEmail = email.trim().toLowerCase();
+
+ //Check if Landlord Email Exists in DB
+  const existingLandlord = await Landlord.findOne({email: trimmedEmail})
+    if (existingLandlord) {
+      throw new Error("Landlord already exists. Please login.");
+    }
+
+  const landlordExists = await Landlord.findOne({ user: userId });
+  if (landlordExists) {
+    throw new Error("User already has a landlord profile");
   }
 
-  const newLandlord = new Landlord({
+  //Create New Landlord
+  const landlord = new Landlord({
     user: userId,
     firstName,
     lastName,
@@ -57,39 +67,36 @@ export async function createLandlordController(data) {
   });
 
 
-  // ✅ CORRECT PARALLEL CALLS
-  const [referralCode, otp] = await Promise.all([
-    generateReferralCode(
-      trimmedEmail,
-      "verifiedAccount",
-      "Landlord",
-      newLandlord._id
-    ),
-    generateOtp(
-      trimmedEmail,
-      "verifyAccount",
-      "Landlord",
-      newLandlord._id
-    ),
+  // ✅ Create OTP and referal code
+  const [{ code: otpCode, referral }] = await Promise.all([
+    generateOtp({
+      email: trimmedEmail,
+      action: "verifyAccount",
+      userType: "Landlord",
+      userId: landlord._id
+    }),
+
+    generateReferralCode({
+      email: trimmedEmail,
+      action: "verifiedAccount",
+      userType: "Landlord",
+      userId: landlord._id
+    }),
   ]);
-
-  newLandlord.referralCode = referralCode._id;
-  newLandlord.otp = otp._id;
   
-  await newLandlord.save();
+  await landlord.save();
 
-  // Send email
-  if (!resend) {
-   throw new Error("Resend is not configured")
-  }
+  // Send email via resend
+  if (!resend) throw new Error("Resend is not configured");
+
     await resend.emails.send({
-      from: process.env.SEND_OTP_FROM || "onboarding@resend.dev",
+      from: process.env.SEND_OTP_FROM,
       to: trimmedEmail,
       subject: "Welcome to Okuper!",
       html: `
         <h2>Welcome to Okuper, ${firstName}!</h2>
-        <p>Your verification code is <strong>${otp.code}</strong></p>
-        <p>Your referral code is <strong>${referralCode.code}</strong></p>
+        <p>Your verification code is <strong>${otpCode}</strong></p>
+        <p>Your referral code is <strong>${referral}</strong></p>
         <p>It expires in 5 minutes.<p><br/><br/>
         <p>Warm Regards, <br/>Okuper Technologies Limited</p>
         `,
@@ -97,8 +104,7 @@ export async function createLandlordController(data) {
 
   return {
     success: true,
-    message: "New landlord created successfully",
-    landlordId: newLandlord._id,
+    landlordId: landlord._id,
   };
 }
 

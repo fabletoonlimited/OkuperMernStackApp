@@ -27,7 +27,14 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  const noLayoutRoutes = ["/landlordDashboard", "/tenantDashboard", "/landlordDashboardInbox", "/propertyListing","/propertyListingUploadForm", "/propertyCardExpanded"];
+  const noLayoutRoutes = [
+    "/landlordDashboard", 
+    "/tenantDashboard", 
+    "/landlordDashboardInbox", 
+    "/propertyListing",
+    "/propertyListingUploadForm", 
+    "/propertyCardExpanded"
+  ];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
   return (
