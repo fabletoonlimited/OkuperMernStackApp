@@ -1,9 +1,19 @@
 "use client";
+
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify"
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 
 const page = () => {
+  const searchParams = useSearchParams();
+
+  const userId = searchParams.get("userId");
+  const residencyStatus = searchParams.get("residencyStatus");
+  const whoIsUsingPlatform = searchParams.get("whoIsUsingPlatform");
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -11,23 +21,40 @@ const page = () => {
     password: "",
     survey: "",
   });
-  const [showOtpLandlord, setShowOtpLandlord ] = useState(false);
+
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showOtpLandlord, setShowOtpLandlord] = useState(false);
+  const [error, setError] = useState("");
+
+  // 🔒 HARD GUARD — PREVENT BROKEN FLOW
+  useEffect(() => {
+    if (!userId) return;
+    if(!residencyStatus || !whoIsUsingPlatform) {
+      setError("Signup flow is invalid. Please restart signup.");
+    }
+  }, [userId, residencyStatus, whoIsUsingPlatform]);
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setError("");
 
-     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      alert("Please fill all required fields");
+    if(!userId) {
+      setError("Signup flow is invalid. Please restart signup.");
       return;
     }
+
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) 
+      {
+      setError("Please fill all required fields");
+      return;
+      }
 
     if (!termsAccepted) {
       alert("Please accept the terms and conditions");
@@ -35,49 +62,130 @@ const page = () => {
     }
 
     try {
-      // Send OTP to user's email
-      const response = await fetch("/api/otp", {
+
+      // const user = await userRes.json();
+
+      // if (!userRes.ok) {
+      //   setError(user.message || "Failed to create user");
+      //   return;
+      // }
+
+      // const userId = user.user?._id;
+      // if (!userId) {
+      //  setError("User creation failed");
+      //   return;
+      // }
+
+      // Create landlord
+      const landlordRes = await fetch("/api/landlord", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "generateOtp",
+        body: JSON.stringify({
+          userId,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           email: formData.email,
-          purpose: "verifyAccount",
+          password: formData.password,
+          survey: formData.survey,
+          terms: true,
+        }),
+      });
+
+      const landlord = await landlordRes.json();
+
+      if (!landlordRes.ok) {
+        setError(landlord.message || "Failed to create landlord");
+        return;
+      }
+
+      const otpRes = await fetch("/api/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+        action: "generate",
+        email: formData.email,
+        userType:["tenant", "landlord", "admin"]
+      }),
+    });
+
+    if (!otpRes.ok) {
+      setError("Failed to generate OTP");
+      return;
+    }
+
+    // ✅ OPEN OTP MODAL
+      setShowOtpLandlord(true);
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
+
+    if (!formData.email.includes("@")) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    const payload = {
+      ...formData,
+      terms: termsAccepted,
+    };
+
+    console.log("Sending payload:", payload);
+
+    const response = await fetch("/api/landlord", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message || "Something went wrong");
+      return;
+    }
+
+    toast.success(
+      "Account created! Please verify your email with the OTP sent."
+    );
+    setShowOtpLandlord(true);
+  };
+
+
+  const handleOtpVerification = async (otpCode) => {
+    if (!otpCode) return;
+
+    try {
+      const res = await fetch("/api/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "verify",
+          email: formData.email,
+          code: otpCode,
           userType: "Landlord",
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        alert(data.message || "Failed to send OTP");
-      return;
+      if (!res.ok) {
+        alert(data.message || "Invalid OTP or expired");
+        return;
       }
-      setShowOtpLandlord (true);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+
+      alert("Account verified successfully 🎉");
+      setShowOtpLandlord(false);
+    } catch (err) {
+      console.error(err);
+      alert("OTP verification failed");
     }
   };
-
-  const handleOtpVerification = async () => {
-    // After OTP is verified, create the user account
-    try {
-      const response = await fetch("/api/landlord", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        // Redirect to sign in or dashboard
-        window.location.href = "/signInLandlord";
-      }
-    } catch (error) {
-      console.error("Error creating account:", error);
-    }
-  };
-
   return (
     <>
       <h1
@@ -86,6 +194,10 @@ const page = () => {
       >
         Signup as Landlord
       </h1>
+
+      {error && (
+        <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>
+      )}
 
       {/*SignUp Form*/}
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">
@@ -169,7 +281,7 @@ const page = () => {
         <div className="termsSection -mt-11 md:mt-10 md:ml-13 ml-13 mr-10 md:mr-0 flex items-center">
           <input
             type="checkbox"
-            id="agreeTerms"
+            // id="agreeTerms"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
             className="w-7 h-7 border-2 border-blue-950 rounded cursor-pointer accent-blue-700"
@@ -190,19 +302,24 @@ const page = () => {
 
         {/*SignUp Btn*/}
         <div className="landlordSignUpSection mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <button onClick={handleSignUp} className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
+          <button 
+          onClick={handleSignUp} 
+          email={formData.email}
+          className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
             {" "}
             Sign Up{" "}
           </button>
         </div>
 
-        {/* OTP Modal */}
-        <OtpLandlord 
-          isOpen={showOtpLandlord }
-          onClose={() => setShowOtpLandlord (false)}
-          email={formData.email}
-          onVerify={handleOtpVerification}
-        />
+ {/* OTP MODAL */}
+    {showOtpLandlord && (
+      <OtpLandlord
+        isOpen
+        onClose={() => setShowOtpLandlord(false)}
+        email={formData?.email ?? ""}
+        onVerify={handleOtpVerification}
+      />
+      )}
 
         {/*Banner Section*/}
         <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-290 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
@@ -248,5 +365,6 @@ const page = () => {
     </>
   );
 };
+
 
 export default page;

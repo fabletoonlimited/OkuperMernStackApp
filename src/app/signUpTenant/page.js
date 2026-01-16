@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import {toast} from 'react-toastify'
 import Link from "next/link";
 import OtpTenant from "@/components/otpTenant";
 
@@ -24,9 +25,14 @@ const page = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+// Added form validation for user to fill all required fields
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.survey) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
     if (!termsAccepted) {
-      alert("Please accept the terms and conditions");
+      toast.error("Please accept the terms and conditions");
       return;
     }
 

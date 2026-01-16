@@ -86,6 +86,15 @@ const page = () => {
     visitorVisa: "Visitor Visa",
   };
 
+
+  const residencyMap = {
+    citizen: "Citizen",
+    permanentResident: "Permanent Resident",
+    workPermit: "Work Permit",
+    studentVisa: "Student Visa",
+    visitorVisa: "Visitor Visa",
+  };
+
   const enumValues = [
     "selectOne",
     "citizen",
@@ -110,10 +119,26 @@ const page = () => {
   const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
   const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-  /* =======================
-     CREATE USER
-  ======================= */
 
+  /* =======================
+       CREATE USER
+    ======================= */
+  
+    const createUser = async (role) => {
+      try {
+        if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+          toast.error("Please select your residency status");
+          return;
+        }
+  
+        if (!selectWhoIsUsingPlatform) {
+          toast.error("Please select who is using the platform");
+          return;
+        }
+
+<<<<<<< HEAD
+        const response = await fetch("/api/user", {
+=======
   const createUser = async (role) => {
     try {
       if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
@@ -138,6 +163,7 @@ const page = () => {
       const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
       const response = await fetch("/api/user", {
+>>>>>>> bdab594e401629856e06a1716f552a7e265cd107
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -147,33 +173,33 @@ const page = () => {
         }),
       });
 
-      const data = await response.json();
-
+        const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
       }
 
-      const userId = data.user._id;
-      const userRole = data.user.role;
-
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("role", userRole);
-
-      toast.success(
-        data.exists
-          ? "Welcome back! Resuming signup…"
-          : "User created successfully"
-      );
-
-      router.replace(
-        userRole === "tenant"
-          ? `/signUpTenant?userId=${userId}`
-          : `/signUpLandlord?userId=${userId}`
-      );
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
+    const userId = data._id || data.user?._id;
+          const userRole = data.role || data.user?.role;
+    
+          localStorage.setItem("userId", userId);
+          localStorage.setItem("role", userRole);
+    
+          toast.success(
+            data.exists
+              ? "Welcome back! Resuming signup…"
+              : "User created successfully"
+          );
+    
+          router.replace(
+            userRole === "tenant"
+              ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+              : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+          );
+        } catch (err) {
+          toast.error(err.message);
+        }
+      };
+    
 
   return (
     <>
@@ -296,6 +322,9 @@ const page = () => {
             Sign Up as Tenant
           </button>
 
+<<<<<<< HEAD
+export default page
+=======
           <button
             onClick={() => createUser("landlord")}
             className="signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:65 border-1px solid #ccc text-2xl text-center cursor-pointer"
@@ -352,3 +381,4 @@ const page = () => {
 };
 
 export default page;
+>>>>>>> bdab594e401629856e06a1716f552a7e265cd107

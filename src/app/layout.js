@@ -9,6 +9,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
+import { ToastContainer } from "react-toastify";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,14 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  const noLayoutRoutes = ["/landlordDashboard", "/tenantDashboard", "/landlordDashboardInbox", "/propertyListing","/propertyListingUploadForm", "/propertyCardExpanded"];
+  const noLayoutRoutes = [
+    "/landlordDashboard", 
+    "/tenantDashboard", 
+    "/landlordDashboardInbox", 
+    "/propertyListing",
+    "/propertyListingUploadForm", 
+    "/propertyCardExpanded"
+  ];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
   return (
@@ -35,6 +44,16 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {!shouldHideLayout && <Nav />}
         {children}
+
+        {/* Toast container */}
+        <ToastContainer
+        position="top-center"
+        autoClose={4000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        />
         {!shouldHideLayout && <Footer />}
       </body>
     </html>

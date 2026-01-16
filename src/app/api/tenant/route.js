@@ -11,10 +11,17 @@ import { NextResponse } from "next/server";
     } else {
       return await loginTenant(req, body);
     }
+<<<<<<< HEAD
+  } catch (error) {
+    return NextResponse.json({ message: "Invalid request" }, { status: 400 });
+  }
+}
+=======
 //   } catch (error) {
 //     return NextResponse.json({ message: "Invalid request" }, { status: 400 });
 //   }
 // }
+>>>>>>> bdab594e401629856e06a1716f552a7e265cd107
 
 export async function GET(req) {
   await connectDB();
