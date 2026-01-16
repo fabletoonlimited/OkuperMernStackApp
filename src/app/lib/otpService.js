@@ -1,65 +1,51 @@
 import crypto from "crypto";
-import Otp from "../../app/api/models/otpModel";
-import {Resend } from "resend"
+import Otp from "../../app/api/models/otpModel.js";
 
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-// =====================
 // Generate OTP
-// =====================
-export async function generateOtp(email, purpose, userType, userId = null) {
+export async function generateOtp({action, email, code, userType, userId = null}) {
   // Invalidate previous unused OTPs for same context
-  await Otp.updateMany(
-    { email, purpose, userType, used: false },
-    { used: true }
-  );
+  const invalidateQuery = { action, email, userType, used: false };
+  if (userId) invalidateQuery.user = userId;
 
-  const code = crypto.randomInt(100000, 1000000).toString();
-  // const hashedCode = crypto
-  // .createHash("sha256")
-  // .update(code)
-  // .digest("hex")
+  await Otp.updateMany(invalidateQuery, { used: true });
+  const otpCode = crypto.randomInt(100000, 1000000).toString();
 
-  const otp = {
-    action: "generateOtp",
+  const hashedCode = crypto
+    .createHash("sha256")
+    .update(otpCode)
+    .digest("hex");
+
+  const otp = await Otp.create({ 
+    action,
     email,
-    purpose,
+    otpCode: hashedCode,
     userType,
     user: userId,
-    code,
-    // code: hashedCode,
     used: false,
     expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
-  };
-
-  // if (userId) {
-  //   otpData.user = userId
-  // }
-
-  // const otp = new Otp(otpData);
-  // await otp.save();
- 
-  // return {otp, code};
+  });
   
- return {otp, code};
+ return {
+  message: "OTP generated successfully",
+  otpId: otp._id, 
+  otpCode
+};
 }
 
-// =====================
 // Verify OTP
-// =====================
-export async function verifyOtp(email, code, purpose, userType, userId = null) {
-  // const hashedCode = crypto
-  // .createHash("sha256")
-  // .update(code)
-  // .digest("hex")
+export async function verifyOtp({action, email, otpCode, userType, userId = null}) {
+  const verifyOtp = { action, email, purpose, userType, used: false };
+  if (userId) verifyOtp.user = userId;
+
+  const hashedCode = crypto
+    .createHash("sha256")
+    .update(code)
+    .digest("hex");
 
   const query = {
+    action,
     email,
-    code,
-    // code: hashedCode,
-    purpose,
+    code: hashedCode,
     userType,
     used: false,
     expiresAt: { $gt: new Date() },
@@ -76,5 +62,5 @@ export async function verifyOtp(email, code, purpose, userType, userId = null) {
   otp.used = true;
   await otp.save();
 
-  return otp;
+  return {message: "OTP verified"};
 }

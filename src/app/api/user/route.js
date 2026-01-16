@@ -6,20 +6,24 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req) {
-  console.log("➡️ POST /api/user hit");
-
   try {
-    console.log("1️⃣ connecting to DB...");
     await dbConnect();
-    console.log("2️⃣ DB connected");
-    const body = await req.json();
-    console.log("4️⃣ body:", body);
 
-    if (!body.role || !body.residencyStatus || !body.whoIsUsingPlatform) {
-      return NextResponse.json({ message: "Invalid user" }, { status: 400 });
+    const { residencyStatus, whoIsUsingPlatform, role } = await req.json();
+
+    if (!residencyStatus || !whoIsUsingPlatform || !role) {
+      return NextResponse.json(
+        { message: "Invalid user" },
+        { status: 400 }
+      );
     }
 
-    const result = await createUserController(body);
+    // ✅ Correct usage: call the controller directly
+    const result = await createUserController({
+      residencyStatus,
+      whoIsUsingPlatform,
+      role,
+    });
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
@@ -31,6 +35,7 @@ export async function POST(req) {
     );
   }
 }
+
 
 export async function GET(request) {
   await dbConnect();

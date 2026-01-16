@@ -1,0 +1,263 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const page = () => {
+  const router = useRouter();
+
+  /* =======================
+     STATE
+  ======================= */
+  const [selectResidencyStatus, setSelectResidencyStatus] = useState(null);
+  const [showResidencyStatus, setShowResidencyStatus] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
+  const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
+  const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
+
+  /* =======================
+     CONSTANTS
+  ======================= */
+
+  const residencyStatus = {
+    selectOne: "Select One",
+    citizen: "Citizen",
+    permanentResident: "Permanent Resident",
+    workPermit: "Work Permit",
+    studentVisa: "Student Visa",
+    visitorVisa: "Visitor Visa",
+  };
+
+  const residencyMap = {
+    citizen: "Citizen",
+    permanentResident: "Permanent Resident",
+    workPermit: "Work Permit",
+    studentVisa: "Student Visa",
+    visitorVisa: "Visitor Visa",
+  };
+
+  const enumValues = [
+    "selectOne",
+    "citizen",
+    "permanentResident",
+    "workPermit",
+    "studentVisa",
+    "visitorVisa",
+  ];
+
+  const translated = enumValues.map((residency) => ({
+    value: residency,
+    label: residencyStatus[residency],
+  }));
+
+  const whoIsUsingPlatform = {
+    myself: "myself",
+    someoneElse: "someoneElse",
+  };
+
+  const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
+  const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+  
+  /* =======================
+     EFFECTS
+  ======================= */
+
+  // Residency dropdown
+  useEffect(() => {
+    if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+      setShowResidencyStatus(true);
+    } else {
+      setShowResidencyStatus(false);
+      setError(null);
+    }
+  }, [selectResidencyStatus]);
+
+  // Who-is-using-platform buttons
+  useEffect(() => {
+    if (!selectWhoIsUsingPlatform) {
+      setShowWhoIsUsingPlatform(true);
+    } else {
+      setShowWhoIsUsingPlatform(false);
+      setErrorWhoisUsingPlatform(null);
+    }
+  }, [selectWhoIsUsingPlatform]);
+
+  // ✅ Resume signup (SAFE, FIXED, NO DOUBLE FIRE)
+  // useEffect(() => {
+  //   const resumeSignup = async () => {
+  //     const userId = localStorage.getItem("userId");
+  //     const role = localStorage.getItem("role");
+
+  //     if (!userId || !role) return;
+  //     if (!selectResidencyStatus || !selectWhoIsUsingPlatform) return;
+
+  //     if (sessionStorage.getItem("signupNavigated")) return;
+  //     sessionStorage.setItem("signupNavigated", "true");
+
+  //     try {
+  //       // const res = await fetch(`/api/user?id=${userId}`);
+  //       if (!res.ok) {
+  //         localStorage.removeItem("userId");
+  //         localStorage.removeItem("role");
+  //         return;
+  //       }
+
+  //       router.replace(
+  //         role === "tenant"
+  //           ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+  //           : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+  //       );
+
+  //       localStorage.removeItem("userId");
+  //       localStorage.removeItem("role");
+  //     } catch {
+  //       // silent fail
+  //     }
+  //   };
+
+  //   resumeSignup();
+  // }, [router, selectResidencyStatus, selectWhoIsUsingPlatform]);
+
+  /* =======================
+     CREATE USER
+  ======================= */
+
+  const createUser = async (role) => {
+    try {
+      if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+        toast.error("Please select your residency status");
+        return;
+      }
+
+      if (!selectWhoIsUsingPlatform) {
+        toast.error("Please select who is using the platform");
+        return;
+      }
+
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          residencyStatus: residencyMap[selectResidencyStatus],
+          whoIsUsingPlatform: selectWhoIsUsingPlatform,
+          role,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create user");
+      }
+
+      const userId = data._id || data.user?._id;
+      const userRole = data.role || data.user?.role;
+
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("role", userRole);
+
+      toast.success(
+        data.exists
+          ? "Welcome back! Resuming signup…"
+          : "User created successfully"
+      );
+
+      router.replace(
+        userRole === "tenant"
+          ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+          : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+      );
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  return (
+    <>
+      <h1 className="font-bold text-4xl" style={{ paddingLeft: 50, marginTop: 70 }}>
+        Sign Up
+      </h1>
+
+      {/* UI BELOW IS UNCHANGED */}
+      <div className="signUpLoandingContainer md:flex-col col mt-10 mb-10">
+        <ToastContainer position="top-center" autoClose={3000} />
+
+        <div
+          className="residencyStatusSection text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            maxWidth: "556px",
+            height: "650px",
+            border: "1px solid #ccc",
+            padding: "20px",
+            borderRadius: "5px",
+            paddingLeft: "40px",
+            paddingRight: "50px",
+            marginLeft: "50px",
+          }}
+        >
+          <p style={{ paddingTop: 40, marginBottom: 30 }}>
+            What is your residency status?
+          </p>
+
+          {showResidencyStatus && (
+            <select
+              value={selectResidencyStatus || "selectOne"}
+              onChange={(e) => setSelectResidencyStatus(e.target.value)}
+            >
+              {translated.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="whoIsUsingPlatform mt-10 ml-12 flex gap-4">
+          <button onClick={() => createUser("tenant")}>Sign Up as Tenant</button>
+          <button onClick={() => createUser("landlord")}>Sign Up as Landlord</button>
+        </div>
+      </div>
+ 
+        {/*Banner Section*/}
+        <div className='bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-295 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10'>
+            {/* RIGHT SECTION */}
+            <div className={ 'relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170'}>
+                <div className={'relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor '}>
+                    <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-justify md:text-center">
+                    <b>Sign up on Okuper to connect directly with landlords and tenants.</b>
+                    </h2>
+                </div>
+
+                <p className="absolute md:font-medium leading-[1.5] -mt-10 md:text-[20px] text-white text-center px-5 md:px-20 text-xl md:text-center">
+                    No agents. No hidden fees. Just verified people and real homes.
+                </p>
+
+                {/* RIGHT BANNER IMAGES */}
+                <img
+                    src={BASE_URL + '/bannerlady_uzwewr'}
+                    alt="bannerlady"
+                    className={'bannerLady md:h-auto h-60 md:w-155 w-75 bottom-[-315px] md:bottom-[-721px]'}
+                    style={{position: 'absolute', height: 'auto'}}
+                />
+
+                <img
+                    src= "/BannerSam.png"
+                    alt="Ad Banner Sam"
+                    className={'rounded-b-2xl'}
+                />
+            </div>
+        </div>
+
+        {/*End of Banner Section*/}
+        
+    </>
+  )
+}
+
+export default page
