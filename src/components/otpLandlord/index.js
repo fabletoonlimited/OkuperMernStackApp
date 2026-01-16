@@ -40,11 +40,12 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
       const response = await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email, 
+        body: JSON.stringify({
+          action: "verifyOtp",
+          email,
           code: otpCode,
           purpose: "verifyAccount",
-          userType: "Landlord"
+          userType: "Landlord",
         }),
       });
 
@@ -53,8 +54,8 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
       if (!response.ok || !data.success) {
         setError(data.message || "Invalid OTP. Please try again.");
         return;
-      } 
-        onVerify();
+      }
+      onVerify();
     } catch {
       setError("Verification failed. Please try again.");
     } finally {
@@ -68,11 +69,11 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
       await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           action: "generateOtp",
           email,
           purpose: "verifyAccount",
-          userType: "Landlord"
+          userType: "Landlord",
         }),
       });
       alert("OTP resent successfully!");
@@ -129,16 +130,14 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
             <p className="text-red-600 text-center mb-4 text-sm">{error}</p>
           )}
 
-
           {/* Verify Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-950 hover:bg-blue-800 text-white p-3 rounded-lg text-lg font-semibold disabled:opacity-50">
+            className="w-full bg-blue-950 hover:bg-blue-800 text-white p-3 rounded-lg text-lg font-semibold disabled:opacity-50"
+          >
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
-          
-          
         </form>
 
         {/* Resend Link */}
@@ -146,7 +145,8 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
           Didn't receive the code?{" "}
           <button
             onClick={handleResend}
-            className="text-blue-600 hover:underline font-semibold">
+            className="text-blue-600 hover:underline font-semibold"
+          >
             Resend OTP
           </button>
         </p>

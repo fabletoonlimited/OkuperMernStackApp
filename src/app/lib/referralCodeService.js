@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import ReferralCode from "../models/referralCode.js";
+import ReferralCode from "../api/models/referralCodeModel.js";
 
 export async function generateReferralCode(email, purpose,userType,userId) 
 {
