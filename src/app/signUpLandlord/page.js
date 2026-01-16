@@ -9,6 +9,7 @@ import OtpLandlord from "@/components/otpLandlord";
 
 const page = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const userId = searchParams.get("userId");
   const residencyStatus = searchParams.get("residencyStatus");
@@ -162,15 +163,23 @@ const page = () => {
         }),
       });
 
-      if (updateRes.ok) {
-        toast.success("Account verified successfully! 🎉");
-        setShowOtpLandlord(false);
+      const updateData = await updateRes.json();
 
-        // Redirect to landlord dashboard or login
-        setTimeout(() => {
-          router.push("/landlordDashboard");
-        }, 2000);
+      if (!updateRes.ok) {
+        console.error("Failed to update landlord:", updateData);
+        toast.error("Verification successful but failed to update account");
+        return;
       }
+
+      console.log("✅ Landlord updated to verified");
+      toast.success("Account verified successfully! 🎉");
+      setShowOtpLandlord(false);
+
+      // Redirect to landlord dashboard
+      setTimeout(() => {
+        console.log("🚀 Redirecting to landlord dashboard...");
+        router.push("/landlordDashboard");
+      }, 2000);
     } catch (err) {
       console.error(err);
       toast.error("OTP verification failed");
