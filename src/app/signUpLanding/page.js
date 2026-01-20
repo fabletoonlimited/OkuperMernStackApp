@@ -63,7 +63,7 @@ const page = () => {
         router.replace(
           role === "tenant"
             ? `/signUpTenant?userId=${userId}`
-            : `/signUpLandlord?userId=${userId}`
+            : `/signUpLandlord?userId=${userId}`,
         );
       } catch {
         // silent fail
@@ -85,7 +85,6 @@ const page = () => {
     studentVisa: "Student Visa",
     visitorVisa: "Visitor Visa",
   };
-
 
   const residencyMap = {
     citizen: "Citizen",
@@ -119,11 +118,10 @@ const page = () => {
   const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
   const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-
   /* =======================
        CREATE USER
     ======================= */
-  
+
   const createUser = async (role) => {
     try {
       if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
@@ -157,33 +155,32 @@ const page = () => {
         }),
       });
 
-        const data = await response.json();
+      const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
       }
 
-    const userId = data._id || data.user?._id;
-          const userRole = data.role || data.user?.role;
-    
-          localStorage.setItem("userId", userId);
-          localStorage.setItem("role", userRole);
-    
-          toast.success(
-            data.exists
-              ? "Welcome back! Resuming signup…"
-              : "User created successfully"
-          );
-    
-          router.replace(
-            userRole === "tenant"
-              ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
-              : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
-          );
-        } catch (err) {
-          toast.error(err.message);
-        }
-      };
-    
+      const userId = data._id || data.user?._id;
+      const userRole = data.role || data.user?.role;
+
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("role", userRole);
+
+      toast.success(
+        data.exists
+          ? "Welcome back! Resuming signup…"
+          : "User created successfully",
+      );
+
+      router.replace(
+        userRole === "tenant"
+          ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
+          : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`,
+      );
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   return (
     <>
@@ -300,14 +297,14 @@ const page = () => {
           style={{ display: "flex", gap: "20px" }}
         >
           <button
-            onClick={() => createUser("tenant")}
+            onClick={() => createUser("Tenant")}
             className="signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:w-60 border-1px solid #ccc text-2xl text-center cursor-pointer"
           >
             Sign Up as Tenant
           </button>
 
           <button
-            onClick={() => createUser("landlord")}
+            onClick={() => createUser("Landlord")}
             className="signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:65 border-1px solid #ccc text-2xl text-center cursor-pointer"
           >
             Sign Up as Landlord
