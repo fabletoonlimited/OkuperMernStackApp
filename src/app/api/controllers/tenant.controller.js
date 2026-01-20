@@ -1,26 +1,33 @@
-import Tenant from "../models/tenantModel";
+import Tenant from "../models/tenantModel.js";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateOtp } from "../lib/otpService.js";
-import { Resend } from "resend";
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+
 
 //Signup Tenant
-export const signupTenant = async (req, body) => {
-  const { firstName, lastName, email, password, referalCode, survey, terms } =
-    body;
+export const signupTenant = async (req) => {
+  const body = await req.json();
+  const { 
+    firstName,
+    lastName,
+    email,
+    password,
+    otp,
+    referalCode,
+    surveyInputField,
+    terms 
+  } = body;
 
-  if (!firstName || !lastName || !email || !password || !survey || !terms) {
+  if (
+    !firstName || !lastName || !email || !password || !surveyInputField || !terms
+  ) {
     return NextResponse.json(
       { message: "Kindly fill all fields required" },
       { status: 400 }
     );
   }
 
-  //check if landlord exists in DB
+  //check if tenant exists in DB
   const existingUser = await Tenant.findOne({ email });
   if (existingUser) {
     return NextResponse.json(
@@ -35,40 +42,35 @@ export const signupTenant = async (req, body) => {
       lastName,
       email,
       password,
+      otp,
       referalCode,
-      survey,
+      survey: surveyInputField,
       terms,
       role: "tenant",
     });
 
-    const otp = await generateOtp(
-      email,
-      "verifyAccount",
-      "Tenant",
-      newTenant._id
-    );
-    newTenant.otp = otp._id;
-
     await newTenant.save();
 
     //send welcome email to tenant
-    if (resend) {
+    try {
+      const { Resend } = await import("resend");
+      const resend = new Resend(process.env.RESEND_API_KEY);
+
       await resend.emails.send({
-        from: "noreply@fabletoon.com", // Use your verified domain
+        from: process.env.SEND_OTP_FROM || "noreply@okuper.com",
         to: email,
         subject: "Welcome to Okuper!",
         html: `
-                  <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
                     <h1 style="color: #003399;">Welcome to Okuper, ${firstName}!</h1>
                     <p>Thank you for joining Okuper - your trusted platform for renting and buying homes directly.</p>
                     <p>No agents. No hidden fees. Just verified people and real homes.</p>
-                    <p>Your verification code is: <strong>${otp.code}</strong></p>
                     <br/>
                     <p>Get started by:</p>
                     <ul>
                       <li>Completing your profile</li>
-                      <li>Browsing available properties</li>
-                      <li>Saving your favorite homes</li>
+                      <li>Listing your properties</li>
+                      <li>Managing tenant inquiries</li>
                     </ul>
                     <br/>
                     <p>If you have any questions, feel free to contact our support team.</p>
@@ -77,14 +79,16 @@ export const signupTenant = async (req, body) => {
                   </div>
                 `,
       });
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
     }
 
     return NextResponse.json(
       {
-        message: "New tenant created Successfully",
+        message: "New Tenant created Successfully",
         user: newTenant,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error(error);
@@ -95,8 +99,9 @@ export const signupTenant = async (req, body) => {
   }
 };
 
-export const loginTenant = async (req, body) => {
+export const loginTenant = async (req) => {
   try {
+    const body = await req.json();
     const { email, password } = body;
 
     const tenant = await Tenant.findOne({ email });
@@ -107,7 +112,7 @@ export const loginTenant = async (req, body) => {
       );
     }
 
-    const isMatch = bcrypt.compareSync(password, tenant.password);
+    const isMatch = await bcrypt.compare(password, tenant.password);
     if (!isMatch) {
       return NextResponse.json({ error: "invalid password" }, { status: 401 });
     }
@@ -144,17 +149,28 @@ export const loginTenant = async (req, body) => {
   }
 };
 
-export const getTenant = async (req, tenantData) => {
-  const { _id } = tenantData;
+export const getTenant = async (req) => {
+  try{
+    const { _id } = req.tenant;
 
-  const tenant = await Tenant.findById(_id)
-    .populate("User")
-    .populate("Otp")
-    .populate("TenantKyc")
-    .populate("TenantDashboard")
-    .populate("Property");
+    const tenant = await Tenant.findById(_id)
+      .populate("User")
+      .populate("Otp")
+      .populate("TenantKyc")
+      .populate("TenantDashboard")
+      .populate("Property");
 
-  return NextResponse.json(tenant);
+      if (!tenant) {
+        return NextResponse.json(
+          { message: "Tenant not found" },
+          { status: 404 }
+        );
+      }
+      
+      return NextResponse.json(tenant, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
+  };
 };
 
 export const getAllTenant = async (req) => {
@@ -167,7 +183,7 @@ export const getAllTenant = async (req) => {
       .populate("TenantDashboard")
       .populate("Property");
 
-    return NextResponse.json(allTenant);
+    return NextResponse.json(allTenant, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "error getting tenant" },
@@ -176,19 +192,23 @@ export const getAllTenant = async (req) => {
   }
 };
 
-export const updateTenant = async (req, tenantData) => {
+export const updateTenant = async (req) => {
   try {
     const body = await req.json();
-    const { firstName, lastName, email } = body;
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const { _id, firstName, lastName, email } = body;
+    // const { searchParams } = new URL(req.url);
+    // const id = searchParams.get("id");
 
     // only self-update or admin
-    // Simplified logic for this fix
-    const targetId = id || tenantData._id;
+    if (req.tenant && req.tenant._id !== _id && !req.admin) {
+      return NextResponse.json(
+        { success: false, message: "You are unauthorized" },
+        { status: 403 }
+      );
+    }
 
     const tenant = await Tenant.findByIdAndUpdate(
-      targetId,
+      _id,
       { firstName, lastName, email },
       { new: true, runValidators: true }
     ).select("-password");
@@ -212,36 +232,64 @@ export const updateTenant = async (req, tenantData) => {
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "something went wrong" },
+      { message: "something went wrong", error: error.message },
       { status: 500 }
     );
   }
 };
 
 export const deleteTenant = async (req) => {
-  const { searchParams } = new URL(req.url);
-  const _id = searchParams.get("id");
-
   try {
-    const deleteTenant = await Tenant.findByIdAndDelete(_id);
-    return NextResponse.json(deleteTenant);
+    const { searchParams } = new URL(req.url);
+    const _id = searchParams.get("id");
+
+    if (!_id) {
+      return NextResponse.json(
+        { error: "Tenant ID is required" },
+        { status: 400 },
+      );
+    };
+
+    const deletedTenant = await Tenant.findByIdAndDelete(_id);
+
+    if (!deletedTenant) {
+      return NextResponse.json(
+        { error: "Tenant not found" },
+        { status: 404 }
+      );
+    };
+
+    return NextResponse.json(
+      { message: "Tenant deleted successfully", tenant: deletedTenant },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Delete error:", error);
     return NextResponse.json(
       { error: "Cannot delete Tenant" },
       { status: 500 }
     );
-  }
+  };
 };
 
 // ================== ARRAY UPLOAD ==================
-export const arrayUpload = async (req, res, next) => {
+export const arrayUpload = async (req) => {
   try {
+    const formData = await req.formData();
+    const files = formData.getAll("files");
+
     const uploads = await Promise.all(
-      req.files.map((file) => streamUpload(file.buffer, "images"))
+      files.map((file) => streamUpload(file, "images")),
     );
-    return res.json({ message: "Upload successful", uploads });
+
+    return NextResponse.json(
+      { message: "Upload successful", uploads },
+      { status: 200 }
+    );
   } catch (error) {
-    next(error);
-  }
+    return NextResponse.json(
+      { message: error.message || "Upload failed" },
+      { status: 500 }
+    );
+  };
 };

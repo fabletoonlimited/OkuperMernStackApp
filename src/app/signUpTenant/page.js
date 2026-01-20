@@ -1,11 +1,20 @@
 "use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
-import {toast} from 'react-toastify'
 import Link from "next/link";
 import OtpTenant from "@/components/otpTenant";
 
 const page = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const userId = searchParams.get("userId");
+  const residencyStatus = searchParams.get("residencyStatus");
+  const whoIsUsingPlatform = searchParams.get("whoIsUsingPlatform");
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -13,23 +22,49 @@ const page = () => {
     password: "",
     survey: "",
   });
+
   const [showOtpTenant, setShowOtpTenant] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [error, setError] = useState("");
+
+
+  useEffect(() => {
+    if (!userId) return;
+    if (!residencyStatus || !whoIsUsingPlatform) {
+      toast.error("Signup flow is invalid. Please restart signup.");
+    }
+  }, [userId, residencyStatus, whoIsUsingPlatform]);
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-// Added form validation for user to fill all required fields
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.survey) {
-      toast.error("Please fill in all fields");
+    setError("");
+
+    if(!userId) {
+      toast.error("Signup flow is invalid. Please restart signup.");
       return;
     }
+
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password ) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!formData.email.includes("@")) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    // if (formData.password.length < 8) {
+    //   setError("Password must be at least 8 characters");
+    //   return;
+    // }
 
     if (!termsAccepted) {
       toast.error("Please accept the terms and conditions");
@@ -37,40 +72,112 @@ const page = () => {
     }
 
     try {
-      // Send OTP to user's email
-      const response = await fetch("/api/otp/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
-      });
-
-      if (response.ok) {
-        // Show OTP modal
-        setShowOtpTenant(true);
-      } else {
-        alert("Failed to send OTP. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
-
-  const handleOtpVerification = async () => {
-    // After OTP is verified, create the user account
-    try {
+      // Create tenant
       const response = await fetch("/api/tenant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ 
+          userId,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          survey: formData.survey,
+          terms: termsAccepted,
+       }),
       });
 
-      if (response.ok) {
-        // Redirect to sign in or dashboard
-        window.location.href = "/signInTenant";
+      const tenant = await response.json();
+
+      if (!response.ok) {
+        toast.error(tenant.message || "Failed to create tenant");
+        return;
       }
+
+      // Generate and send OTP
+      const otpRes = await fetch("/api/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generate",
+          email: formData.email,
+          purpose: "verifyAccount",
+          userType: "tenant",
+        }),
+      });
+
+      if (!otpRes.ok) {
+        toast.error("Failed to generate OTP. Please try again.");
+        return;
+      }
+
+      const otpData = await otpRes.json();
+      console.log("OTP sent to email:", formData.email);
+
+      // Open OTP modal
+      setShowOtpTenant(true);
     } catch (error) {
-      console.error("Error creating account:", error);
+      console.error(error);
+      toast.error("An error occurred. Please try again.");
+    }
+  };
+
+  const handleOtpVerification = async (otpCode) => {
+    if (!otpCode) return;
+
+    console.log("Verifying OTP:", otpCode, "for email:", formData.email);
+
+    try {
+      const response = await fetch("/api/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "verify",
+          email: formData.email,
+          code: otpCode,
+          purpose: "verifyAccount",
+          userType: "tenant",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("OTP verification failed:", data);
+        toast.error(data.message || "Invalid OTP or expired");
+        throw new Error(data.message || "Invalid OTP");
+      }
+
+      // Update tenant to verified
+      const updateResponse = await fetch("/api/tenant", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          isVerified: true,
+        }),
+      });
+
+      const updateData = await updateResponse.json();
+
+      if (!updateResponse.ok) {
+        console.error("Failed to update tenant:", updateData);
+        toast.error("Verification successful but failed to update account");
+        return;
+      }
+
+      console.log("✅ Tenant updated to verified");
+      toast.success("Account verified successfully! 🎉");
+      setShowOtpTenant(false);
+
+      // Redirect to tenant dashboard
+      setTimeout(() => {
+        toast.success("🚀 Redirecting to sign in page...");
+        router.push("/signInTenant");
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      toast.error("OTP verification failed");
     }
   };
 
@@ -82,6 +189,10 @@ const page = () => {
       >
         Signup as Tenant
       </h1>
+
+      <ToastContainer position="top-center" autoClose={3000} />
+
+      {error && <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>}
 
       {/*SignUp Form*/}
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">

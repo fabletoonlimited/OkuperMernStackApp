@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
+// import Link from "next/link";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -36,38 +39,62 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
     try {
       // Call your verification API
-      const response = await fetch("/api/otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: otpCode }),
-      });
-
-      if (response.ok) {
-        onVerify();
-      } else {
-        setError("Invalid OTP. Please try again.");
-      }
+      await onVerify(otpCode);
     } catch (err) {
-      setError("Verification failed. Please try again.");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // const handleVerify = async () => {
+  //     const response = await fetch("/api/otp", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ email, otp: otpCode }),
+  //     });
+
+  //     if (response.ok) {
+  //       onVerify();
+  //     } else {
+  //       setError("Invalid OTP. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     setError("Verification failed. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleResend = async () => {
     // Call your resend OTP API
     try {
-      await fetch("/api/otp", {
+      const res = await fetch("/api/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          action: "generate",
+          email,
+          purpose: "verifyAccount",
+          userType: "tenant",
+         }),
       });
-      alert("OTP resent successfully!");
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Failed to resend OTP");
+        return;
+      }
+
+      setOtp(["", "", "", "", "", ""]);
+      setError("");
+      toast.success("OTP resent successfully! Check your email.");
     } catch (err) {
-      setError("Failed to resend OTP");
+      setError("Failed to resend OTP. Please try again.");
     }
   };
-
+  
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-xl relative">
@@ -118,7 +145,6 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
 
 
           {/* Verify Button */}
-          <Link href="/signUpTenant" className="mb-4 text-blue-700 underline">
           <button
             type="submit"
             disabled={loading}
@@ -126,7 +152,6 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
           >
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
-          </Link>
           
         </form>
 

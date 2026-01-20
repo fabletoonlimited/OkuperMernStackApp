@@ -2,14 +2,17 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const PUBLIC_ROUTES = [
-   "/api/user",
-    "/api/admin/login",
-    "/api/admin/",
-    "/api/tenant/",
-    "/api/tenant/loginTenant",
-    "/api/landlord",
-    "/api/landlord/loginLandlord",
-    "/api/otp"
+  "/api/user",
+  "/api/admin/login",
+  "/api/admin",
+  "/api/tenant",
+  "/api/loginTenant",
+  "/api/landlord",
+  "/api/loginLandlord",
+  "/api/otp",
+  "/signUpLanding",
+  "/signUpTenant",
+  "/signUpLandlord",
 ];
 
 const ALLOWED_ORIGINS = [
@@ -41,11 +44,11 @@ export async function middleware(req) {
   res.headers.set("Access-Control-Allow-Credentials", "true");
   res.headers.set(
     "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
+    "GET,POST,PUT,DELETE,OPTIONS",
   );
   res.headers.set(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization"
+    "Content-Type, Authorization",
   );
 
   if (req.method === "OPTIONS") {
@@ -53,9 +56,7 @@ export async function middleware(req) {
   }
 
   /* -------- AUTH -------- */
-  const isPublic = PUBLIC_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
+  const isPublic = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
 
   if (!isPublic) {
     const token =
@@ -63,10 +64,7 @@ export async function middleware(req) {
       req.headers.get("authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     try {
@@ -74,7 +72,7 @@ export async function middleware(req) {
     } catch (err) {
       return NextResponse.json(
         { message: "Invalid or expired token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
   }

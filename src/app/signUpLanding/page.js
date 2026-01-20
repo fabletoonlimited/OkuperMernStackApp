@@ -173,7 +173,7 @@ const page = () => {
       );
 
       router.replace(
-        userRole === "tenant"
+        userRole === "Tenant"
           ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
           : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`,
       );

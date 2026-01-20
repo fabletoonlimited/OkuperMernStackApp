@@ -22,12 +22,23 @@ const tenantSchema = new mongoose.Schema(
         default: "Tenant"
     },
 
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
     tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc"},
     tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
     messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
-    
+
+    user: { 
+        type: mongoose.Schema.Types.ObjectId, ref: "User",
+        required: false,
+    },
+    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
+    tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc" },
+    tenantDashboard: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TenantDashboard",
+    },
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
 }, {timestamps: true});
 
 // Password hashing
