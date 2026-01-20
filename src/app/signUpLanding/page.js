@@ -145,7 +145,7 @@ const page = () => {
       };
 
       // Capitalize role to match schema enum
-      const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
+      // const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
       const response = await fetch("/api/user", {
         method: "POST",
@@ -153,7 +153,7 @@ const page = () => {
         body: JSON.stringify({
           residencyStatus: residencyMap[selectResidencyStatus],
           whoIsUsingPlatform: selectWhoIsUsingPlatform,
-          role: capitalizedRole,
+          role,
         }),
       });
 

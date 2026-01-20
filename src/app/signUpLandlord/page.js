@@ -177,8 +177,8 @@ const page = () => {
 
       // Redirect to landlord dashboard
       setTimeout(() => {
-        console.log("🚀 Redirecting to landlord dashboard...");
-        router.push("/landlordDashboard");
+        toast.success("🚀 Redirecting to sign in page...");
+        router.push("/signInLandlord");
       }, 2000);
     } catch (err) {
       console.error(err);
