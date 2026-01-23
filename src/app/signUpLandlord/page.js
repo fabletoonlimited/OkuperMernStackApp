@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import OtpLandlord from "@/components/otpLandlord";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,18 +26,19 @@ const page = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showOtpLandlord, setShowOtpLandlord] = useState(false);
   const [error, setError] = useState("");
- 
-  //Auth code session not signing out
-  useEffect(() =>{
-    const checkAuth = async () => {
-    const res = await fetch("/api/auth/me", {
-      credentials: "include",
-    });
 
-    if (res.ok) {
-      router.replace("/landlordDashboard")
-    }};
-      checkAuth();
+  //Auth code session not signing out
+  useEffect(() => {
+    const checkAuth = async () => {
+      const res = await fetch("/api/auth/me/", {
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        router.replace("/landlordDashboard");
+      }
+    };
+    checkAuth();
   }, []);
 
   // 🔒 HARD GUARD — PREVENT BROKEN FLOW
@@ -192,7 +194,6 @@ const page = () => {
         toast.success("🚀 Redirecting to sign in page...");
         router.push("/signInLandlord");
       }, 2000);
-
     } catch (err) {
       console.error(err);
       toast.error("OTP verification failed");
@@ -206,6 +207,18 @@ const page = () => {
       >
         Signup as Landlord
       </h1>
+
+      {/*Already have account - Sign In Link*/}
+      <div className="signInLinkSection ml-12 mt-3">
+        <p className="text-lg">
+          Already have an account?{" "}
+          <Link href="/signInLandlord">
+            <span className="text-blue-600 hover:text-blue-800 underline cursor-pointer font-semibold">
+              Sign In
+            </span>
+          </Link>
+        </p>
+      </div>
 
       <ToastContainer position="top-center" autoClose={3000} />
 

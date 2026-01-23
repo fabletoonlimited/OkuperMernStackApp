@@ -27,7 +27,6 @@ const page = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     if (!userId) return;
     if (!residencyStatus || !whoIsUsingPlatform) {
@@ -46,12 +45,17 @@ const page = () => {
     e.preventDefault();
     setError("");
 
-    if(!userId) {
+    if (!userId) {
       toast.error("Signup flow is invalid. Please restart signup.");
       return;
     }
 
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password ) {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -76,7 +80,7 @@ const page = () => {
       const response = await fetch("/api/tenant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           userId,
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -84,7 +88,7 @@ const page = () => {
           password: formData.password,
           survey: formData.survey,
           terms: termsAccepted,
-       }),
+        }),
       });
 
       const tenant = await response.json();
@@ -189,6 +193,18 @@ const page = () => {
       >
         Signup as Tenant
       </h1>
+
+      {/*Already have account - Sign In Link*/}
+      <div className="signInLinkSection ml-12 mt-3">
+        <p className="text-lg">
+          Already have an account?{" "}
+          <Link href="/signInTenant">
+            <span className="text-blue-600 hover:text-blue-800 underline cursor-pointer font-semibold">
+              Sign In
+            </span>
+          </Link>
+        </p>
+      </div>
 
       <ToastContainer position="top-center" autoClose={3000} />
 

@@ -10,7 +10,8 @@ const tenantSchema = new mongoose.Schema(
     password: {type: String, required: true},
     survey: {type: String},
     terms: {type: Boolean, required: true},
-    // forgotPasswordToken: {type: String},
+    forgotPasswordToken: {type: String},
+    forgotPasswordTokenExpiry: {type: Date},
 
     isVerified: {
         type: Boolean,

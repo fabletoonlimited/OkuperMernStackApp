@@ -76,14 +76,25 @@ const index = () => {
 
 
                         <Link href="#"
-                            onClick={() => {
-                                fetch("/api/auth/logout", {
-                                    method: "POST",
-                                    credentials: "include",
-                            });
-                            router.push("/signInLandlord");
-                            toast.success("Logged out successfully");
-                        }}
+                            onClick={async (e) => {
+                                e.preventDefault();
+                                try {
+                                    const response = await fetch("/api/auth/logout", {
+                                        method: "POST",
+                                        credentials: "include",
+                                    });
+
+                                    if (response.ok) {
+                                        toast.success("Logged out successfully");
+                                        router.push("/"); // Redirect to home page
+                                    } else {
+                                        toast.error("Failed to logout. Please try again.");
+                                    }
+                                } catch (error) {
+                                    console.error("Logout error:", error);
+                                    toast.error("An error occurred during logout");
+                                }
+                            }}
                         >
                             <li> Logout </li>
                         </Link>
