@@ -20,9 +20,16 @@ export async function POST(req) {
             );
         }
 
-        const result = await loginLandlord(body);
+        // Normalize email (trim and lowercase to match signup)
+        const normalizedBody = {
+            email: email.trim().toLowerCase(),
+            password: password
+        };
 
-        return NextResponse.json(result, { status: 201 });
+        const result = await loginLandlord(normalizedBody);
+
+        // Return the response directly (it already has status and cookies)
+        return result;
         
     } catch (error) {
         console.error("❌ API ERROR:", error);

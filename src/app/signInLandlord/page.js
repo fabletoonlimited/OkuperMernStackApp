@@ -31,6 +31,18 @@ const Page = () => {
   // Handler
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!email || !password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -38,25 +50,25 @@ const Page = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message);
+        toast.error(data.message || data.error || "Login failed. Please try again.");
         setLoading(false);
         return;
       }
 
+      toast.success("Login successful! 🎉");
       setTimeout(() => {
-        toast.success("🚀 Redirecting to landlord dashboard...");
         router.push("/landlordDashboard");
-      }, 2000);
+      }, 1000);
       
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
@@ -72,31 +84,34 @@ const Page = () => {
 
     <ToastContainer position="top-center" autoClose={3000} />
 
-      {/*SignUp Form*/}
+      {/*SignIn Form*/}
       <div className="signInLoandingContainer md:flex-col col mt-10 mb-50">
-        <div
-          className="landlordSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            maxWidth: "556px",
-            // width: '100%',
-            height: "auto",
-            maxHeight: "100%",
-            border: "1px solid #ccc",
-            padding: "20px",
-            borderRadius: "5px",
-            paddingLeft: "35px",
-            paddingRight: "50px",
-            marginTop: "20px",
-            marginLeft: "50px",
-            paddingBottom: "80px",
-          }}
-        >
+        <form onSubmit={handleSignInSubmit}>
+          <div
+            className="landlordSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              maxWidth: "556px",
+              // width: '100%',
+              height: "auto",
+              maxHeight: "100%",
+              border: "1px solid #ccc",
+              padding: "20px",
+              borderRadius: "5px",
+              paddingLeft: "35px",
+              paddingRight: "50px",
+              marginTop: "20px",
+              marginLeft: "50px",
+              paddingBottom: "80px",
+            }}
+          >
           {/*Email*/}
           <p style={{ paddingTop: 20, marginBottom: 30 }}>Email Address</p>
           <input
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
           />
@@ -105,7 +120,9 @@ const Page = () => {
           <p style={{ paddingTop: 20, marginBottom: 30 }}>Password</p>
           <input
             type="password"
-            placeholder="Create a password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
             className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
           />
 
@@ -127,17 +144,18 @@ const Page = () => {
               </span>
             </Link>
           </p>
-        </div>
+          </div>
 
-        {/*SignIn Btn*/}
-        <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <button 
-            onClick={handleSignInSubmit}
-            className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
-            {" "}
-            Sign In{" "}
-          </button>
-        </div>
+          {/*SignIn Btn*/}
+          <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
+            <button 
+              type="submit"
+              disabled={loading}
+              className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
+              {loading ? "Signing In..." : "Sign In"}
+            </button>
+          </div>
+        </form>
 
         {/*Banner Section*/}
         <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-240 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">

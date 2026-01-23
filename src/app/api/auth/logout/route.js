@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logoutLandlord } from "../../controllers/landlord.controller.js";
 
 export async function POST() {
   const res = NextResponse.json({ message: "Logged out" });

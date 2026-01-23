@@ -102,12 +102,21 @@ export const signupLandlord = async (req) => {
   }
 };
 
-export const loginLandlord = async (req) => {
+export const loginLandlord = async (body) => {
   try {
-    const body = await req.json();
     const { email, password } = body;
 
-    const landlord = await Landlord.findOne({ email });
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 },
+      );
+    }
+
+    // Normalize email (trim and lowercase to match signup)
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const landlord = await Landlord.findOne({ email: normalizedEmail });
     if (!landlord) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -117,7 +126,7 @@ export const loginLandlord = async (req) => {
 
     const isMatch = await bcrypt.compare(password, landlord.password);
     if (!isMatch) {
-      return NextResponse.json({ error: "invalid password" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     //create a token
@@ -129,16 +138,18 @@ export const loginLandlord = async (req) => {
 
     const response = NextResponse.json(
       {
+        success: true,
         landlord: {
           id: landlord._id,
           name: `${landlord.firstName} ${landlord.lastName}`,
           email: landlord.email,
         },
+        message: "Login successful",
       },
       { status: 200 },
     );
 
-    response.cookie("token", token, {
+    response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

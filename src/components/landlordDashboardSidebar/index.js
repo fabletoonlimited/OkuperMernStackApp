@@ -2,9 +2,14 @@
 import React, { useState, useEffect} from 'react'
 import Link from 'next/link'
 import { Menu, X } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 
 const index = () => {
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
 
@@ -67,6 +72,20 @@ const index = () => {
 
                         <Link href="/homeInterest">
                             <li> Home Interests </li>
+                        </Link>
+
+
+                        <Link href="#"
+                            onClick={() => {
+                                fetch("/api/auth/logout", {
+                                    method: "POST",
+                                    credentials: "include",
+                            });
+                            router.push("/signInLandlord");
+                            toast.success("Logged out successfully");
+                        }}
+                        >
+                            <li> Logout </li>
                         </Link>
                     </ul>
                 </aside>
