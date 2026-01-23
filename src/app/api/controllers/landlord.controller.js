@@ -22,7 +22,6 @@ export const signupLandlord = async (req) => {
     !lastName ||
     !email ||
     !password ||
-    surveyInputField ||
     !terms
   ) {
     return NextResponse.json(
@@ -50,7 +49,7 @@ export const signupLandlord = async (req) => {
       referalCode,
       survey: surveyInputField,
       terms,
-      role: "landlord",
+      role: "Landlord",
     });
 
     await newLandlord.save();
@@ -139,10 +138,11 @@ export const loginLandlord = async (req) => {
       { status: 200 },
     );
 
-    response.cookies.set("token", token, {
+    response.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
+      path:"/",
       maxAge: 24 * 60 * 60 * 1000, // 1day
     });
 

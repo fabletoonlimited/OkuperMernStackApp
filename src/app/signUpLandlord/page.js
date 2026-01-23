@@ -1,11 +1,10 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import OtpLandlord from "@/components/otpLandlord";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import OtpLandlord from "@/components/otpLandlord";
 
 const page = () => {
   const searchParams = useSearchParams();
@@ -26,12 +25,25 @@ const page = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showOtpLandlord, setShowOtpLandlord] = useState(false);
   const [error, setError] = useState("");
+ 
+  //Auth code session not signing out
+  useEffect(() =>{
+    const checkAuth = async () => {
+    const res = await fetch("/api/auth/me", {
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      router.replace("/landlordDashboard")
+    }};
+      checkAuth();
+  }, []);
 
   // 🔒 HARD GUARD — PREVENT BROKEN FLOW
   useEffect(() => {
     if (!userId) return;
     if (!residencyStatus || !whoIsUsingPlatform) {
-      setError("Signup flow is invalid. Please restart signup.");
+      toast.error("Signup flow is invalid. Please restart signup.");
     }
   }, [userId, residencyStatus, whoIsUsingPlatform]);
 
@@ -47,7 +59,7 @@ const page = () => {
     setError("");
 
     if (!userId) {
-      setError("Signup flow is invalid. Please restart signup.");
+      toast.error("Signup flow is invalid. Please restart signup.");
       return;
     }
 
@@ -57,22 +69,22 @@ const page = () => {
       !formData.email ||
       !formData.password
     ) {
-      setError("Please fill all required fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
     if (!formData.email.includes("@")) {
-      setError("Please enter a valid email");
+      toast.error("Please enter a valid email");
       return;
     }
 
     // if (formData.password.length < 8) {
-    //   setError("Password must be at least 8 characters");
+    //   toast.error("Password must be at least 8 characters");
     //   return;
     // }
 
     if (!termsAccepted) {
-      setError("Please accept the terms and conditions");
+      toast.error("Please accept the terms and conditions");
       return;
     }
 
@@ -95,7 +107,7 @@ const page = () => {
       const landlord = await landlordRes.json();
 
       if (!landlordRes.ok) {
-        setError(landlord.message || "Failed to create landlord");
+        toast.error(landlord.message || "Failed to create landlord");
         return;
       }
 
@@ -112,7 +124,7 @@ const page = () => {
       });
 
       if (!otpRes.ok) {
-        setError("Failed to generate OTP. Please try again.");
+        toast.error("Failed to generate OTP. Please try again.");
         return;
       }
 
@@ -123,7 +135,7 @@ const page = () => {
       setShowOtpLandlord(true);
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -169,17 +181,18 @@ const page = () => {
         console.error("Failed to update landlord:", updateData);
         toast.error("Verification successful but failed to update account");
         return;
+      } else {
+        console.log("✅ Landlord updated to verified");
+        toast.success("Account verified successfully! 🎉");
+        setShowOtpLandlord(false);
       }
 
-      console.log("✅ Landlord updated to verified");
-      toast.success("Account verified successfully! 🎉");
-      setShowOtpLandlord(false);
-
-      // Redirect to landlord dashboard
+      // Redirect to landlord signin page
       setTimeout(() => {
         toast.success("🚀 Redirecting to sign in page...");
         router.push("/signInLandlord");
       }, 2000);
+
     } catch (err) {
       console.error(err);
       toast.error("OTP verification failed");

@@ -50,7 +50,7 @@ const OtpModal = ({ isOpen, onClose, email, onVerify }) => {
           action: "generate",
           email,
           purpose: "verifyAccount",
-          userType: "landlord",
+          userType: "Landlord",
         }),
       });
 

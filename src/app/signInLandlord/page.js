@@ -1,11 +1,25 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import OtpLandlord from "@/components/otpLandlord";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 
 const Page = () => {
   const router = useRouter();
+
+  //Auth code session not signing out
+  useEffect(() =>{
+    const checkAuth = async () => {
+    const res = await fetch("/api/auth/me", {
+      credentials: "include",
+    });
+  
+    if (res.ok) {
+      router.replace("/landlordDashboard")
+    }};
+    checkAuth();
+  }, []);
 
   // State for form and modal
   const [email, setEmail] = useState("");
@@ -15,27 +29,31 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
 
   // Handler
-  const handleSignUpSubmit = async (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch("/api/landlord", {
+      const response = await fetch("/api/loginLandlord", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || data.error);
+        toast.error(data.message);
         setLoading(false);
         return;
       }
 
-      // Login successful
-      router.push("/landlordDashboard");
+      setTimeout(() => {
+        toast.success("🚀 Redirecting to landlord dashboard...");
+        router.push("/landlordDashboard");
+      }, 2000);
+      
     } catch (error) {
       console.error("Login error:", error);
       alert("Something went wrong. Please try again.");
@@ -51,6 +69,8 @@ const Page = () => {
       >
         Sign in
       </h1>
+
+    <ToastContainer position="top-center" autoClose={3000} />
 
       {/*SignUp Form*/}
       <div className="signInLoandingContainer md:flex-col col mt-10 mb-50">
@@ -109,35 +129,14 @@ const Page = () => {
           </p>
         </div>
 
-        {/*Terms*/}
-        <div className="termsSection -mt-11 md:mt-10 md:ml-13 ml-13 mr-10 md:mr-0 flex items-center">
-          <input
-            type="checkbox"
-            id="agreeTerms"
-            className="w-7 h-7 border-2 border-blue-950 rounded cursor-pointer accent-blue-700"
-          />
-          {/*Terms Text*/}
-          <span className="text-sm ml-2 md:ml-2 mr-0 md:mr-12 md:mt-0 mt-5">
-            By signing up, you agree to Okuper's{" "}
-            <a href="/termsOfService" className="text-blue-600 underline">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacyPolicy" className="text-blue-600 underline">
-              Privacy Policy
-            </a>
-            .
-          </span>
-        </div>
-
         {/*SignIn Btn*/}
         <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <Link href="/landlordDashboard">
-            <button className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
-              {" "}
-              Sign In{" "}
-            </button>
-          </Link>
+          <button 
+            onClick={handleSignInSubmit}
+            className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
+            {" "}
+            Sign In{" "}
+          </button>
         </div>
 
         {/*Banner Section*/}

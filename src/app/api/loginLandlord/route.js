@@ -1,8 +1,7 @@
 export const runtime = 'nodejs';
 
 import dbConnect from "@/app/lib/mongoose";
-import {authenticateLandlord} from "../middlewares/landlordMiddleware.js";
-import {loginLandlordController} from "../controllers/landlord.controller.js";
+import {loginLandlord} from "../controllers/landlord.controller.js";
 import { NextResponse } from "next/server";
 
 //Login Landlord
@@ -12,19 +11,19 @@ export async function POST(req) {
 
         const body = await req.json();
         
-        const requiredFields = ["email", "password"];
-        const missing = requiredFields.some((f) => !body[f]);
-
-        if (!missing) {
+        const {email, password} = body;
+        
+        if(!email || !password) {
             return NextResponse.json(
                 { message: "Please input credentials" },
                 { status: 400 }
             );
         }
 
-        const result = await loginLandlordController(body);
+        const result = await loginLandlord(body);
 
         return NextResponse.json(result, { status: 201 });
+        
     } catch (error) {
         console.error("❌ API ERROR:", error);
 

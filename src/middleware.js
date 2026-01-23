@@ -4,15 +4,16 @@ import { jwtVerify } from "jose";
 const PUBLIC_ROUTES = [
   "/api/user",
   "/api/admin/login",
+  "/api/admin/signUp",
   "/api/admin",
   "/api/tenant",
-  "/api/loginTenant",
+  "/api/signUpTenant",
+  "/api/signInTenant",
   "/api/landlord",
-  "/api/loginLandlord",
+  "/api/signUpLanding",
+  "/api/signInLandlord",
   "/api/otp",
-  "/signUpLanding",
-  "/signUpTenant",
-  "/signUpLandlord",
+  "/api/auth/me"
 ];
 
 const ALLOWED_ORIGINS = [
@@ -22,67 +23,45 @@ const ALLOWED_ORIGINS = [
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-/* ===============================
-   MIDDLEWARE
-================================ */
-
 export async function middleware(req) {
-  const { pathname } = req.nextUrl;
+  const pathname = req.nextUrl.pathname;
+  const token = req.cookies.get("token")?.value;
 
-  // Make sure origin is declared!
-  const origin = req.headers.get("origin");
+  let isAuthenticated = false;
 
-  const res = NextResponse.next();
-
-  // CORS
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    res.headers.set("Access-Control-Allow-Origin", origin);
-  } else {
-    res.headers.set("Access-Control-Allow-Origin", "*");
-  }
-
-  res.headers.set("Access-Control-Allow-Credentials", "true");
-  res.headers.set(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS",
-  );
-  res.headers.set(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization",
-  );
-
-  if (req.method === "OPTIONS") {
-    return res;
-  }
-
-  /* -------- AUTH -------- */
-  const isPublic = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
-
-  if (!isPublic) {
-    const token =
-      req.cookies.get("token")?.value ||
-      req.headers.get("authorization")?.replace("Bearer ", "");
-
-    if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
+  if (token) {
     try {
       await jwtVerify(token, JWT_SECRET);
-    } catch (err) {
-      return NextResponse.json(
-        { message: "Invalid or expired token" },
-        { status: 401 },
-      );
+      isAuthenticated = true;
+    } catch {
+      isAuthenticated = false;
     }
   }
 
-  return res;
+  // Landlord auth pages
+  const landlordAuthPages =
+    pathname.startsWith("/signInLandlord") ||
+    pathname.startsWith("/signUpLandlord");
+
+  // Landlord dashboard
+  const landlordDashboard =
+    pathname.startsWith("/landlordDashboard");
+
+  if (isAuthenticated && landlordAuthPages) {
+    return NextResponse.redirect(
+      new URL("/landlordDashboard", req.url)
+    );
+  }
+
+  if (!isAuthenticated && landlordDashboard) {
+    return NextResponse.redirect(
+      new URL("/signInLandlord", req.url)
+    );
+  }
+
+  return NextResponse.next();
 }
 
-/* ===============================
-   APPLY TO API ROUTES ONLY
-================================ */
 export const config = {
-  matcher: "/api/:path*",
+  matcher: ["/((?!_next|favicon.ico).*)"],
 };

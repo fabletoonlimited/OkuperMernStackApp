@@ -1,27 +1,56 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./Nav.module.scss";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faTimes,
+  faUserCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
 
 function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  const [isMenuSelected, setIsMenuSelected] = useState(false);
-  const menuClose = () => setIsMenuOpen(!setIsMenuOpen);
+  // 🔐 CHECK AUTH SESSION
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          credentials: "include",
+        });
+
+        setIsAuthenticated(res.ok);
+      } catch {
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <nav className={styles.navbar}>
       {/* Hamburger Icon */}
       <div className={styles.navbar__hamburger} onClick={toggleMenu}>
-        <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} size="lg" />{" "}
+        <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} size="lg" />
       </div>
 
       {/* Mobile-only logo */}
-      <div className={`${styles.navbar__logo} ${styles["navbar__logo--mobile"]}`}>
+      <div
+        className={`${styles.navbar__logo} ${styles["navbar__logo--mobile"]}`}
+      >
         <Link href="/" onClick={() => setIsMenuOpen(false)}>
           <Image src="/logo.png" alt="Logo" width={220} height={110} />
         </Link>
@@ -49,8 +78,10 @@ function Nav() {
           <li className={styles.navbar__item}>SHORTLETS</li>
         </Link>
 
-        {/* Desktop-only logo */}
-        <div className={`${styles.navbar__logo} ${styles["navbar__logo--desktop"]}`}>
+        {/* Desktop logo */}
+        <div
+          className={`${styles.navbar__logo} ${styles["navbar__logo--desktop"]}`}
+        >
           <Link href="/">
             <Image src="/logo.png" alt="Logo" width={220} height={110} />
           </Link>
@@ -68,9 +99,32 @@ function Nav() {
           <li className={styles.navbar__item}>HELP</li>
         </Link>
 
-        <Link href="/signUpLanding" onClick={() => setIsMenuOpen(false)}>
-          <li className={styles.navbar__item}>SIGN UP / SIGN IN</li>
-        </Link>
+        {/* 🔐 AUTH SECTION */}
+        {!loading && (
+          <>
+            {!isAuthenticated ? (
+              <Link
+                href="/signUpLanding"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <li className={styles.navbar__item}>
+                  SIGN UP / SIGN IN
+                </li>
+              </Link>
+            ) : (
+              <li
+                className={styles.navbar__item}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  router.push("/landlordDashboard");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <FontAwesomeIcon icon={faUserCircle} size="lg" />
+              </li>
+            )}
+          </>
+        )}
       </ul>
     </nav>
   );
