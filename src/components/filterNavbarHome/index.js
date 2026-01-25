@@ -1,122 +1,128 @@
 "use client";
 import React, { useState } from "react";
-import { prices, ratings, categories, propertiesType } from "../../data/constants";
+import {
+    prices,
+    ratings,
+    categories,
+    propertiesType,
+} from "../../data/constants";
+import {
+    faMagnifyingGlass,
+    faChevronDown,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 function FilterNavbarIndex() {
-  const [category, setCategory] = useState("all");
-  const [propertyType, setPropertyType] = useState("all");
-  const [price, setPrice] = useState("all");
-  const [rating, setRating] = useState("all");
-  const [sort, setSort] = useState("featured");
-  const [query, setQuery] = useState("");
+    const [filters, setFilters] = useState({
+        category: "all",
+        price: "all",
+        rating: "all",
+        propertyType: "all",
+        query: "",
+    });
 
-  const inputStyle =
-    "w-40 h-10 border rounded-lg px-3 text-blue-900 bg-white outline-none focus:ring-2 focus:ring-blue-500";
-  
-  const inputStyle2 =
-    "w-40 h-10 rounded-lg px-3 text-blue-800 outline-none bg-white focus:ring-2 focus:ring-blue-500";
+    const pillSelect =
+        "appearance-none bg-white h-14 px-4 pr-10 text-base rounded-lg border border-gray-300 flex items-center";
 
-  return (
-    <>
-      {/* 🔵 Filters Section */}
-      <div className="md:w-full w-full bg-blue-900 text-white px-13 py-6">
-        <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-28 flex-wrap">
-          {/* Search Input */}
-          <div>
-            <label className="block mb-1 text-sm">Search</label>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search"
-              className={`${inputStyle} w-56`}/>
-          </div>
+    const updateFilter = (key, value) => {
+        setFilters((prev) => ({ ...prev, [key]: value }));
+    };
 
-          {/* Category */}
-          <div>
-            <label className="block mb-1 text-sm">Category</label>
-            <select
-              className={inputStyle}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}>
-              <option value="all">All</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
+    // ✅ Sorting function that works for both objects and numbers/strings
+    const sortOptions = (options) => {
+        return [...options].sort((a, b) => {
+            // If items are objects with a "value" property
+            if (typeof a === "object" && typeof b === "object") {
+                return a.value - b.value;
+            }
+            // If items are numbers (or numeric strings)
+            const numA = Number(a);
+            const numB = Number(b);
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            // Otherwise, sort alphabetically
+            return String(a).localeCompare(String(b));
+        });
+    };
 
-          {/* Property Type */}
-          <div>
-            <label className="block mb-1 text-sm">Property Type</label>
-            <select
-              className={inputStyle}
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value)}>
-              <option value="all">All</option>
-              {propertiesType.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
+    // ✅ Apply sorting to prices
+    const sortedPrices = sortOptions(prices);
 
-          {/* Price */}
-          <div>
-            <label className="block mb-1 text-sm">Price</label>
-            <select
-              className={inputStyle}
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}>
-              <option value="all">All</option>
-              {prices.map((p) => (
-                <option key={p.value} value={p.value}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
+    const filterConfig = [
+        { key: "category", placeholder: "For Rent", options: categories },
+        { key: "price", placeholder: "Price", options: sortedPrices },
+        {
+            key: "rating",
+            placeholder: "Bed & Bath",
+            options: ratings,
+            suffix: "+ stars",
+        },
+        {
+            key: "propertyType",
+            placeholder: "Home type",
+            options: propertiesType,
+        },
+    ];
 
-          {/* Ratings */}
-          <div>
-            <label className="block mb-1 text-sm">Ratings</label>
-            <select
-              className={inputStyle}
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}>
-              <option value="all">All</option>
-              {ratings.map((r) => (
-                <option key={r} value={r}>
-                  {r} star{r > 1 ? "s" : ""} & up
-                </option>
-              ))}
-            </select>
-          </div>
+    return (
+        <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-center gap-5">
+            {/* Search */}
+            <div className="relative">
+                <input
+                    type="text"
+                    value={filters.query}
+                    onChange={(e) => updateFilter("query", e.target.value)}
+                    placeholder="Search"
+                    className="h-14 w-80 rounded-lg bg-white pl-4 pr-10 text-sm text-gray-700 outline-none"
+                />
+                <Link href={"/"}>
+                    <button className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <FontAwesomeIcon
+                            icon={faMagnifyingGlass}
+                            className="text-black text-lg"
+                        />
+                    </button>
+                </Link>
+            </div>
+
+            {/* Filters */}
+            {filterConfig.map(({ key, placeholder, options, suffix }) => (
+                <div key={key} className="relative">
+                    <select
+                        className={pillSelect}
+                        value={filters[key]}
+                        onChange={(e) => updateFilter(key, e.target.value)}>
+                        <option value="all">{placeholder}</option>
+
+                        {options.map((option) =>
+                            typeof option === "object" ? (
+                                <option key={option.value} value={option.value}>
+                                    {option.name}
+                                </option>
+                            ) : (
+                                <option key={option} value={option}>
+                                    {suffix ? `${option}${suffix}` : option}
+                                </option>
+                            ),
+                        )}
+                    </select>
+
+                    <FontAwesomeIcon
+                        icon={faChevronDown}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    />
+                </div>
+            ))}
+
+            {/* Right icon */}
+            <div className="h-14 flex items-center rounded-lg justify-center text-white hover:bg-white/10 gap-1 pb-3">
+                <p className="text-sm mt-2 font-medium">2</p>
+                <img src="/home.png" alt="Home Icon" />
+            </div>
         </div>
-      </div>
-
-
-      {/* 🟡 Sort Outside Blue Box */}
-      <div className="flex items-center mt-6 px-12 pb-2 text-md font-bold text-gray-700 justify-end">
-        <div>
-          Sort:{" "}
-          <select 
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className={inputStyle2}>
-            <option value="featured">Homes for you</option>
-            <option value="lowest">Price: Low to High</option>
-            <option value="highest">Price: High to Low</option>
-            <option value="toprated">Tenant Reviews</option>
-            <option value="newest">Newest Arrivals</option>
-          </select>
-        </div>
-      </div>
-    </>
-  );
+    );
 }
 
 export default FilterNavbarIndex;

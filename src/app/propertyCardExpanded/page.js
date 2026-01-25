@@ -7,6 +7,7 @@ import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import propertyData from "../../data/property";
 import TrendingRentIndexCarousel from "../../components/trendingRentIndexCarousel";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
@@ -39,7 +40,7 @@ const Index = () => {
             item.img &&
             Array.isArray(item.img) &&
             item.img.length > 0 &&
-            item._id
+            item._id,
     );
 
     // Mix ad banners
@@ -74,7 +75,19 @@ const Index = () => {
     return (
         <div className="w-auto">
             <PropExpandedNav />
-
+            <div>
+                <div>
+                    <div>
+                        <input type="text" />
+                    </div>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
+                    <div></div>
+                </div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
             <div className="property-card-expanded px-4 md:px-12">
                 {/* IMAGE GRID */}
                 {/* IMAGE GRID */}
