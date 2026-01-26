@@ -79,7 +79,9 @@ export async function GET(request) {
     const email = searchParams.get("email");
 
     if (id) {
-      const landlord = await Landlord.findById(id).select("-password");
+      const landlord = await Landlord
+      .findById(id)
+      .select("-password");
 
       if (!landlord) {
         return NextResponse.json(
@@ -92,7 +94,9 @@ export async function GET(request) {
     }
 
     if (email) {
-      const landlord = await Landlord.findOne({ email }).select("-password");
+      const landlord = await Landlord
+      .findOne({ email })
+      .select("-password");
 
       if (!landlord) {
         return NextResponse.json(

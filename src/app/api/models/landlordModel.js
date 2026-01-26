@@ -5,7 +5,7 @@ const landlordSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: {type: String, required: true},
-    email: {type: String, required: true, lowerCase: true, trim: true}, 
+    email: {type: String, required: true, unique: true, lowercase: true, trim: true}, 
     password: {type: String, required: true},
     survey: {type: String},
     terms: {type: Boolean, required: true},
@@ -13,36 +13,23 @@ const landlordSchema = new mongoose.Schema(
     forgotPasswordTokenExpiry: {type: Date},
 
     isVerified: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false
     },
 
     role: {
-        type: String,
-        default: "Landlord",
+      type: String,
+      default: "landlord",
     },
-
     
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
     landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc"},
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
     messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
-
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
-    },
-    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
-    landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc" },
-    landlordDashboard: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "LandlordDashboard",
-    },
-    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
-  },
-  { timestamps: true }
+    
+  }, { timestamps: true }
 );
 
 //Password pre-hashing middleware

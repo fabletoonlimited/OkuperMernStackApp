@@ -1,28 +1,118 @@
-// import { NextResponse } from "next/server";
-import express from 'express';
-import propertyModel from '../models/propertyModel.js';
+import {userRouter} from "next/navigation";
 
-const router = express.Router();
+import dbConnect from "@/app/lib/mongoose";
+import { NextResponse } from "next/server";
+import Property from '../models/propertyModel.js';
 
-router.post('/createproperty', async (req, res) => {
-  if (!req.body.title || !req.body.price) {
-    return res.status(400).json({ message: 'Title and price are required' });
-  } 
-  const newProperty = new propertyModel(req.body);
+
+//CREATE A PROPERTY
+export async function POST(req) {
+
   try {
-    const savedProperty = await newProperty.save();
-    res.status(201).json(savedProperty);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to create property', error });
-  }
-});
+    await dbConnect();
 
-router.get('/', async (req, res) => {
-  const properties = await propertyModel
-  .find()
-  .sort({ createdAt: -1 });
-  return res.json(properties);
-});
+    const body = await req.json();
+
+    const {previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, price, category, propertyType, bed, bath, features, listedBy, savedHomes, unitsAvailable, rating} = body;
+
+  if (!Img1 || !Img2 || !Img3 || !title || !address || !price || !category || !propertyType || !bed || !bath || !features || !listedBy) {
+    return NextResponse.json(
+      { message: "Missing required fields" },
+      { status: 400 }
+    );
+  } 
+
+  if (!previewPic) {
+    return NextResponse.json(
+      { message: "At least one preview Picture needs to be added" },
+      { status: 400 }
+    );
+  } 
+
+  if (existingProperty) {
+    return NextResponse.json(
+      { message: "Property already exists in Database, create another" }, 
+      { status: 400 }
+      );
+    }
+
+    //create New Property
+    const newProperty = await Property.create({
+      previewPic, 
+      Img1, 
+      Img2, 
+      Img3, 
+      Img4, 
+      Img5, 
+      Img6, 
+      title, 
+      address, 
+      price, 
+      category, 
+      propertyType, 
+      bed, 
+      bath, 
+      features, 
+      listedBy, 
+      savedHomes, 
+      unitsAvailable, 
+      rating
+    });
+
+    return NextResponse.json(
+      { 
+        success: true,
+        property: {
+          _id: newProperty._id,
+          previewPic: newProperty.previewPic,
+          title: newProperty.title,
+          price: newProperty.price,
+          category: newProperty.category,
+          listedBy: newProperty.listedBy
+        }, 
+        message: "Property created successfully!"
+      }, 
+      {status: 201}
+    );
+
+  } catch (error) {
+    console.error("Propert creation error:", error);
+    return NextResponse.json(
+      { message: error.message || "Server error, something went wrong" },
+      { status: 500 }
+    );
+  }
+}
+
+//GET PROPERTIES
+export async function GET(request) {
+  await dbConnect();
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const listedBy = searchParams.get("listedBy");
+
+    if (id) {
+      const property = await Property
+      .findById(id)
+    
+      if (!property) {
+        return NextResponse.json(
+          { message: "Property not found" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(property, { status: 200 });
+    } 
+  } catch (err) {
+    return NextResponse.json(
+        { message: err.message },
+        { status: 500 }
+    );
+  }
+}
+
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -59,6 +149,3 @@ router.get('/filter', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch properties', error });
   }
 });
-
-
-export default router;

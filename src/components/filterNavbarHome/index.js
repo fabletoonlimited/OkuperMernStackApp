@@ -1,17 +1,11 @@
 "use client";
-import React, { useState } from "react";
-import {
-    prices,
-    ratings,
-    categories,
-    propertiesType,
-} from "../../data/constants";
-import {
-    faMagnifyingGlass,
-    faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState } from "react";
+import { prices, ratings, categories, propertiesType } from "../../data/constants";
+import {faMagnifyingGlass, faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+// import router from "@/app/api/rent/route";
+import {userRouter} from "next/navigation";
 
 function FilterNavbarIndex() {
     const [filters, setFilters] = useState({
@@ -65,7 +59,27 @@ function FilterNavbarIndex() {
             options: propertiesType,
         },
     ];
+useEffect(() => {
+    const checkAuth = async () => {
+      const res = await fetch("/api/auth/me/", {
+        credentials: "include",
+      });
 
+      if (res.ok) {
+        router.replace("/landlordDashboard");
+      }
+    };
+    checkAuth();
+  }, []);
+
+
+    useEffect(() => {
+        const savedHome = async () => {
+        const savedHomeRes = await fetch ("/api/savedHomes", {
+        credentials: "include"
+        })
+    }})
+  
     return (
         <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-center gap-5">
             {/* Search */}
@@ -118,8 +132,10 @@ function FilterNavbarIndex() {
 
             {/* Right icon */}
             <div className="h-14 flex items-center rounded-lg justify-center text-white hover:bg-white/10 gap-1 pb-3">
-                <p className="text-sm mt-2 font-medium">2</p>
-                <img src="/home.png" alt="Home Icon" />
+                <p className="text-sm mt-2 font-medium">
+                    {/* `${savedHome}` */}
+                    </p>
+                <img src="/houseIcon.png" alt="Home Icon" /> 
             </div>
         </div>
     );

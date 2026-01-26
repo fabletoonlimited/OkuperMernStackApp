@@ -1,4 +1,4 @@
-import { HomeInterest, Property } from "../models/propertyModel.js"
+import { HomeInterest, Property } from "../models/homeInterestModel.js"
 import User from "../models/userModel.js"
 
 export const createProperty = async (req, res) => {
