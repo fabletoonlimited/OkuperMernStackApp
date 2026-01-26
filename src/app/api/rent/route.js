@@ -113,39 +113,88 @@ export async function GET(request) {
   }
 }
 
-
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+// UPDATE PROPERTY
+export async function PUT(request) {
   try {
-    const property = await propertyModel.findById(id);
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
+    await dbConnect();
+    const body = await request.json();
+
+    const { listedBy, _id, ...updateData } = body;
+
+    if (!_id && !listedBy) {
+      return NextResponse.json(
+        { message: "Property ID or listedBy is required" },
+        { status: 400 }
+      );
     }
-    return res.json(property);
+
+    const query = _id ? { _id } : { listedBy };
+    
+    const updatedProperty = await Property
+    .findOneAndUpdate(
+      query,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    )
+
+    if (!updatedProperty) {
+      return NextResponse.json(
+        { message: "Property not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { 
+        success: true, 
+        property: updatedProperty,
+        message: "Property updated successfully" 
+      }, 
+      { status: 200 }
+    );
+
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching property', error });
+    console.error("❌ API ERROR:", error);
+    return NextResponse.json(
+      { message: error.message || "Server error" },
+      { status: 500 }
+    );
   }
-});
+}
 
-router.get('/filter', async (req, res) => {
-
-  const { status, price, bedroom, type } = req.query;
-
-  const filter = {};
-
-  if (status) filter.status = status;
-  if (bedroom) filter.bedroom = parseInt(bedroom);
-  if (type) filter.type = type;
-
-  if (price) {
-    const [min, max] = price.split('-').map(Number);
-    filter.price = { $gte: min, $lte: max };
-  }
+// PROPERTY LANDLORD
+export async function PROPERTY(request) {
+  await dbConnect();
 
   try {
-    const properties = await propertyModel.find(filter).sort({ createdAt: -1 });
-    res.json(properties);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch properties', error });
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Property ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const deletedProperty = await Property.findByIdAndDelete(id);
+
+    if (!deletedProperty) {
+      return NextResponse.json(
+        { message: "Property not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, message: "Property deleted successfully" }, 
+      { status: 200 }
+    );
+
+  } catch (err) {
+    return NextResponse.json(
+      { message: err.message },
+      { status: 500 }
+    );
   }
-});
+}
