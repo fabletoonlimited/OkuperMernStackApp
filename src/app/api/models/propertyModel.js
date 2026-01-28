@@ -91,7 +91,7 @@ const propertySchema = new mongoose.Schema({
       default: true,
     },
 
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    // user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true },
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true },
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -16,8 +15,8 @@ const page = () => {
     const router = useRouter();
 
     const [formData, setFormData] = useState({
-        landlordId: "", Img1: "", Img2: "", Img3: "",
-        title: "", address: "", price: "", category: "", 
+        landlord_id: "", Img1: "", Img2: "", Img3: "", Img4: "",
+        Img5: "", title: "", address: "", price: "", category: "", 
         unitsAvailable: "", unitsAvailable: "",
         bed: "", bath: "", features: "", listedBy: ""
     });
@@ -38,17 +37,17 @@ const page = () => {
         setError("");
 
         if (
-            !formData.landlordId ||
+            !formData.landlord_id ||
             !formData.Img1 || !formData.Img2 || !formData.Img3 ||
             !formData.title || !formData.address || !formData.price ||
             !formData.category || !unitsAvailable || !formData.unitsAvailable ||
-            !formData.bed || formData.bath || formData.features || formData.listedBy
+            !formData.bed || formData.bath || formData.listedBy ||formData.features 
             ) {
               toast.error("Please fill all required fields");
               return;
             }
 
-        if (!landlordId) {
+        if (!landlord_id) {
           toast.error("You are not a valid landlord. Please signup or signin.");
           return;
         }
@@ -108,7 +107,7 @@ const page = () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              landlordId,
+              landlord_id,
               Img1: formData.Img1,
               Img2: formData.Img2,
               Img3: formData.Img3,
@@ -139,7 +138,7 @@ const page = () => {
     //         body: JSON.stringify({
     //           action: "generate",
     //           email: formData.email,
-    //           purpose: "verifyPAyment",
+    //           purpose: "verifyPayment",
     //           userType: "landlord",
     //         }),
     //       });
@@ -306,7 +305,7 @@ const page = () => {
                                 value={formData.title}
                                 onChange={handleInputChange}
                                 placeholder="2 Bedroom Mini Flat in Agbowa"
-                                className="border border-[#233670] md:w-[742px] md:h-[67px] pl-5 font-medium md:text-2xl w-69 h-8"
+                                className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
                             />
                         </div>
                     </li>
@@ -319,7 +318,7 @@ const page = () => {
                                 value={formData.address}
                                 onChange={handleInputChange}
                                 placeholder="Address Line 1"
-                                className="border border-[#233670] md:w-[742px] md:h-[67px] pl-5 font-medium md:text-2xl w-69 h-8"
+                                className="border border-[#233670] md:w-[760px] w-full pl-5 font-medium md:text-2xlh-8"
                             />
                             <input
                                 type="text"
@@ -327,7 +326,7 @@ const page = () => {
                                 value={formData.address}
                                 onChange={handleInputChange}
                                 placeholder="Address Line 2"
-                                className="border-[#233670] border md:w-[742px] md:h-[67px] pl-5 font-medium md:text-2xl w-69 h-8"
+                                className="border-[#233670] border md:w-[760px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
                             />
                         </div>
                     </li>
@@ -340,7 +339,7 @@ const page = () => {
                                 value={formData.price}
                                 onChange={handleInputChange}
                                 placeholder="N10,000,000"
-                                className="border border-[#233670] md:w-[742px] md:h-[67px] pl-5 font-medium md:text-2xl w-69 h-8"
+                                className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
                             />
                         </div>
                     </li>
@@ -365,7 +364,7 @@ const page = () => {
                             <input
                                 type="text"
                                 placeholder="No. of property"
-                                className="border border-[#233670] md:w-[742px] md:h-[67px] pl-5 font-medium w-69 h-8"
+                                className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium h-8"
                             />
                         </div>
                     </li>
@@ -430,7 +429,7 @@ const page = () => {
                             <input
                                 type="text"
                                 placeholder="Input home owners name"
-                                className="border border-[#233670] md:w-[742px] md:h-[67px] h-8 pl-5 font-medium md:text-2xl w-69"
+                                className="border border-[#233670] md:w-[860px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl"
                             />
                         </div>
                     </li>
@@ -445,7 +444,7 @@ const page = () => {
                         <input
                             type="text"
                             placeholder="Prepaid meter, All room en-suite, etc"
-                            className="border border-[#233670] md:w-[624px] md:h-[67px]  pl-5 font-medium md:text-2xl md:ml-6 w-77 h-8"
+                            className="border border-[#233670] md:w-[770px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl md:ml-6h-8"
                         />
                     </li>
                     <li>
@@ -453,7 +452,7 @@ const page = () => {
                         <input
                             type="text"
                             placeholder="Standby security, 24hrs light,Standby Generator, etc"
-                            className="border border-[#233670] md:w-[624px] md:h-[67px] pl-5 font-medium w-77 h-10 md:text-2xl md:ml-6"
+                            className="border border-[#233670] md:w-[747px] w-full md:h-[67px] pl-5 font-medium h-10 md:text-2xl md:ml-6"
                         />
                     </li>
                     <li>
@@ -461,7 +460,7 @@ const page = () => {
                         <input
                             type="text"
                             placeholder="00000"
-                            className="border border-[#233670] md:w-[546px] md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 w-77 h-10"
+                            className="border border-[#233670] md:w-[670px] md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 w-full h-10"
                         />
                     </li>
                     <li>
@@ -469,7 +468,7 @@ const page = () => {
                         <input
                             type="text"
                             placeholder="Around school, Ikeja city mall, govt hospital."
-                            className="border border-[#233670] md:w-[678px] w-78 md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
+                            className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
                         />
                     </li>
                     <div className="flex justify-center mt-15">

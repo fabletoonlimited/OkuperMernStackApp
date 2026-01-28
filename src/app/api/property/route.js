@@ -11,31 +11,88 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    const {previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, price, category, propertyType, bed, bath, features, listedBy, savedHomes, unitsAvailable, rating, isVerified} = body;
+    const {landlord_id, previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, price, category, propertyType, bed, bath, features, listedBy, savedHomes, unitsAvailable, rating, isVerified} = body;
 
-  if (!Img1 || !Img2 || !Img3 || !title || !address || !price || !category || !propertyType || !bed || !bath || !features || !listedBy) {
-    return NextResponse.json(
-      { message: "Missing required fields" },
-      { status: 400 }
-    );
-  } 
+    if (!previewPic) {
+      return NextResponse.json(
+        { message: "At least one preview picture needs to be added" },
+        { status: 400 }
+      );
+    } 
 
-  if (!previewPic) {
-    return NextResponse.json(
-      { message: "At least one preview Picture needs to be added" },
-      { status: 400 }
-    );
-  } 
+    if (!Img1 || !Img2 || !Img3) {
+      return NextResponse.json(
+        { message: "Upload at least three images" },
+        { status: 400 }
+      );
+    } 
 
-  if (existingProperty) {
-    return NextResponse.json(
-      { message: "Property already exists in Database, create another" }, 
-      { status: 400 }
+    if (!title) {
+      return NextResponse.json(
+        { message: "Please add a title to your property." },
+        { status: 400 }
+      );
+    } 
+
+    if (!address) {
+      return NextResponse.json(
+        { message: "Kindly add an address to your property." },
+        { status: 400 }
+      );
+    }
+
+    if (!price) {
+      return NextResponse.json(
+        { message: "Kindly add an price to your property." },
+        { status: 400 }
+      );
+    }
+
+    if (!category) {
+      return NextResponse.json(
+        { message: "Kindly add your property to a category." },
+        { status: 400 }
+      );
+    }
+
+    if (!unitsAvailable) {
+      return NextResponse.json(
+        { message: "Please input how many of this property is available." },
+        { status: 400 }
+      );
+    } 
+
+    if (!bed) {
+      return NextResponse.json(
+        { message: "Kindly add number of bed to your property." },
+        { status: 400 }
+      );
+    }
+
+    if (!bath) {
+      return NextResponse.json(
+        { message: "Kindly add number of bath to your property." },
+        { status: 400 }
+      );
+    }
+
+    if (!listedBy) {
+      return NextResponse.json(
+        { message: "Kindly add name of who is listing this property" },
+        { status: 400 }
+      );
+    } 
+
+    if (existingProperty) {
+      return NextResponse.json(
+        { message: "This property already exists in Database, create another." }, 
+        { status: 400 }
       );
     }
 
     //create New Property
     const newProperty = await createProperty.create({
+      landlord_id,
       previewPic, 
       Img1, 
       Img2, 
@@ -55,8 +112,6 @@ export async function POST(req) {
       savedHomes, 
       unitsAvailable, 
       rating,
-      user,
-      landlord,
       isVerified
     });
 
