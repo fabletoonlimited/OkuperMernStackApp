@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
-import Tenant from "../models/tenantModel.js";
+import Tenant from "../controllers/tenant.controller";
 
 // CREATE TENANT
 export async function POST(req) {

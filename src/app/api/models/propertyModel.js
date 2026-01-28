@@ -10,7 +10,6 @@ const imageSchema = new mongoose.Schema({
 
 const propertySchema = new mongoose.Schema({
     previewPic: {type: String, required: true},
-
     Img1: [imageSchema],
     Img2: [imageSchema],
     Img3: [imageSchema],
@@ -24,6 +23,11 @@ const propertySchema = new mongoose.Schema({
         type: String,
         enum: ["Rent", "Buy", "Sell", "Shortlet"],
         default: "Rent",
+    },
+
+    unitsAvailable: {
+        type: Number,
+        default: 0
     },
     propertyType: {
         type: String,
@@ -75,11 +79,6 @@ const propertySchema = new mongoose.Schema({
         default: false,
         icon: String
     },
-    unitsAvailable: {
-        type: Number,
-        default: 0
-    },
-
     rating: {
         type: Number,
         min: 0,
@@ -87,10 +86,10 @@ const propertySchema = new mongoose.Schema({
         default: 0
     },
 
-    // isVerified: {
-    //   type: Boolean,
-    //   default: true,
-    // },
+    isVerified: {
+      type: Boolean,
+      default: true,
+    },
 
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true },
