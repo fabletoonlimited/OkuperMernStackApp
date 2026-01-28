@@ -20,9 +20,51 @@ const page = () => {
         unitsAvailable: "", unitsAvailable: "",
         bed: "", bath: "", features: "", listedBy: ""
     });
-    
-    const [selectedType, setSelectedType] = useState("");
 
+const [file, setFile] = useState(null);
+const [previewPic, setPreviewPic] = useState(null);
+
+function handleChange (e) { 
+const img = e.target.files?.[0];
+        if (!img) return;
+
+    setFile(img);
+    setPreviewPic(URL.createObjectURL(img));
+
+    async function uploadImage() {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "okuper");
+
+        try {
+            const res = await fetch(
+                "https://api.cloudinary.com/v1_1/dfdzbuk0c/image/upload",
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+
+            const data = await res.json();
+            console.log("Cloudinary upload response:", data);
+
+            if (data.secure_url) {
+                setFormData((prev) => ({
+                    ...prev,
+                    Img1: data.secure_url,
+                }));
+                toast.success("Image uploaded successfully!");
+            } else {
+                toast.error("Image upload failed. Please try again.");
+            }
+        } catch (err) {
+            console.error("Error uploading image to Cloudinary:", err);
+            toast.error("Image upload failed. Please try again.");
+        }       
+    }
+}
+    
+    const [selectedFeatures, setSelectedFeatures] = useState("");
 
     const handleInputChange = (e) => {
     setFormData((prev) => ({
@@ -242,52 +284,82 @@ const page = () => {
                     <li className="md:flex">
                         <h5 className="mt-4">Pictures:</h5>
                         <div className="md:flex gap-5 md:ml-8 space-y-4">
-                            <div 
-                            //   onClick={}
-                            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[211px]"
-                                    >
+                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[211px]"> 
+                            <input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={handleChange}
+                                className="absolute w-full h-full opacity-0 cursor-pointer"
+                                id='PreviewPic'
+                            />
                                 <CloudUpload className="text-gray-300" />
                                 <p className="text-gray-500 font-medium text-xl leading-normal">
                                     Preview picture
                                 </p>
-                            </div>
-                            <div className='md:grid md:grid-cols-3 gap-4 space-y-4'>
-                                <div
-                                    className="flex flex-col items-center justify-center
-                                border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                        </div>
+                        <div className='md:grid md:grid-cols-3 gap-4 space-y-4'>
+                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    className="absolute w-full h-full opacity-0 cursor-pointer"
+                                    id='Image1'
+                                />   
                                     <CloudUpload className="text-gray-300" />
                                     <p className="text-gray-500 font-medium text-xl leading-normal">
                                         Image1
                                     </p>
-                                </div>
-                                <div
-                                    className="flex flex-col items-center justify-center
-                                border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                            </div>
+                        
+                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    className="absolute w-full h-full opacity-0 cursor-pointer"
+                                    id='Image2'
+                                />     
                                     <CloudUpload className="text-gray-300" />
                                     <p className="text-gray-500 font-medium text-xl">
                                         Image 2
                                     </p>
                                 </div>
-                                <div
-                                    className="flex flex-col items-center justify-center
-                                border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                    <input 
+                                        type="file" 
+                                        accept="image/*"
+                                        onChange={handleChange}
+                                        className="absolute w-full h-full opacity-0 cursor-pointer"
+                                        id='Image3'
+                                    />  
                                     <CloudUpload className="text-gray-300" />
                                     <p className="text-gray-500 font-medium text-xl">
                                         Image 3
                                     </p>
                                 </div>
 
-                                <div
-                                    className="flex flex-col items-center justify-center 
-                                    border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                    <input 
+                                        type="file" 
+                                        accept="image/*"
+                                        onChange={handleChange}
+                                        className="absolute w-full h-full opacity-0 cursor-pointer"
+                                        id='Image4'
+                                    />
                                     <CloudUpload className="text-gray-300" />
                                     <p className="text-gray-500 font-medium text-xl">
                                         Image 4
                                     </p>
                                 </div>
-                                <div
-                                    className="flex flex-col items-center justify-center 
-                                border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                                    <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    className="absolute w-full h-full opacity-0 cursor-pointer"
+                                    id='Image5'
+                                    />
                                     <CloudUpload className="text-gray-300" />
                                     <p className="text-gray-500 font-medium text-xl">
                                         Image 5
@@ -346,14 +418,25 @@ const page = () => {
                     <li className="md:flex">
                         <h5 className="mt-4">Category:</h5>
                         <div className="space-x-2 space-y-4 text-white md:ml-6">
-                            {["Rent", "Buy", "Sell", "Shortlet"].map((type) => (
+                            {["Rent", "Buy", "Sell", "Shortlet"].map((feature) => (
                             <button 
-                                key={type}
+                                key={feature}
                                 type='button'
-                                onClick={() => setSelectedType(type)}
-                                className="bg-blue-900 w-32 h-15 rounded cursor-pointer hover:bg-blue-700"
+                                onClick={() => {setSelectedFeatures((prev) =>
+                                    prev.includes(feature)
+                                    ? prev.filter((f) => f !==feature) // remove
+                                    : [...prev, feature] // add
+                                );
+                            }}
+                            className={`w-32 h-15 rounded cursor-pointer transition
+                                ${
+                                    selectedFeatures.includes(feature)
+                                        ? "bg-blue-700 text-white"
+                                        : "bg-blue-900 text-white"
+                                    }
+                                `}
                             >
-                                {type}
+                                {feature}
                             </button>
                             ))}
                         </div>
@@ -363,7 +446,7 @@ const page = () => {
                         <div className="md:ml-12">
                             <input
                                 type="text"
-                                placeholder="No. of property"
+                                placeholder="No. of property available."
                                 className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium h-8"
                             />
                         </div>
@@ -372,14 +455,27 @@ const page = () => {
                     <li className="md:flex propertyType">
                         <h5 className="mt-4 mr-6">Property Type:</h5>
                         <div className="space-x-10 space-y-8 text-white ">
-                            {["Appartment", "Bungalow", "Office", "Condo", "TownHouse", "Duplex", "SelfCon", "Villa", "BQ", "Other"].map((type) => (
+                            {["Appartment", "Bungalow", "Office", "Condo", "TownHouse", "Duplex", "SelfCon", "Villa", "BQ", "Other"].map(
+                            (feature) => (                      
                                 <button 
-                                    key={type}
+                                    key={feature}
                                     type='button'
-                                    onClick={() => setSelectedType(type)}
-                                    className="bg-blue-900 md:w-35 w-full h-15 rounded cursor-pointer hover:bg-blue-700"
+                                    onClick={() => {
+                                        setSelectedFeatures((prev) =>
+                                        prev.includes(feature)
+                                    ? prev.filter((f) => f !== feature) //remove
+                                    : [...prev, feature] // add
+                                    );
+                                }}
+                                    className={`md:w-35 w-full h-15 cursor-pointer transition      
+                                        ${
+                                            selectedFeatures.includes(feature)
+                                            ? "bg-blue-700 text-white"
+                                            : "bg-blue-900 text-white"
+                                        }
+                                    `}
                                 >
-                                    <p className='text-lg md:text-md'>{type}</p>
+                                    <p className='text-lg md:text-md'>{feature}</p>
                                 </button>
                             ))}
                         </div>
@@ -387,14 +483,26 @@ const page = () => {
                     <li className="md:flex">
                         <h5 className="mt-4">Bed:</h5>
                         <div className="space-x-2 space-y-4 text-white md:ml-18">
-                            {["1Bdr", "2Bdr", "3Bdr", "4Bdr", "5Bdr", "6Bdr", "7Bdr", "8Bdr"].map((type) => (
+                            {["1Bdr", "2Bdr", "3Bdr", "4Bdr", "5Bdr", "6Bdr", "7Bdr", "8Bdr"].map((feature) => (
                             <button 
-                                key={type}
+                                key={feature}
                                 type='button'
-                                onClick={() => setSelectedType(type)}
-                                className="bg-blue-900 w-25 h-15 rounded cursor-pointer hover:bg-blue-700"
+                                onClick={() => { 
+                                    setSelectedFeatures((prev) =>
+                                    prev.includes(feature)
+                                    ? prev.filter((f) => f !== feature) // remove
+                                    : [...prev, feature] // add
+                                    );
+                                }}
+                                className={`w-25 h-15 rounded-full cursor-pointer
+                                ${
+                                    selectedFeatures.includes(feature)
+                                        ? "bg-blue-700 text-white"
+                                        : "bg-blue-900 text-white"
+                                    }
+                                `}
                             >
-                                {type}   
+                                {feature}   
                             </button>
                             ))}
                         </div>
@@ -405,14 +513,24 @@ const page = () => {
                    <li className="md:flex">
                         <h5 className="mt-4">Bath:</h5>
                         <div className="space-x-2 space-y-4 text-white md:ml-18">
-                            {["1Bath", "2Bath", "3Bath", "4Bath", "5Bath", "6Bath", "7Bath", "8Bath"].map((type) => (
+                            {["1Bath", "2Bath", "3Bath", "4Bath", "5Bath", "6Bath", "7Bath", "8Bath"].map((feature) => (
                             <button 
-                                key={type}
+                                key={feature}
                                 type='button'
-                                onClick={() => setSelectedType(type)}
-                                className="bg-blue-900 w-25 h-15 rounded cursor-pointer hover:bg-blue-700"
+                                onClick={() => {
+                                    setSelectedFeatures((prev) =>
+                                    prev.includes(feature)
+                                    ? prev.filter((f) => f !== feature) // remove
+                                    : [...prev, feature] // add
+                                );}}
+                                className={`w-25 h-15 rounded-full cursor-pointer transition
+                                    ${selectedFeatures.includes(feature)
+                                        ? "bg-blue-700 text-white"
+                                        : "bg-blue-900 text-white"
+                                    }
+                                `}                            
                             >    
-                            {type}    
+                            {feature}    
                             </button>
                             ))}
                         </div>
@@ -428,7 +546,7 @@ const page = () => {
                         <div className="md:ml-4">
                             <input
                                 type="text"
-                                placeholder="Input home owners name"
+                                placeholder="Enter fullname or company name."
                                 className="border border-[#233670] md:w-[860px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl"
                             />
                         </div>
@@ -443,7 +561,7 @@ const page = () => {
                         Building Amenities:
                         <input
                             type="text"
-                            placeholder="Prepaid meter, All room en-suite, etc"
+                            placeholder="Prepaid meter, All room en-suite, etc."
                             className="border border-[#233670] md:w-[770px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl md:ml-6h-8"
                         />
                     </li>
@@ -451,7 +569,7 @@ const page = () => {
                         Property Amenities:
                         <input
                             type="text"
-                            placeholder="Standby security, 24hrs light,Standby Generator, etc"
+                            placeholder="Standby security, 24hrs light,Standby Generator, etc."
                             className="border border-[#233670] md:w-[747px] w-full md:h-[67px] pl-5 font-medium h-10 md:text-2xl md:ml-6"
                         />
                     </li>
@@ -467,7 +585,7 @@ const page = () => {
                         Nearby Places:
                         <input
                             type="text"
-                            placeholder="Around school, Ikeja city mall, govt hospital."
+                            placeholder="Schools, Malls, Govt hospitals, Central Mosque, etc."
                             className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
                         />
                     </li>

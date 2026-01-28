@@ -14,14 +14,53 @@ export const createProperty = async (data) => {
         unitsAvailable, rating
     } = data;
 
-    if (!Img1 || !Img2 || !Img3 
-        || !title || !address 
-        || !price || !category 
-        || !propertyType || !bed 
-        || !bath || !features 
-        || !listedBy) {
-        throw new Error("Missing required fields");
-    }
+    if (!previewPic) {
+          throw new Error("Please uplaod a preview picture")
+        } 
+    
+        if (!Img1 || !Img2 || !Img3) {
+          throw new Error("Please uplod at least 3 images")
+        } 
+    
+        if (!title) {
+          throw new Error("Missing property title")
+        } 
+    
+        if (!address) {
+          throw new Error("Missing address fields")
+        }
+    
+        if (!price) {
+          throw new Error("Missing price fields")
+        }
+    
+        if (!category) {
+          throw new Error("Missing category fields")
+        }
+    
+        if (!unitsAvailable) {
+          throw new Error("Property units available missing")
+        } 
+    
+        if (!bed) {
+          throw new Error("At least one number of bed is required")
+        }
+    
+        if (!bath) {
+          throw new Error("At least one number of bath is required")
+        }
+    
+        if (!features) {
+          throw new Error("Missing property features")
+        }
+    
+        if (!listedBy) {
+          throw new Error("Property listed feature is required")
+        } 
+    
+        if (existingProperty) {
+          throw new Error("Property exists in the database. Kindly upload a new property")
+        }
 
     let newProperty;
 
@@ -32,7 +71,8 @@ export const createProperty = async (data) => {
             title, 
             address, price, category, 
             propertyType, bed, bath, 
-            features, listedBy, savedHomes, 
+            features: //"buildingAmenities", "propertyAmenities", "neighbourhoodPostcode", "nearbyPlaces", 
+            listedBy, savedHomes, 
             unitsAvailable, 
             rating,
             user,

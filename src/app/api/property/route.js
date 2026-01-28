@@ -76,6 +76,13 @@ export async function POST(req) {
       );
     }
 
+    if (!features) {
+      return NextResponse.json(
+        { message: "Kindly your property features." },
+        { status: 400 }
+      );
+    }
+
     if (!listedBy) {
       return NextResponse.json(
         { message: "Kindly add name of who is listing this property" },
@@ -104,13 +111,14 @@ export async function POST(req) {
       address, 
       price, 
       category, 
+      unitsAvailable, 
       propertyType, 
       bed, 
-      bath, 
-      features, 
+      bath,
+      rating,
       listedBy, 
+      features: //"buildingAmenities", "propertyAmenities", "neighbourhoodPostcode", "nearbyPlaces", 
       savedHomes, 
-      unitsAvailable, 
       rating,
       isVerified
     });
