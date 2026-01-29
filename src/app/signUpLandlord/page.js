@@ -44,7 +44,9 @@ const page = () => {
 
   // 🔒 HARD GUARD — PREVENT BROKEN FLOW
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) 
+      return;
+    
     if (!residencyStatus || !whoIsUsingPlatform) {
       toast.error("Signup flow is invalid. Please restart signup.");
     }

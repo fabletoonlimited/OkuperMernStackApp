@@ -4,6 +4,7 @@ import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Landlord from "../models/landlordModel.js";
 import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
+// import {signupLandlord, getLandlord, getAllLandlord, updateLandlord, deleteLandlord} from "../controllers/landlord.controller.js"
 
 // CREATE LANDLORD
 export async function POST(req) {
