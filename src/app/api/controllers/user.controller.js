@@ -1,4 +1,5 @@
-import User from "../models/userModel.js"
+import User from "../models/userModel.js";
+import { generateUniqueReferralCode } from "@/app/lib/referralUtils.js";
 
 // Create User
 export async function createUserController(data) {
@@ -13,32 +14,41 @@ export async function createUserController(data) {
     whoIsUsingPlatform = "someoneElse";
   }
 
-  //Existing User
-  const existingUser = await User.findOne({
-    residencyStatus,
-    whoIsUsingPlatform,
-    role
-  });
+  // COMMENTED OUT: This lookup reuses the same User for different people
+  // if they have matching residencyStatus, whoIsUsingPlatform, and role.
+  // This breaks referralCode uniqueness (multiple users get the same code).
+  // Solution: Always create a fresh User per signup (every email gets unique referralCode).
+  // //Existing User
+  // const existingUser = await User.findOne({
+  //   residencyStatus,
+  //   whoIsUsingPlatform,
+  //   role,
+  // });
 
-  if (existingUser) {
-    return {
-      exists: "true",
-      message: "User already exists",
-      user: {
-        _id: existingUser._id,
-        role: existingUser.role
-      },
-    };
-  }
+  // if (existingUser) {
+  //   return {
+  //     exists: "true",
+  //     message: "User already exists",
+  //     user: {
+  //       _id: existingUser._id,
+  //       role: existingUser.role,
+  //     },
+  //   };
+  // }
+
+  // Generate unique referral code with collision handling
+  const referralCode = await generateUniqueReferralCode();
 
   //New user
   const newUser = new User({
     residencyStatus,
     whoIsUsingPlatform,
     role,
+    referralCode,
+    referredBy: null,
+    referralCount: 0,
   });
   await newUser.save();
-
 
   return {
     exists: false,
@@ -54,7 +64,7 @@ export async function getUserController(userId) {
   if (!userId) {
     throw new Error("User ID is required");
   }
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new Error("Invalid user ID");
   }
 
@@ -63,7 +73,7 @@ export async function getUserController(userId) {
   const user = await User.findById(userId)
     .populate("Tenant")
     .populate("Landlord")
-    .populate("Admin")
+    .populate("Admin");
 
   if (!user) {
     throw new Error("User not found");
@@ -72,10 +82,8 @@ export async function getUserController(userId) {
   return user;
 }
 
-
 // Get all users
 export async function getAllUserController() {
-
   const { default: User } = await import("../models/userModel.js");
 
   const users = await User.find()

@@ -21,6 +21,7 @@ const page = () => {
     email: "",
     password: "",
     survey: "",
+    referralCode: "",
   });
 
   const [showOtpTenant, setShowOtpTenant] = useState(false);
@@ -87,6 +88,7 @@ const page = () => {
           email: formData.email,
           password: formData.password,
           survey: formData.survey,
+          referralCode: formData.referralCode,
           terms: termsAccepted,
         }),
       });
@@ -272,6 +274,18 @@ const page = () => {
             value={formData.password}
             onChange={handleInputChange}
             placeholder="password"
+            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
+          />
+
+          <p style={{ paddingTop: 20, marginBottom: 30 }}>
+            Referral Code (Optional)
+          </p>
+          <input
+            type="text"
+            name="referralCode"
+            value={formData.referralCode}
+            onChange={handleInputChange}
+            placeholder="Enter referral code"
             className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
           />
 
