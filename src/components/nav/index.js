@@ -84,8 +84,8 @@ function Nav() {
                       <Image
                           src="/logo.png"
                           alt="Logo"
-                          width={430}
-                          height={320}
+                          width={330}
+                          height={250}
                       />
                   </Link>
               </div>

@@ -1,17 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import {
-    prices,
-    ratings,
-    categories,
-    propertiesType,
-} from "../../data/constants";
-import {
-    faMagnifyingGlass,
-    faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
+import Link from "next/link"
+import {mockProperties} from "../../app/api/models/mockProperty.js";
+
 
 function FilterNavbarIndex() {
     const [filters, setFilters] = useState({
@@ -29,41 +22,28 @@ function FilterNavbarIndex() {
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
 
-    // ✅ Sorting function that works for both objects and numbers/strings
+    // Sorting helper
     const sortOptions = (options) => {
         return [...options].sort((a, b) => {
-            // If items are objects with a "value" property
-            if (typeof a === "object" && typeof b === "object") {
-                return a.value - b.value;
-            }
-            // If items are numbers (or numeric strings)
+            if (typeof a === "object" && typeof b === "object") return a.value - b.value;
             const numA = Number(a);
             const numB = Number(b);
-            if (!isNaN(numA) && !isNaN(numB)) {
-                return numA - numB;
-            }
-            // Otherwise, sort alphabetically
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
             return String(a).localeCompare(String(b));
         });
     };
 
-    // ✅ Apply sorting to prices
-    const sortedPrices = sortOptions(prices);
+    // ✅ Generate options dynamically from mockProperties
+    const categories = [...new Set(mockProperties.map((p) => p.category))];
+    const prices = sortOptions([...new Set(mockProperties.map((p) => p.price))]);
+    const ratings = [...new Set(mockProperties.map((p) => Math.floor(p.rating)))];
+    const propertiesType = [...new Set(mockProperties.map((p) => p.propertyType))];
 
     const filterConfig = [
         { key: "category", placeholder: "For Rent", options: categories },
-        { key: "price", placeholder: "Price", options: sortedPrices },
-        {
-            key: "rating",
-            placeholder: "Bed & Bath",
-            options: ratings,
-            suffix: "+ stars",
-        },
-        {
-            key: "propertyType",
-            placeholder: "Home type",
-            options: propertiesType,
-        },
+        { key: "price", placeholder: "Price", options: prices },
+        { key: "rating", placeholder: "Bed & Bath", options: ratings, suffix: "+ stars" },
+        { key: "propertyType", placeholder: "Home type", options: propertiesType },
     ];
 
     return (
@@ -79,10 +59,7 @@ function FilterNavbarIndex() {
                 />
                 <Link href={"/"}>
                     <button className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <FontAwesomeIcon
-                            icon={faMagnifyingGlass}
-                            className="text-black text-lg"
-                        />
+                        <FontAwesomeIcon icon={faMagnifyingGlass} className="text-black text-lg" />
                     </button>
                 </Link>
             </div>
@@ -93,20 +70,14 @@ function FilterNavbarIndex() {
                     <select
                         className={pillSelect}
                         value={filters[key]}
-                        onChange={(e) => updateFilter(key, e.target.value)}>
+                        onChange={(e) => updateFilter(key, e.target.value)}
+                    >
                         <option value="all">{placeholder}</option>
-
-                        {options.map((option) =>
-                            typeof option === "object" ? (
-                                <option key={option.value} value={option.value}>
-                                    {option.name}
-                                </option>
-                            ) : (
-                                <option key={option} value={option}>
-                                    {suffix ? `${option}${suffix}` : option}
-                                </option>
-                            ),
-                        )}
+                        {options.map((option) => (
+                            <option key={option} value={option}>
+                                {suffix ? `${option}${suffix}` : option}
+                            </option>
+                        ))}
                     </select>
 
                     <FontAwesomeIcon

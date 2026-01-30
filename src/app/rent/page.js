@@ -6,6 +6,7 @@ import FilterNavbarIndex from "../../components/filterNavbarHome";
 import "../../style/globals.css";
 import { insertAdBanners } from "../../utils/insertAdBanners";
 
+
 function Rent() {
     const [propertyItems, setPropertyItems] = useState([]);
     const [loading, setLoading] = useState(true);

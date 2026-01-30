@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const mockProperties = [
+export const mockProperties = [
   {
     _id: "Prop-001",
     img: [
