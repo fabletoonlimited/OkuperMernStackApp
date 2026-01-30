@@ -5,11 +5,7 @@ import Link from "next/link";
 import styles from "./Nav.module.scss";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faTimes,
-  faUserCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import {faBars, faTimes, faUserCircle} from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 
 function Nav() {
@@ -44,17 +40,17 @@ function Nav() {
   return (
       <nav className="flex justify-around gap-2 ">
           {/* Hamburger Icon */}
-          <div className={styles.navbar__hamburger} onClick={toggleMenu}>
-              <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} size="lg" />
-          </div>
+            <div className={styles.navbar__hamburger} onClick={toggleMenu}>
+                <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} size="lg" />
+            </div>
 
           {/* Mobile-only logo */}
-          <div
-              className={`${styles.navbar__logo} ${styles["navbar__logo--mobile"]}`}>
-              <Link href="/" onClick={() => setIsMenuOpen(false)}>
-                  <Image src="/logo.png" alt="Logo" width={220} height={110} />
-              </Link>
-          </div>
+            <div
+                className={`${styles.navbar__logo} ${styles["navbar__logo--mobile"]}`}>
+                <Link href="/" onClick={() => setIsMenuOpen(false)}>
+                    <Image src="/logo.png" alt="Logo" width={220} height={110} />
+                </Link>
+            </div>
 
           {/* Menu */}
           <ul
@@ -102,31 +98,32 @@ function Nav() {
                   <li className="text-sm">HELP</li>
               </Link>
 
-              {/* 🔐 AUTH SECTION */}
-              {!loading && (
-                  <>
-                      {!isAuthenticated ? (
-                          <Link
-                              href="/signUpLanding"
-                              onClick={() => setIsMenuOpen(false)}>
-                              <li className="text-sm">
-                                  SIGN UP / SIGN IN
-                              </li>
-              </Link>
-              
-                      ) : (
-                          <li
-                              className={styles.navbar__item}
-                              onClick={() => {
-                                  setIsMenuOpen(false);
-                                  router.push("/landlordDashboard");
-                              }}
-                              style={{ cursor: "pointer" }}>
-                              <FontAwesomeIcon icon={faUserCircle} size="lg" />
-                          </li>
-                      )}
-                  </>
-              )}
+                {/* 🔐 AUTH SECTION */}
+                {!loading && (
+                    <>
+                        {!isAuthenticated ? (
+                        <Link
+                            href="/signUpLanding"
+                                onClick={() => setIsMenuOpen(false)}>
+                                <li className="text-sm">
+                                    SIGN UP / SIGN IN
+                                </li>
+                        </Link>
+                
+                        ) : (
+                            <li
+                                className={styles.navbar__item}
+                                onClick={() => {
+                                setIsMenuOpen(false);
+                                    router.push("/landlordDashboard");
+                                }}
+                                style={{ cursor: "pointer" }}>
+                                <FontAwesomeIcon icon={faUserCircle} size="lg" 
+                            />
+                            </li>
+                        )}
+                    </>
+                )}
           </ul>
       </nav>
   );

@@ -3,6 +3,8 @@ export const runtime = "nodejs";
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Landlord from "../models/landlordModel.js";
+import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
+// import {signupLandlord, getLandlord, getAllLandlord, updateLandlord, deleteLandlord} from "../controllers/landlord.controller.js"
 
 // CREATE LANDLORD
 export async function POST(req) {
@@ -11,7 +13,7 @@ export async function POST(req) {
 
     const body = await req.json();
     
-    const {userId, firstName, lastName, email, password, survey, terms} = body;
+    const {userId, firstName, lastName, email, password, survey, terms, referralCode} = body;
 
     if (!userId || !firstName || !lastName || !email || !password || !terms) {
       return NextResponse.json(
@@ -31,6 +33,9 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    // Apply referral (optional; only if valid and not self-referred)
+    await validateAndAssignReferral(userId, referralCode);
 
     //create New Landlord
     const newLandlord = await Landlord.create({
@@ -79,7 +84,9 @@ export async function GET(request) {
     const email = searchParams.get("email");
 
     if (id) {
-      const landlord = await Landlord.findById(id).select("-password");
+      const landlord = await Landlord
+      .findById(id)
+      .select("-password");
 
       if (!landlord) {
         return NextResponse.json(
@@ -92,7 +99,9 @@ export async function GET(request) {
     }
 
     if (email) {
-      const landlord = await Landlord.findOne({ email }).select("-password");
+      const landlord = await Landlord
+      .findOne({ email })
+      .select("-password");
 
       if (!landlord) {
         return NextResponse.json(

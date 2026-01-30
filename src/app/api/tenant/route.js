@@ -3,6 +3,8 @@ export const runtime = "nodejs";
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Tenant from "../models/tenantModel.js";
+import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
+import Tenant from "../controllers/tenant.controller";
 
 // CREATE TENANT
 export async function POST(req) {
@@ -11,7 +13,7 @@ export async function POST(req) {
 
     const body = await req.json();
     
-    const {userId, firstName, lastName, email, password, survey, terms} = body;
+    const {userId, firstName, lastName, email, password, survey, terms, referralCode} = body;
 
     if (!userId || !firstName || !lastName || !email || !password || !terms) {
       return NextResponse.json(
@@ -31,6 +33,9 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    // Apply referral (optional; only if valid and not self-referred)
+    await validateAndAssignReferral(userId, referralCode);
 
     //create New Tenant
     const newTenant = await Tenant.create({

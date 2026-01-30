@@ -126,15 +126,6 @@ const Page = () => {
             className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
           />
 
-          {/*Referral*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>
-            Referral Code (Optional)
-          </p>
-          <input
-            type="text"
-            placeholder="Enter your referral code"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
           <p style={{ paddingTop: 30, marginBottom: 30 }}>
             Forgot password?
             <Link href="/forgotPassword">

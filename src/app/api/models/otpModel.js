@@ -3,24 +3,10 @@ import {mongoose} from "@/app/lib/mongoose.js"
 
 const otpSchema = new mongoose.Schema(
   {
-    action: {
-      type: String,
-      enum:["generate", "verify", "passwordReset"],
-      required: true
-    },
-    email: {
-      type: String,
-      required: true,
-      index: true,
-      lowercase: true,
-      trim: true
-    },
-
-    code: {
-      type: String,
-      required: true,
-    },
-
+    action: {type: String, enum:["generate", "verify", "passwordReset"], required: true},
+    email: {type: String, required: true, index: true, lowercase: true, trim: true},
+    code: {type: String, required: true},
+    
     userType: {
       type: String,
       enum: ["tenant", "landlord", "admin"],
@@ -36,8 +22,7 @@ const otpSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-  },
-  { timestamps: true }
+  }, { timestamps: true }
 );
 
 

@@ -4,8 +4,7 @@ import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
 //Signup Landlord
-export const signupLandlord = async (req) => {
-  const body = await req.json();
+export const signupLandlord = async (data) => {
   const {
     firstName,
     lastName,
@@ -15,28 +14,17 @@ export const signupLandlord = async (req) => {
     referalCode,
     surveyInputField,
     terms,
-  } = body;
+  } = data;
 
   if (
-    !firstName ||
-    !lastName ||
-    !email ||
-    !password ||
-    !terms
-  ) {
-    return NextResponse.json(
-      { message: "Kindly fill all fields required" },
-      { status: 400 },
-    );
+    !firstName || !lastName || !email || !password || !terms) {
+    throw new Error ("Kindly fill all fields required");
   }
 
   //check if landlord exists in DB
   const existingUser = await Landlord.findOne({ email });
   if (existingUser) {
-    return NextResponse.json(
-      { message: "Landlord already exist!! Please login" },
-      { status: 400 },
-    );
+    throw new Error("Landlord already exist!! Please login");
   }
 
   try {
@@ -86,31 +74,27 @@ export const signupLandlord = async (req) => {
       console.error("Failed to send welcome email:", emailError);
     }
 
-    return NextResponse.json(
+    return(
       {
+        success: true,
         message: "New Landlord created Successfully",
         user: newLandlord,
-      },
-      { status: 201 },
+      }
     );
+    
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { message: "Something went wrong", error: error.message },
-      { status: 500 },
+    throw new Error ("Something went wrong"
     );
   }
 };
 
-export const loginLandlord = async (body) => {
+export const loginLandlord = async (data) => {
   try {
-    const { email, password } = body;
+    const { email, password } = data;
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 },
-      );
+      throw new Error ("Email and password are required" );
     }
 
     // Normalize email (trim and lowercase to match signup)
@@ -118,15 +102,12 @@ export const loginLandlord = async (body) => {
 
     const landlord = await Landlord.findOne({ email: normalizedEmail });
     if (!landlord) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 400 },
-      );
+      throw new Error ("Invalid credentials");
     }
 
     const isMatch = await bcrypt.compare(password, landlord.password);
     if (!isMatch) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+      throw new Error ("Invalid password");
     }
 
     //create a token
@@ -164,9 +145,9 @@ export const loginLandlord = async (body) => {
   }
 };
 
-export const getLandlord = async (req) => {
+export const getLandlord = async (data) => {
   try {
-    const { _id } = req.landlord;
+    const { _id } = data.landlord;
 
     const landlord = await Landlord.findById(_id)
       .populate("User")
@@ -176,19 +157,18 @@ export const getLandlord = async (req) => {
       .populate("Property");
 
     if (!landlord) {
-      return NextResponse.json(
-        { message: "Landlord not found" },
-        { status: 404 },
-      );
+      throw new Error ( "Landlord not found");
     }
-
-    return NextResponse.json(landlord, { status: 200 });
+    return {
+      success: true, 
+      landlord
+    };
   } catch (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 };
 
-export const getAllLandlord = async (req) => {
+export const getAllLandlord = async (data) => {
   try {
     const allLandlord = await Landlord.find()
       .select("-password")
@@ -198,7 +178,9 @@ export const getAllLandlord = async (req) => {
       .populate("LandlordDashboard")
       .populate("Property");
 
-    return NextResponse.json(allLandlord, { status: 200 });
+    return {
+      success: true, 
+      allLandlord};
   } catch (error) {
     return NextResponse.json(
       { message: "error getting landlord" },
@@ -207,17 +189,14 @@ export const getAllLandlord = async (req) => {
   }
 };
 
-export const updateLandlord = async (req) => {
+export const updateLandlord = async (data) => {
   try {
-    const body = await req.json();
+    const body = await data.json();
     const { _id, firstName, lastName, email } = body;
 
     // only self-update or admin
-    if (req.landlord && req.landlord._id !== _id && !req.admin) {
-      return NextResponse.json(
-        { success: false, message: "You are unauthorized" },
-        { status: 403 },
-      );
+    if (data.landlord && req.landlord._id !== _id && !req.admin) {
+     throw new Error("You are unauthorized");
     }
 
     const landlord = await Landlord.findByIdAndUpdate(
@@ -227,20 +206,14 @@ export const updateLandlord = async (req) => {
     ).select("-password");
 
     if (!landlord) {
-      return NextResponse.json(
-        { success: false, message: "Landlord not found" },
-        { status: 404 },
-      );
+      throw new Error("Landlord not found" );
     }
 
-    return NextResponse.json(
-      {
+    return({
         success: true,
         message: "Landlord updated successfully",
         landlord,
-      },
-      { status: 200 },
-    );
+      });
   } catch (error) {
     return NextResponse.json(
       { message: "something went wrong", error: error.message },
@@ -255,36 +228,30 @@ export const deleteLandlord = async (req) => {
     const _id = searchParams.get("_id");
 
     if (!_id) {
-      return NextResponse.json(
-        { error: "Landlord ID is required" },
-        { status: 400 },
-      );
+      throw new Error("Landlord ID is required");
     }
 
     const deletedLandlord = await Landlord.findByIdAndDelete(_id);
 
     if (!deletedLandlord) {
-      return NextResponse.json(
-        { error: "Landlord not found" },
-        { status: 404 },
-      );
+     throw new Error ("Landlord not found");
     }
 
-    return NextResponse.json(
-      { message: "Landlord deleted successfully", landlord: deletedLandlord },
-      { status: 200 },
+    return (
+      { message: "Landlord deleted successfully", 
+        landlord: deletedLandlord 
+      }
     );
   } catch (error) {
     console.error("Delete error:", error);
     return NextResponse.json(
       { error: "Cannot delete Landlord" },
-      { status: 500 },
     );
   }
 };
 
 // ================== ARRAY UPLOAD ==================
-export const arrayUpload = async (req) => {
+export const arrayUpload = async (data) => {
   try {
     const formData = await req.formData();
     const files = formData.getAll("files");
@@ -293,10 +260,13 @@ export const arrayUpload = async (req) => {
       files.map((file) => streamUpload(file, "images")),
     );
 
-    return NextResponse.json(
-      { message: "Upload successful", uploads },
-      { status: 200 },
-    );
+    return (
+      { 
+        success: true,
+        message: "Upload successful", 
+        uploads 
+      }
+    )
   } catch (error) {
     return NextResponse.json(
       { message: error.message || "Upload failed" },
