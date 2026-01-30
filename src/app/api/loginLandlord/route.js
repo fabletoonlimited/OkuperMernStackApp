@@ -13,9 +13,16 @@ export async function POST(req) {
         
         const {email, password} = body;
         
-        if(!email || !password) {
+        if(!email) {
             return NextResponse.json(
-                { message: "Please input credentials" },
+                { message: "Please input your email" },
+                { status: 400 }
+            );
+        }
+
+        if(!password) {
+            return NextResponse.json(
+                { message: "Please input password" },
                 { status: 400 }
             );
         }
@@ -27,10 +34,8 @@ export async function POST(req) {
         };
 
         const result = await loginLandlord(normalizedBody);
-
-        // Return the response directly (it already has status and cookies)
         return result;
-        
+
     } catch (error) {
         console.error("❌ API ERROR:", error);
 

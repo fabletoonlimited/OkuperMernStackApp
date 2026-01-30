@@ -101,9 +101,6 @@ export const loginLandlord = async (data) => {
     const normalizedEmail = email.trim().toLowerCase();
 
     const landlord = await Landlord.findOne({ email: normalizedEmail });
-    if (!landlord) {
-      throw new Error ("Invalid credentials");
-    }
 
     const isMatch = await bcrypt.compare(password, landlord.password);
     if (!isMatch) {
@@ -137,8 +134,12 @@ export const loginLandlord = async (data) => {
       path:"/",
       maxAge: 24 * 60 * 60 * 1000, // 1day
     });
-
+     
+  if (!normalizedEmail || !landlord) {
+    throw new Error ("landlord not found with this email" );
+  }  
     return response;
+
   } catch (err) {
     console.error("Login Error:", err.message);
     return NextResponse.json({ message: "Server error" }, { status: 500 });

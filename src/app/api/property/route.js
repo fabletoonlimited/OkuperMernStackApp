@@ -11,7 +11,7 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    const {landlord_id, previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, price, category, propertyType, bed, bath, features, listedBy, savedHomes, unitsAvailable, rating, isVerified} = body;
+    const {landlord, user, previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, price, category, propertyType, bed, bath, features, listedBy, savedHomes, unitsAvailable, rating, isVerified} = body;
 
     if (!previewPic) {
       return NextResponse.json(
@@ -78,7 +78,7 @@ export async function POST(req) {
 
     if (!features) {
       return NextResponse.json(
-        { message: "Kindly your property features." },
+        { message: "Kindly add property features." },
         { status: 400 }
       );
     }
@@ -90,16 +90,17 @@ export async function POST(req) {
       );
     } 
 
-    if (existingProperty) {
-      return NextResponse.json(
-        { message: "This property already exists in Database, create another." }, 
-        { status: 400 }
-      );
-    }
+    // if (existingProperty) {
+    //   return NextResponse.json(
+    //     { message: "This property already exists in Database, create another." }, 
+    //     { status: 400 }
+    //   );
+    // }
 
     //create New Property
-    const newProperty = await createProperty.create({
-      landlord_id,
+    const newProperty = await createProperty({
+      user,
+      landlord,
       previewPic, 
       Img1, 
       Img2, 

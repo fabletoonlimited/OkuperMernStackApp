@@ -4,81 +4,93 @@ import { NextResponse } from "next/server";
 //Create Property
 export const createProperty = async (data) => {
     const {
-        previewPic, 
-        Img1, Img2, Img3, Img4, Img5, Img6, 
-        title, address, 
-        price, category, 
-        propertyType, bed, 
-        bath, features, 
-        listedBy, savedHomes, 
-        unitsAvailable, rating
+      landlord,
+      previewPic, 
+      Img1, Img2, Img3, Img4, Img5, Img6, 
+      title, address, 
+      price, category, 
+      propertyType, bed, 
+      bath, features, 
+      listedBy, savedHomes, 
+      unitsAvailable, rating
     } = data;
 
     if (!previewPic) {
-          throw new Error("Please uplaod a preview picture")
-        } 
+      throw new Error("Please uplaod a preview picture")
+    } 
     
-        if (!Img1 || !Img2 || !Img3) {
-          throw new Error("Please uplod at least 3 images")
-        } 
+    if (!Img1 || !Img2 || !Img3) {
+      throw new Error("Please uplod at least 3 images")
+    } 
     
-        if (!title) {
-          throw new Error("Missing property title")
-        } 
+    if (!title) {
+      throw new Error("Missing property title")
+    } 
     
-        if (!address) {
-          throw new Error("Missing address fields")
-        }
+    if (!address) {
+      throw new Error("Missing address fields")
+    }
     
-        if (!price) {
-          throw new Error("Missing price fields")
-        }
+    if (!price) {
+      throw new Error("Missing price fields")
+    }
     
-        if (!category) {
-          throw new Error("Missing category fields")
-        }
+    if (!category) {
+      throw new Error("Missing category fields")
+    }
     
-        if (!unitsAvailable) {
-          throw new Error("Property units available missing")
-        } 
+    if (!unitsAvailable) {
+      throw new Error("Property units available missing")
+    } 
     
-        if (!bed) {
-          throw new Error("At least one number of bed is required")
-        }
+    if (!bed) {
+      throw new Error("At least one number of bed is required")
+    }
     
-        if (!bath) {
-          throw new Error("At least one number of bath is required")
-        }
+    if (!bath) {
+      throw new Error("At least one number of bath is required")
+    }
     
-        if (!features) {
-          throw new Error("Missing property features")
-        }
+    if (!features) {
+      throw new Error("Missing property features")
+    }
     
-        if (!listedBy) {
-          throw new Error("Property listed feature is required")
-        } 
+    if (!listedBy) {
+      throw new Error("Property listed feature is required")
+    } 
     
-        if (existingProperty) {
-          throw new Error("Property exists in the database. Kindly upload a new property")
-        }
+    if (existingProperty) {
+      throw new Error("Property exists in the database. Kindly upload a new property")
+    }
 
-    let newProperty;
+  let newProperty;
 
     try {  
-        newProperty = await Property.create({
-            previewPic, 
-            Img1, Img2, Img3, Img4, Img5, Img6, 
-            title, 
-            address, price, category, 
-            propertyType, bed, bath, 
-            features: //"buildingAmenities", "propertyAmenities", "neighbourhoodPostcode", "nearbyPlaces", 
-            listedBy, savedHomes, 
-            unitsAvailable, 
-            rating,
-            user,
-            landlord,
-            isVerified: false
-        }); 
+      newProperty = await Property.create({
+      user,
+      landlord,
+      previewPic, 
+      Img1, 
+      Img2, 
+      Img3, 
+      Img4, 
+      Img5, 
+      Img6, 
+      title, 
+      address, 
+      price, 
+      category, 
+      unitsAvailable, 
+      propertyType, 
+      bed, 
+      bath,
+      rating,
+      listedBy, 
+      features: //"buildingAmenities", "propertyAmenities", "neighbourhoodPostcode", "nearbyPlaces", 
+      savedHomes, 
+      rating,
+      isVerified
+      }); 
 
         await newProperty.save();
 

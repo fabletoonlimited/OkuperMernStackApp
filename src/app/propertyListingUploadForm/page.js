@@ -10,7 +10,20 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const page = () => {
-  const router = useRouter();
+const router = useRouter();
+
+const [extraFeatures, setExtraFeatures] = useState({
+  buildingAmenities: "",
+  propertyAmenities: "",
+  neighbourhoodPostcode: "",
+  nearbyPlaces: "",
+});
+
+const propertyPayload = {
+  ...formData,
+  features: allFeatures,
+  address: `${formData.address.line1} ${formData.address.line2}`,
+};
 
   const [formData, setFormData] = useState({
     landlord_id: "",
@@ -21,7 +34,10 @@ const page = () => {
     Img4: "",
     Img5: "",
     title: "",
-    address: "",
+    address: {
+        line1: "",
+        line2: "",
+    },
     price: "",
     category: "",
     unitsAvailable: "",
@@ -31,7 +47,15 @@ const page = () => {
     listedBy: "",
   });
 
-  const [previewPic, setPreviewPic] = useState(null);
+    const [imagePreviews, setImagePreviews] = useState({
+    previewPic: null,
+    Img1: null,
+    Img2: null,
+    Img3: null,
+    Img4: null,
+    Img5: null,
+    });
+
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
   /* keep features synced */
@@ -47,82 +71,133 @@ const page = () => {
     const img = e.target.files?.[0];
     if (!img) return;
 
-    const localPreview = URL.createObjectURL(img);
-    setPreviewPic(localPreview);
-    setFormData((prev) => ({ 
-        ...prev, 
-        previewPic: result.secure_url 
-    }));
+    const imgKey = e.target.id; // previewPic, Img1, Img2, ...
 
     const data = new FormData();
     data.append("file", img);
     data.append("upload_preset", "okuper");
+   
 
     try {
-      const res = await fetch(
+        const res = await fetch(
         "https://api.cloudinary.com/v1_1/dfdzbuk0c/image/upload",
-        { method: "POST", body: data }
-      );
+        {
+            method: "POST",
+            body: data,
+        }
+    );
 
-      const result = await res.json();
+    const uploadResult = await res.json();
 
-      if (!result.secure_url) {
-        toast.error("Image upload failed");
-        return;
-      }
-
-      setFormData((prev) => ({
+    if (!uploadResult.secure_url) {
+      toast.error("Image upload failed");
+      return;
+    }
+    
+   // Update preview for this specific input
+    setImagePreviews((prev) => ({
+      ...prev,
+      [imgKey]: URL.createObjectURL(img),
+    }));
+    
+    setFormData((prev) => ({
         ...prev,
-        Img1: prev.Img1 || result.secure_url,
-        Img2: prev.Img1 && !prev.Img2 ? result.secure_url : prev.Img2,
-        Img3:
-          prev.Img1 && prev.Img2 && !prev.Img3
-            ? result.secure_url
-            : prev.Img3,
-      }));
-
-      toast.success("Image uploaded");
+            [imgKey]: uploadResult.secure_url,
+            }));
+        toast.success(`${imgKey} Image uploaded successfully`);
     } catch (err) {
-      toast.error("Upload error");
+        console.error(err);
+        toast.error("Upload error")
     }
   };
 
-  const handleInputChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+    const handleInputChange = (e) => {
+        setFormData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+        }));
+    
+    };
 
   /* SUBMIT */
   const handlePropertyUpload = async (e) => {
     e.preventDefault();
 
+     const landlordRes = await fetch("/api/property", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+           title: formData.title,
+            address: formData.address,
+            price: formData.price,
+            category: formData.category,
+            unitsAvailable: formData.unitsAvailable,
+            bed: formData.bed,
+            bath: formData.bath,
+            features: formData.features,
+            listedBy: formData.listedBy,
+        }),
+      });
+
     if (
-      !formData.previewPic ||
-      !formData.Img1 ||
-      !formData.Img2 ||
-      !formData.Img3 ||
-      !formData.title ||
-      !formData.address ||
-      !formData.price ||
-      !formData.category ||
-      !formData.unitsAvailable ||
-      !formData.bed ||
-      !formData.bath ||
-      !formData.listedBy ||
-      formData.features.length === 0
+        !formData.previewPic ||
+        !formData.Img1 ||
+        !formData.Img2 ||
+        !formData.Img3 ||
+        !formData.title ||
+        !formData.address.line1 ||
+        !formData.price ||
+        !formData.category ||
+        !formData.unitsAvailable ||
+        !formData.bed ||
+        !formData.bath ||
+        !formData.listedBy
     ) {
       toast.error("Please fill all required fields");
       return;
+    }
+
+    const allFeatures = {
+        buildingAmenities: extraFeatures.buildingAmenities
+            .split(",")
+            .map(f => f.trim())
+            .filter(Boolean),
+        propertyAmenities: extraFeatures.propertyAmenities
+            .split(",")
+            .map(f => f.trim())
+            .filter(Boolean),
+        neighbourhoodPostcode: extraFeatures.neighbourhoodPostcode || "00000",
+        nearbyPlaces: extraFeatures.nearbyPlaces
+            .split(",")
+            .map(f => f.trim())
+            .filter(Boolean),
+        };
+
+    if (
+    !allFeatures.buildingAmenities.length &&
+    !allFeatures.propertyAmenities.length &&
+    !allFeatures.neighbourhoodPostcode &&
+    !allFeatures.nearbyPlaces.length
+    ) {
+    throw new Error("lease add at least one property feature");
+        return;
     }
 
     try {
       const res = await fetch("/api/property", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+            ...formData,
+            features: allFeatures,
+            address: `${formData.address.line1} ${formData.address.line2}`,
+        }),
       });
+
+    //   if (!propertyFeaturesResponse.length) {
+    //     toast.error("Please add at least one property feature");
+    //     return;
+    //   }
 
       const data = await res.json();
 
@@ -132,6 +207,7 @@ const page = () => {
       }
 
       toast.success("Property uploaded successfully");
+      router.push("/allProperties");
     } catch (err) {
       toast.error("Property upload failed");
     }
@@ -152,109 +228,182 @@ const page = () => {
                 <ToastContainer position="top-center" autoClose={3000} />
             </div>
           {/* Form Section*/}
-            <div className="bg-white md:w-[1300px] md:h-auto h-750 md:m-8 m-4 md:flex">
+            <div className="bg-white md:w-[1300px] md:h-auto h-750 md:m-8 m-4 md:flex">           
+            <form onSubmit={handlePropertyUpload}>
                 <ul className="font-semibold md:text-2xl md:space-y-10 space-y-8 p-10 md:pt-20 md:ml-18 ">
-                    <div className="md:flex gap-5 md:ml-8 space-y-4">
+                    
+                    {/* Picture Upload Section */}
+                    <div className="md:flex gap-5 md:ml-8 mb-10">
                         <h5 className="mt-4 -ml-7">Pictures:</h5>
-                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[150px]"> 
-                            {previewPic ? (    
-                                <img
-                                    src={previewPic}
-                                    alt="Preview"
-                                    className="absolute w-full h-full object-cover opacity-0 cursor-pointer"
+                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[150px] cursor-pointer"> 
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
                                     id='previewPic'
                                 />
-                                ):(
-                                <CloudUpload className="text-gray-300" />
+                                {imagePreviews.previewPic ? (
+                                    <img
+                                    src={imagePreviews.previewPic}
+                                    alt="Preview"
+                                    className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                <>
+                                    <CloudUpload className="text-gray-300" />
+                                    <p className="text-gray-500 font-medium text-xl leading-normal">
+                                        Preview picture
+                                    </p>
+                                </>
                                 )}
-                                <p className="text-gray-500 font-medium text-xl leading-normal">
-                                    Preview picture
-                                </p>
-                            </span>
-                        
-                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
-                                <input 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={handleChange}
-                                    className="absolute w-full h-full opacity-0 cursor-pointer"
-                                    id='Image1'
-                            />   
-                                <CloudUpload className="text-gray-300" />
-                                <p className="text-gray-500 font-medium text-xl leading-normal">
-                                    Image1
-                                </p>
-                            </span>
-                        
-                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
-                                <input 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={handleChange}
-                                    className="absolute w-full h-full opacity-0 cursor-pointer"
-                                    id='Image2'
-                                />     
-                                <CloudUpload className="text-gray-300" />
-                                <p className="text-gray-500 font-medium text-xl">
-                                    Image 2
-                                </p>
                             </span>
 
-                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                              {/* Image 1 Uploads */}
+                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
                                 <input 
                                     type="file" 
                                     accept="image/*"
                                     onChange={handleChange}
-                                    className="absolute w-full h-full opacity-0 cursor-pointer"
-                                    id='Image3'
+                                    className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                                    id='Img1'
+                                />   
+                                {imagePreviews.Img1 ? (
+                                    <img
+                                    src={imagePreviews.Img1}
+                                    alt="Img1 Preview"
+                                    className="md:h-[126px] md:w-[145px] object-cover"
+                                    />
+                                ) : (
+                                <>
+                                    <CloudUpload className="text-gray-300" />
+                                    <p className="text-gray-500 font-medium text-xl leading-normal">
+                                        Image1
+                                    </p>
+                                </>
+                                )}
+                            </span>
+                        
+                            {/* Image 2 Uploads */}
+                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                                    id='Img2'
+                                />    
+
+                                {imagePreviews.Img2 ? (
+                                    <img
+                                    src={imagePreviews.Img2}
+                                    alt="Img2 Preview"
+                                    className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                    ) : (
+                                    <> 
+                                    <CloudUpload className="text-gray-300" />
+                                    <p className="text-gray-500 font-medium text-xl">
+                                        Image 2
+                                    </p>
+                                    </>
+                                )}
+                            </span>
+
+                            {/* Image 3 Uploads */}
+                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                                    id='Img3'
                                 />
+
+                                {imagePreviews.Img3 ? (
+                                <img
+                                src={imagePreviews.Img3}
+                                alt="Img3 Preview"
+                                className="md:h-[126px] md:w-[150px] object-cover"
+                                />
+                                ) : (
+                                <>
                                 <CloudUpload className="text-gray-300" />
                                 <p className="text-gray-500 font-medium text-xl">
                                     Image 3
                                 </p>
+                                </>
+                                )}
                             </span>
-
-                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
-                                <input 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={handleChange}
-                                    className="absolute w-full h-full opacity-0 cursor-pointer"
-                                    id='Image4'
-                                />
-                                <CloudUpload className="text-gray-300" />
-                                <p className="text-gray-500 font-medium text-xl">
-                                    Image 4
-                                </p>
-                            </span>
-                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px]">
+                         
+                            {/* Image 4 Uploads */}
+                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
                                 <input 
                                 type="file" 
                                 accept="image/*"
                                 onChange={handleChange}
-                                className="absolute w-full h-full opacity-0 cursor-pointer"
-                                id='Image5'
+                                className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
+                                id='Img4'
                                 />
-                                <CloudUpload className="text-gray-300" />
-                                <p className="text-gray-500 font-medium text-xl">
-                                    Image 5
-                                </p>
+
+                                {imagePreviews.Img4 ? (
+                                <img
+                                src={imagePreviews.Img4}
+                                alt="Img4 Preview"
+                                className="md:h-[126px] md:w-[150px] object-cover"
+                                />
+                                ) : (
+                                <>
+                                    <CloudUpload className="text-gray-300" />
+                                    <p className="text-gray-500 font-medium text-xl">
+                                        Image 4
+                                    </p>
+                                </>
+                                )}
+                            </span>
+
+                            {/* Image 5 Uploads */}
+                            <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                                <input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={handleChange}
+                                className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
+                                id='Img5'
+                                />
+
+                                {imagePreviews.Img5 ? (
+                                <img
+                                src={imagePreviews.Img5}
+                                alt="Img5 Preview"
+                                className="md:h-[126px] md:w-[150px] object-cover"
+                                />
+
+                                ) : (
+                                <>
+                                    <CloudUpload className="text-gray-300" />
+                                    <p className="text-gray-500 font-medium text-xl">
+                                        Image 5
+                                    </p>
+                                </>
+                                )}
                             </span>
                         
                     </div>
-                
+
+                    {/* Property Details Section */}
                     <li className="md:flex">
                         <h5 className="mt-4"> Title:</h5>
-                        <span className="md:ml-17">
-                            <input
-                                type="text"
-                                name='title'
-                                value={formData.title}
-                                onChange={handleInputChange}
-                                placeholder="2 Bedroom Mini Flat in Agbowa"
-                                className="border border-[#233670] md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
-                            />
-                        </span>
+                        
+                        <input
+                            type="text"
+                            name='title'
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            placeholder="2 Bedroom Mini Flat in Agbowa"
+                            className="border border-[#233670] md:ml-17 md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
+                        />
+                        
                     </li>
                     <li className="md:flex">
                         <h5 className="md:mt-4">Address:</h5>
@@ -262,16 +411,26 @@ const page = () => {
                             <input
                                 type="text"
                                 name='address'
-                                value={formData.address}
-                                onChange={handleInputChange}
+                                value={formData.address.line1}
+                                onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    address: { ...prev.address, line1: e.target.value },
+                                }))
+                                }
                                 placeholder="Address Line 1"
                                 className="border border-[#233670] md:w-[850px] w-full pl-5 font-medium md:text-2xl md:h-[67px] h-8"
                             />
                             <input
                                 type="text"
                                 name='address'
-                                value={formData.address}
-                                onChange={handleInputChange}
+                                value={formData.address.line2}
+                                onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    address: { ...prev.address, line2: e.target.value },
+                                }))
+                                }
                                 placeholder="Address Line 2"
                                 className="border-[#233670] border md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
                             />
@@ -297,14 +456,15 @@ const page = () => {
                             <button 
                                 key={feature}
                                 type='button'
-                                onClick={() => { setFormData((prev) => ({ ...prev, category: feature })
-                                    ? prev.filter((f) => f !==feature) // remove
-                                    : [...prev, feature] // add
-                                );
-                            }}
+                                onClick={() =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    category: feature,
+                                }))
+                                }
                             className={`w-32 h-15 rounded cursor-pointer transition
                                 ${
-                                    selectedFeatures.includes(feature)
+                                    formData.category === feature
                                         ? "bg-blue-700 text-white"
                                         : "bg-blue-900 text-white"
                                     }
@@ -320,6 +480,9 @@ const page = () => {
                         <span className="md:ml-12">
                             <input
                                 type="text"
+                                name='unitsAvailable'
+                                value={formData.unitsAvailable}
+                                onChange={handleInputChange}
                                 placeholder="No. of property available."
                                 className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium h-8"
                             />
@@ -334,11 +497,12 @@ const page = () => {
                                 <button 
                                     key={feature}
                                     type='button'
-                                    onClick={() => {setFormData((prev) => prev.includes(feature)
-                                    ? prev.filter((f) => f !== feature) //remove
-                                    : [...prev, feature] // add
-                                    );
-                                }}
+                                    onClick={() => setSelectedFeatures((prev) => 
+                                        prev.includes(feature)
+                                        ? prev.filter((f) => f !== feature) //remove
+                                        : [...prev, feature] // add
+                                    )
+                                }
                                     className={`md:w-35 w-full h-15 cursor-pointer transition      
                                         ${
                                             selectedFeatures.includes(feature)
@@ -359,15 +523,15 @@ const page = () => {
                             <button 
                                 key={feature}
                                 type='button'
-                                onClick={() => {
-                                    setFormData((prev) => ({...prev, bed:feature})
-                                    ? prev.filter((f) => f !== feature) // remove
-                                    : [...prev, feature] // add
-                                );
-                            }}
+                                onClick={() => 
+                                setFormData((prev) => 
+                                ({...prev, 
+                                bed: feature, 
+                                }))
+                                }
                                 className={`w-25 h-15 rounded-full cursor-pointer
                                 ${
-                                    selectedFeatures.includes(feature)
+                                    formData.bed === feature
                                         ? "bg-blue-700 text-white"
                                         : "bg-blue-900 text-white"
                                     }
@@ -388,14 +552,13 @@ const page = () => {
                             <button 
                                 key={feature}
                                 type='button'
-                                onClick={() => {
-                                    setFormData((prev) => ({...prev, bath:feature})
-                                    ? prev.filter((f) => f !== feature) // remove
-                                    : [...prev, feature] // add
-                                );
-                            }}
+                                onClick={() => 
+                                    setFormData((prev) => 
+                                    ({...prev, bath:feature})
+                                )
+                            }
                                 className={`w-25 h-15 rounded-full cursor-pointer transition
-                                    ${selectedFeatures.includes(feature)
+                                    ${formData.bath === feature
                                         ? "bg-blue-700 text-white"
                                         : "bg-blue-900 text-white"
                                     }
@@ -431,13 +594,19 @@ const page = () => {
                     <span>
                         <h3 className="md:text-5xl text-3xl md:mb-20 mb-10">Features</h3>
                     </span>
+
                     <li>
-                        Building Amenities:
+                    Building Amenities:
                         <input
                             type="text"
-                            name='features'
-                            value={formData.features}
-                            onChange={handleInputChange}
+                            name='buidlingAmenities'
+                            value={extraFeatures.buildingAmenities}
+                            onChange={(e) =>
+                                setExtraFeatures((prev) => ({
+                                ...prev,
+                                buildingAmenities: e.target.value,
+                                }))
+                            }
                             placeholder="Prepaid meter, All room en-suite, etc."
                             className="border border-[#233670] md:w-[770px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl md:ml-6h-8"
                         />
@@ -446,9 +615,14 @@ const page = () => {
                         Property Amenities:
                         <input
                             type="text"
-                            name='features'
-                            value={formData.features}
-                            onChange={handleInputChange}
+                            name='propertyAmenities'
+                            value={extraFeatures.propertyAmenities}
+                           onChange={(e) =>
+                            setExtraFeatures((prev) => ({
+                            ...prev,
+                            propertyAmenities: e.target.value,
+                            }))
+                            }
                             placeholder="Standby security, 24hrs light,Standby Generator, etc."
                             className="border border-[#233670] md:w-[747px] w-full md:h-[67px] pl-5 font-medium h-10 md:text-2xl md:ml-6"
                         />
@@ -457,9 +631,14 @@ const page = () => {
                         Neighbourhood postcode:
                         <input
                             type="text"
-                            name='features'
-                            value={formData.features}
-                            onChange={handleInputChange}
+                            name='neighbourhoodPostcode'
+                            value={extraFeatures.neighbourhoodPostcode}
+                            onChange={(e) =>
+                                setExtraFeatures((prev) => ({
+                                ...prev,
+                                neighbourhoodPostcode: e.target.value,
+                                }))
+                            }
                             placeholder="00000"
                             className="border border-[#233670] md:w-[670px] md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 w-full h-10"
                         />
@@ -468,19 +647,29 @@ const page = () => {
                         Nearby Places:
                         <input
                             type="text"
-                            name='features'
-                            value={formData.features}
-                            onChange={handleInputChange}
+                            name='nearbyPlaces'
+                            value={extraFeatures.nearbyPlaces}
+                            onChange={(e) =>
+                                setExtraFeatures((prev) => ({
+                                ...prev,
+                                nearbyPlaces: e.target.value,
+                                }))
+                            }
                             placeholder="Schools, Malls, Govt hospitals, Central Mosque, etc."
                             className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
                         />
                     </li>
                     <span className="flex justify-center mt-15">
-                        <button onClick={handlePropertyUpload} className="bg-blue-700 md:w-[300px] w-full h-15 rounded cursor-pointer text-white hover:bg-blue-900">
-                            Submit
+                        <button 
+                            type="submit"
+                            // onClick={handlePropertyUpload} 
+                            className="bg-blue-700 md:w-[300px] w-full h-15 rounded cursor-pointer text-white hover:bg-blue-900">
+                                Submit
                         </button>
-                    </span>
+                    </span>       
+                            
                 </ul>
+                 </form>
             </div>
 
           <LandlordDashboardFooter />

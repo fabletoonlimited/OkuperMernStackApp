@@ -45,8 +45,7 @@ function Nav() {
             </div>
 
           {/* Mobile-only logo */}
-            <div
-                className={`${styles.navbar__logo} ${styles["navbar__logo--mobile"]}`}>
+            <div className={`${styles.navbar__logo} ${styles["navbar__logo--mobile"]}`}>
                 <Link href="/" onClick={() => setIsMenuOpen(false)}>
                     <Image src="/logo.png" alt="Logo" width={220} height={110} />
                 </Link>

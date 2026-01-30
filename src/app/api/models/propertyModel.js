@@ -66,11 +66,9 @@ const propertySchema = new mongoose.Schema({
         nearbyPlaces:[String]
     },
 
-    listedBy: {
-        fullName: {
+    listedBy: {   
         type: String,
         required: true,
-        },
     },
 
     //From property Card
