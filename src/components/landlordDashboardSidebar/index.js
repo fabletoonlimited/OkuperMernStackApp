@@ -65,10 +65,13 @@ const index = () => {
     <>
       {/*Overlay (shows only when sidebar is open)*/}
       {isOpen && (
-        <div
-          onClick={toggleSidebar}
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-        ></div>
+        <>
+          <div
+            onClick={toggleSidebar}
+            className="fixed inset-0 bg-black/40 z-40 md:hidden">
+          </div> 
+          <div className="flex bg-transparent w-70"></div>
+        </>
       )}
       {/* Sidebar */}
       <aside
@@ -155,7 +158,7 @@ const index = () => {
       </aside>
       {/* Always show hamburger */}
       <button
-        className="hamburger-wrapper w-10 h-10 fixed top-4 left-4 z-50 bg-white/70 rounded-md flex items-center justify-center shadow-md"
+        className="hamburger-wrapper cursor-pointer w-10 h-10 fixed top-4 left-4 z-50 bg-white/70 rounded-md flex items-center justify-center shadow-md"
         onClick={toggleSidebar}
       >
         {isOpen ? <X /> : <Menu />}

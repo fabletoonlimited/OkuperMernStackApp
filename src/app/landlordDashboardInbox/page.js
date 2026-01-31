@@ -17,6 +17,9 @@ function Message({ id }) {
   const [backendMessage, setBackendMessage] = useState(null);
   const [activeConversation, setActiveConversation] = useState(null);
 
+  // This fixes the error: track which message is opened
+  const [selectedMessage, setSelectedMessage] = useState(null);
+
   useEffect(() => {
     const fetchMessageData = async () => {
       try {
@@ -41,65 +44,20 @@ function Message({ id }) {
     fetchMessageData();
   }, [id]);
 
+  // Your sample inbox messages
   const inboxMessages = [
-    {
-      id: 1,
-      name: "Titilola Giwa",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-    },
-    {
-      id: 2,
-      name: "Titilola Giwa",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-    },
-    {
-      id: 3,
-      name: "Titilola Giwa",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-    },
-    {
-      id: 4,
-      name: "Titilola Giwa",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-    },
-{
-      id: 5,
-      name: "Titilola Giwa",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-    },
-    {
-      id: 6,
-      name: "Titilola Giwa",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-    },
-
+    { id: 1, name: "Titilola Giwa", property: "3Brd Apartment in Bourdillon, Lekki", message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d", unread: true, avatar: "/avatar1.jpg" },
+    { id: 2, name: "Titilola Giwa", property: "3Brd Apartment in Bourdillon, Lekki", message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d", unread: true, avatar: "/avatar1.jpg" },
+    { id: 3, name: "Titilola Giwa", property: "3Brd Apartment in Bourdillon, Lekki", message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d", unread: true, avatar: "/avatar1.jpg" },
+    { id: 4, name: "Titilola Giwa", property: "3Brd Apartment in Bourdillon, Lekki", message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d", unread: true, avatar: "/avatar1.jpg" },
+    { id: 5, name: "Titilola Giwa", property: "3Brd Apartment in Bourdillon, Lekki", message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d", unread: true, avatar: "/avatar1.jpg" },
+    { id: 6, name: "Titilola Giwa", property: "3Brd Apartment in Bourdillon, Lekki", message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d", unread: true, avatar: "/avatar1.jpg" },
   ];
 
   const profilePic = backendMessage?.sender?.profilePic;
-  const currentUserId = backendMessage?.receiver?._id;
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <LandlordDashboardSidebar />
-
       <div className="flex-1 p-6">
         {/* Title */}
         <div className="bg-white shadow-md p-6 rounded-md mb-6">
@@ -108,35 +66,29 @@ function Message({ id }) {
 
         {/* Main Layout */}
         <div className="bg-white shadow-md rounded-md flex min-h-[75vh]">
-          {/* LEFT — Inbox List */}
-         
- 
+          {/* Sidebar */}
+          <LandlordDashboardSidebar />
 
-          {/* RIGHT — Messages */}
-          <div className="flex-1 flex flex-col ml-68">
+          {/* Messages */}
+          <div className="flex-1 flex flex-col">
             {/* Header */}
             <div className="p-4 border-gray-200 border-2 flex items-center justify-between">
               <div className="flex items-center gap-12">
-                <h5 className=" font-bold text-blue-950" style={{fontSize: '20px'}}>
+                <h5 className="font-bold text-blue-950" style={{ fontSize: "20px" }}>
                   My messages
                 </h5>
 
                 <button
                   onClick={() => setOpenCompose(true)}
-                  className="text-blue-800 hover:underline mt-14 " style={{fontSize: '12px'}}
+                  className="text-blue-800 hover:underline mt-14"
+                  style={{ fontSize: "12px" }}
                 >
                   Compose
                 </button>
 
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
                   {profilePic && (
-                    <CldImage
-                      src={profilePic}
-                      width={60}
-                      height={60 }
-                      crop="fill"
-                      alt="profile"
-                    />
+                    <CldImage src={profilePic} width={60} height={60} crop="fill" alt="profile" />
                   )}
                 </div>
               </div>
@@ -144,7 +96,7 @@ function Message({ id }) {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setOpenModal(true)}
-                  className="bg-blue-800 text-white px-6 py-2  hover:bg-blue-700"
+                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700"
                 >
                   Show Profile
                 </button>
@@ -157,15 +109,14 @@ function Message({ id }) {
 
             {/* Inbox Messages */}
             <div className="w-full md:w-1/3 x bg-white">
-              
-
               {inboxMessages.map((item) => (
                 <div
-  key={item}
-  className="flex gap-3 px-2 py-1 border-gray-200 border-2 hover:bg-gray-50 cursor-pointer"
->
-
-                  {/* Avatar */}
+                  key={item.id}
+                  onClick={() =>
+                    setSelectedMessage(item.id === selectedMessage?.id ? null : item)
+                  }
+                  className="flex gap-3 px-2 py-1 border-gray-200 border-2 hover:bg-gray-50 cursor-pointer"
+                >
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
                     <Image
                       src={item.avatar}
@@ -176,37 +127,34 @@ function Message({ id }) {
                     />
                   </div>
 
-                  {/* Text */}
                   <div className="flex-1">
-                    <p className=" font-light text-black" style={{fontSize: '12px'}}>
+                    <p className="font-light text-black" style={{ fontSize: "12px" }}>
                       {item.name}
                     </p>
-                    <p className="text-xs font-semibold text-black">
-                      {item.property}
+                    <p className="text-xs font-semibold text-black">{item.property}</p>
+
+                    <p className="font-light text-black whitespace-pre-line" style={{ fontSize: "10px" }}>
+                      {item.message.replace(/(My name)\b/i, "$1\n")}
                     </p>
-                  
-<p className="font-light text-black whitespace-pre-line" style={{fontSize: '10px'}}>
-  {item.message.replace(
-    /(My name)\b/i,
-    "$1\n"
-  )}
-</p>
-
-
                   </div>
-
-                  
                 </div>
               ))}
+
+              {/* Selected message view */}
+              {selectedMessage && (
+                <div className="mt-4 border p-4 bg-gray-50">
+                  <p><strong>Property:</strong> {selectedMessage.property}</p>
+                  <p><strong>Sender:</strong> {selectedMessage.name}</p>
+                  <p><strong>Receiver:</strong> Joshua</p>
+                  <p><strong>Message:</strong> {selectedMessage.message}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Modals */}
-        <SubscriptionModal1
-          isOpen={openModal}
-          onClose={() => setOpenModal(false)}
-        />
+        <SubscriptionModal1 isOpen={openModal} onClose={() => setOpenModal(false)} />
 
         {openCompose && (
           <ComposeModal
