@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 //Cloudinary config
 
 export default function PropertyCard({
-    previewPix,
+    previewPic,
     unitsAvailable,
     price,
     savedHomes,
@@ -25,15 +25,15 @@ export default function PropertyCard({
     propertyType,
     numberOfBath,
 }) {
-    // const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
-    // const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
-    // const firstImage =
-    //     Array.isArray(img) && img[0]?.publicId
-    //         ? img[0].publicId
-    //         : "placeholder-image.jpg";
+    const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
+    const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+    const firstImage =
+        Array.isArray(previewPic) && previewPic[0]?.publicId
+            ? img[0].publicId
+            : "placeholder-image.jpg";
 
-    // const CLOUDINARY_URL = `${BASE_URL}/${firstImage}`;
-    // const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
+    const CLOUDINARY_URL = `${BASE_URL}/${firstImage}`;
+    const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
 
     const handleInputChange = (e) => {
         setFormData((prev) => ({
@@ -42,49 +42,19 @@ export default function PropertyCard({
         }));
     };
 
-    const [formData, setFormData] = useState({
-        previewPix,
-        unitsAvailable,
-        price,
-        savedHomes,
-        desc,
-        location,
-        category,
-        rating,
-        numberOfBed,
-        propertyType,
-        numberOfBath,
-    });
-
-    if (
-        !formData.previewPix ||
-        !formData.unitsAvailable ||
-        !formData.price ||
-        !formData.savedHomes ||
-        !formData.desc ||
-        !formData.location ||
-        formData.location ||
-        !formData.category ||
-        !formData.rating ||
-        !formData.numberOfBed ||
-        !formData.propertyType ||
-        !formData.numberOfBath
-    ) {
-        toast.error("Please fill all required fields");
-        return;
-    }
 
     const fetchProperties = async () => {
         try {
-            const propertyResponse = await fetch("/api/propertyListing", {
+            const propertyCardRes = await fetch("/api/property", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     _id,
-                    previewPix: formData.previewPix,
+                    previewPix: formData.previewPic,
                     unitsAvailable: formData.unitsAvailable,
                     price: formData.price,
-                    desc: formData.desc,
+                    title: formData.title,
+                    address: formData.address,
                     location: formData.location,
                     category: formData.categories,
                     rating: formData.rating,
@@ -93,6 +63,13 @@ export default function PropertyCard({
                     numberOfBath: formData.numberOfBath,
                 }),
             });
+
+            if (
+                    !propertyCardRes.ok
+                ) {
+                  toast.error("error fetching properties");
+                  return;
+                }
         } catch (error) {
             console.error(error);
         }
