@@ -14,7 +14,7 @@ import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import Footer from "../../components/footer";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import StarRating from "@/components/starRating/starRating";
-
+import Link from "next/link";
 const Index = () => {
     const [hoverLeft, setHoverLeft] = useState(false);
     const [hoverRight, setHoverRight] = useState(false);
@@ -195,12 +195,14 @@ const Index = () => {
 
                     <div className="md:flex flex-col md:items-center border-1 border-blue-950 md:border-1 md:p-6 rounded-lg w-full md:w-96 p-11 h-70 mt-14">
                         <div className="items-start md:items-start">
+                            <Link href="#form" >
                             <button
                                 className="bg-blue-950 hover:bg-blue-700 transition duration-300 ease-in-out
                             text-white md:px-20 md:py-3 rounded-sm md:rounded-md text-3xl md:text-xl  
-                            md:font-semibold font-medium md:w-full w-full px-6 py-3 ">
+                            md:font-semibold font-medium md:w-full w-full px-6 py-3 cursor-pointer ">
                                 Request to apply
                             </button>
+                            </Link>
                         </div>
                         {/*star rating*/}
                         <div className="flex flex-col  mt-4 mb-4 gap-3 w-full">
@@ -336,7 +338,7 @@ const Index = () => {
                 ))}
                 {/* REQUEST TO APPLY FORM */}
                 <div className="mt-10 flex flex-col md:flex-row gap-6">
-                    <form className="flex-1 p-4 md:p-6 rounded-lg md:border-0">
+                    <form className="flex-1 p-4 md:p-6 rounded-lg md:border-0" id="form" >
                         <h3 className="text-3xl md:text-3xl md:font-medium font-medium mb-4">
                             Request to apply
                         </h3>
