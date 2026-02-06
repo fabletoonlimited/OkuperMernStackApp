@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
-import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
+import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
+import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 import { CldImage } from "next-cloudinary";
 import { toast, ToastContainer } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,7 +10,7 @@ import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import ComposeModal from "../../components/composeModal";
 import Image from "next/image";
 
-function LandlordInbox() {
+function TenantInbox() {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -116,7 +116,7 @@ function LandlordInbox() {
 
       const resolvedReceiverType =
         normalizeRole(otherParticipant?.role) ||
-        (currentActorType === "Landlord" ? "Tenant" : "Tenant");
+        (currentActorType === "Tenant" ? "Landlord" : "Landlord");
 
       const res = await fetch("/api/message", {
         method: "POST",
@@ -227,7 +227,7 @@ function LandlordInbox() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <LandlordDashboardSidebar />
+      <TenantDashboardSidebar />
       <div className="flex-1 p-6">
         <div className="bg-white shadow-md p-6 rounded-md mb-6">
           <h3 className="text-3xl font-bold text-blue-800">Inbox</h3>
@@ -594,7 +594,7 @@ function LandlordInbox() {
               </div>
             </div>
 
-            <LandlordDashboardFooter />
+            <TenantDashboardFooter />
             <ToastContainer />
             {openCompose && (
               <ComposeModal
@@ -606,7 +606,7 @@ function LandlordInbox() {
                 senderType={currentActorType}
                 receiverType={
                   normalizeRole(otherParticipant?.role) ||
-                  (currentActorType === "Landlord" ? "Tenant" : "Tenant")
+                  (currentActorType === "Tenant" ? "Landlord" : "Landlord")
                 }
                 onMessageSent={(data) => {
                   if (data?.message) {
@@ -622,4 +622,4 @@ function LandlordInbox() {
   );
 }
 
-export default LandlordInbox;
+export default TenantInbox;

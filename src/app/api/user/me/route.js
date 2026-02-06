@@ -49,7 +49,7 @@ export async function GET() {
     if (!userId) {
       return NextResponse.json(
         { message: "User link not found for authenticated actor" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -58,7 +58,7 @@ export async function GET() {
     if (!user) {
       return NextResponse.json(
         { message: "User record not found" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -66,10 +66,12 @@ export async function GET() {
       {
         authenticated: true,
         role,
+        actorId: actorId.toString(),
+        actorType: role === "landlord" ? "Landlord" : "Tenant",
         referralCode: user.referralCode,
         referredBy: user.referredBy,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("User /me fetch error:", error);

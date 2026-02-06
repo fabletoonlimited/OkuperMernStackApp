@@ -62,16 +62,18 @@ export const getConversations = async (req) => {
           .select("name email avatar profilePic")
           .lean();
 
-        if (!participant) {
-          participant = await Landlord.findById(participantId)
-            .select("name email avatar profilePic")
-            .lean();
+        if (participant) {
+          participant.role = "Tenant";
+          populatedParticipants.push(participant);
+          continue;
         }
 
+        participant = await Landlord.findById(participantId)
+          .select("name email avatar profilePic")
+          .lean();
+
         if (participant) {
-          participant.role =
-            participant.role ||
-            ((await Tenant.findById(participantId)) ? "Tenant" : "Landlord");
+          participant.role = "Landlord";
           populatedParticipants.push(participant);
         }
       }
@@ -118,10 +120,18 @@ export const getConversationMessages = async (req, conversationId) => {
         .select("name avatar profilePic email")
         .lean();
 
-      if (!sender) {
-        sender = await Landlord.findById(msg.sender)
-          .select("name avatar profilePic email")
-          .lean();
+      if (sender) {
+        sender.role = "Tenant";
+        msg.sender = sender;
+        continue;
+      }
+
+      sender = await Landlord.findById(msg.sender)
+        .select("name avatar profilePic email")
+        .lean();
+
+      if (sender) {
+        sender.role = "Landlord";
       }
 
       msg.sender = sender;
@@ -142,13 +152,18 @@ export const getConversationMessages = async (req, conversationId) => {
         .select("name email avatar profilePic")
         .lean();
 
-      if (!participant) {
-        participant = await Landlord.findById(participantId)
-          .select("name email avatar profilePic")
-          .lean();
+      if (participant) {
+        participant.role = "Tenant";
+        populatedParticipants.push(participant);
+        continue;
       }
 
+      participant = await Landlord.findById(participantId)
+        .select("name email avatar profilePic")
+        .lean();
+
       if (participant) {
+        participant.role = "Landlord";
         populatedParticipants.push(participant);
       }
     }
