@@ -9,15 +9,16 @@ const Page = () => {
   const router = useRouter();
 
   //Auth code session not signing out
-  useEffect(() =>{
+  useEffect(() => {
     const checkAuth = async () => {
-    const res = await fetch("/api/auth/me", {
-      credentials: "include",
-    });
-  
-    if (res.ok) {
-      router.replace("/landlordDashboard")
-    }};
+      const res = await fetch("/api/auth/me", {
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        router.replace("/landlordDashboard");
+      }
+    };
     checkAuth();
   }, []);
 
@@ -31,7 +32,7 @@ const Page = () => {
   // Handler
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!email || !password) {
       toast.error("Please fill in all required fields");
@@ -56,7 +57,9 @@ const Page = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || data.error || "Login failed. Please try again.");
+        toast.error(
+          data.message || data.error || "Login failed. Please try again.",
+        );
         setLoading(false);
         return;
       }
@@ -65,7 +68,6 @@ const Page = () => {
       setTimeout(() => {
         router.push("/landlordDashboard");
       }, 1000);
-      
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Something went wrong. Please try again.");
@@ -82,7 +84,7 @@ const Page = () => {
         Sign in
       </h1>
 
-    <ToastContainer position="top-center" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
 
       {/*SignIn Form*/}
       <div className="signInLoandingContainer md:flex-col col mt-10 mb-50">
@@ -106,43 +108,44 @@ const Page = () => {
               paddingBottom: "80px",
             }}
           >
-          {/*Email*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Email Address</p>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email address"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+            {/*Email*/}
+            <p style={{ paddingTop: 20, marginBottom: 30 }}>Email Address</p>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
+            />
 
-          {/*Password*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Password</p>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+            {/*Password*/}
+            <p style={{ paddingTop: 20, marginBottom: 30 }}>Password</p>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
+            />
 
-          <p style={{ paddingTop: 30, marginBottom: 30 }}>
-            Forgot password?
-            <Link href="/forgotPassword">
-              <span className="cursor-pointer hover:text-blue-600">
-                {" "}
-                Click here
-              </span>
-            </Link>
-          </p>
+            <p style={{ paddingTop: 30, marginBottom: 30 }}>
+              Forgot password?
+              <Link href="/forgotPassword">
+                <span className="cursor-pointer hover:text-blue-600">
+                  {" "}
+                  Click here
+                </span>
+              </Link>
+            </p>
           </div>
 
           {/*SignIn Btn*/}
           <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-            <button 
+            <button
               type="submit"
               disabled={loading}
-              className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30">
+              className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
+            >
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </div>
