@@ -131,14 +131,13 @@ function LandlordInbox() {
 
   return (
       <div className="flex min-h-screen bg-gray-100">
+          <LandlordDashboardSidebar />
           <div className="flex-1 p-6">
               <div className="bg-white shadow-md p-6 rounded-md mb-6">
                   <h3 className="text-3xl font-bold text-blue-800">Inbox</h3>
               </div>
 
               <div className="bg-white shadow-md rounded-md flex min-h-[75vh]">
-                  <LandlordDashboardSidebar />
-
                   <div className="flex-1 flex flex-col mb-0">
                       <div className="p-4 border-gray-200 shadow-4xl shadow-gray-300 border-2 flex items-center justify-between">
                           <div className="flex items-center gap-12">
