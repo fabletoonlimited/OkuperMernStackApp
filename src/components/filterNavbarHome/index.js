@@ -112,7 +112,7 @@ useEffect(() => {
                 <p className="text-sm mt-2 font-medium">
                     {/* `${savedHome}` */}
                     </p>
-                <img src="/houseIcon.png" alt="Home Icon" /> 
+                <img src="/houseIcon.png" alt="Home Icon" className="h-10 mt-4" /> 
             </div>
         </div>
     );

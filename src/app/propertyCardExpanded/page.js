@@ -74,6 +74,31 @@ const Index = () => {
 
     return (
         <div className="w-auto">
+            {/* IMAGE MODAL */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+                    onClick={() => setSelectedImage(null)}>
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setSelectedImage(null)}
+                        className="absolute top-8 left-8 z-50 bg-gray-200 hover:bg-gray-300 rounded-full p-2 transition duration-300 ease-in-out shadow-lg">
+                        <span className="text-xl text-black">←</span>
+                    </button>
+
+                    <div
+                        className="relative bg-white rounded-lg shadow-2xl max-w-2xl w-full"
+                        onClick={(e) => e.stopPropagation()}>
+                        {/* Image */}
+                        <img
+                            src={selectedImage}
+                            alt="Property enlarged"
+                            className="w-full h-auto object-contain rounded-lg"
+                        />
+                    </div>
+                </div>
+            )}
+
             <PropExpandedNav />
             <div>
                 <div>
@@ -195,13 +220,13 @@ const Index = () => {
 
                     <div className="md:flex flex-col md:items-center border-1 border-blue-950 md:border-1 md:p-6 rounded-lg w-full md:w-96 p-11 h-70 mt-14">
                         <div className="items-start md:items-start">
-                            <Link href="#form" >
-                            <button
-                                className="bg-blue-950 hover:bg-blue-700 transition duration-300 ease-in-out
+                            <Link href="#form">
+                                <button
+                                    className="bg-blue-950 hover:bg-blue-700 transition duration-300 ease-in-out
                             text-white md:px-20 md:py-3 rounded-sm md:rounded-md text-3xl md:text-xl  
                             md:font-semibold font-medium md:w-full w-full px-6 py-3 cursor-pointer ">
-                                Request to apply
-                            </button>
+                                    Request to apply
+                                </button>
                             </Link>
                         </div>
                         {/*star rating*/}
@@ -338,7 +363,9 @@ const Index = () => {
                 ))}
                 {/* REQUEST TO APPLY FORM */}
                 <div className="mt-10 flex flex-col md:flex-row gap-6">
-                    <form className="flex-1 p-4 md:p-6 rounded-lg md:border-0" id="form" >
+                    <form
+                        className="flex-1 p-4 md:p-6 rounded-lg md:border-0"
+                        id="form">
                         <h3 className="text-3xl md:text-3xl md:font-medium font-medium mb-4">
                             Request to apply
                         </h3>
