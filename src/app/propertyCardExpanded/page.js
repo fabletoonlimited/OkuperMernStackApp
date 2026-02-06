@@ -66,7 +66,6 @@ const Index = () => {
         }
     }
 
-
     const [selectedImage, setSelectedImage] = useState(null);
 
         const images = [
