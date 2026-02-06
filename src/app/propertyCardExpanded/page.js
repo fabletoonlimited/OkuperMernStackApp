@@ -14,8 +14,13 @@ import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import Footer from "../../components/footer";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import StarRating from "@/components/starRating/starRating";
-import Link from "next/link";
+import property from "../../data/property";
+import { toast, ToastContainer } from "react-toastify";
+import { useSearchParams, useRouter } from "next/navigation";
+
 const Index = () => {
+    const router = useRouter();
+
     const [hoverLeft, setHoverLeft] = useState(false);
     const [hoverRight, setHoverRight] = useState(false);
 
@@ -32,15 +37,15 @@ const Index = () => {
         if (ref.current) {
             ref.current.scrollBy({ left: 400, behavior: "smooth" });
         }
-    };
+    }; 
 
     // Filter property items
     const propertyItems = propertyData.filter(
         (item) =>
-            item.img &&
-            Array.isArray(item.img) &&
-            item.img.length > 0 &&
-            item._id,
+        item.img &&
+        Array.isArray(item.img) &&
+        item.img.length > 0 &&
+        item._id,
     );
 
     // Mix ad banners
@@ -61,16 +66,89 @@ const Index = () => {
         }
     }
 
+
     const [selectedImage, setSelectedImage] = useState(null);
 
-    // Image URLs (replace with your actual images)
-    const images = [
-        "/property-image.jpg",
-        "/property-image.jpg",
-        "/property-image.jpg",
-        "/property-image.jpg",
-        "/property-image.jpg",
-    ];
+        const images = [
+            "/property-image.jpg",
+            "/property-image.jpg",
+            "/property-image.jpg",
+            "/property-image.jpg",
+            "/property-image.jpg",
+        ];
+
+     const [formData, setFormData] = useState({
+  firstName: "",
+  lastName: "",
+  phone: "",
+  message: "",
+});
+
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
+
+const requireLogin = () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.error("Please login to send a request");
+    router.push("/signInTenant");
+    return false;
+  }
+  return true;
+};
+
+const handlePropertyRequestForm = async (e) => {
+  e.preventDefault();
+
+  if (!requireLogin()) return;
+
+  if (
+    !formData.firstName ||
+    !formData.lastName ||
+    !formData.phone ||
+    !formData.message
+  ) {
+    toast.error("Please fill all required fields");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("/api/propertyRequestForm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...formData,
+        userId: "userId",
+        propertyId: "propertyId",
+        tenantId: "tenantId",
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || "Failed to send request");
+      return;
+    }
+
+    toast.success("Property interest sent to landlord successfully");
+
+    setTimeout(() => {
+      router.push("/message");
+    }, 1500);
+  } catch (error) {
+    console.error("Property interest sending error:", error);
+    toast.error("Server error");
+  }
+};
+
 
     return (
         <div className="w-auto">
@@ -336,20 +414,27 @@ const Index = () => {
                         <hr className="mt-4 md:mt-6 text-gray-300" />
                     </div>
                 ))}
+
                 {/* REQUEST TO APPLY FORM */}
                 <div className="mt-10 flex flex-col md:flex-row gap-6">
-                    <form className="flex-1 p-4 md:p-6 rounded-lg md:border-0" id="form" >
+                    <form 
+                        onSubmit={handlePropertyRequestForm}
+                        className="flex-1 p-4 md:p-6 rounded-lg md:border-0">
                         <h3 className="text-3xl md:text-3xl md:font-medium font-medium mb-4">
                             Request to apply
                         </h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div 
+                            className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-lg mb-1">
                                     First name
                                 </label>
                                 <input
                                     type="text"
+                                    value={formData.firstName}
+                                    onChange={handleInputChange}
+                                    name="firstName"
                                     placeholder="First name"
                                     className="w-full border px-3 py-2"
                                 />
@@ -361,6 +446,9 @@ const Index = () => {
                                 </label>
                                 <input
                                     type="text"
+                                    value={formData.lastName}
+                                    onChange={handleInputChange}
+                                    name="lastName"
                                     placeholder="Last name"
                                     className="w-full border px-3 py-2"
                                 />
@@ -370,7 +458,10 @@ const Index = () => {
                         <div className="mt-4">
                             <label className="block text-lg mb-1">Phone</label>
                             <input
-                                type="tel"
+                                type="number"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                name="Phone"
                                 placeholder="Phone number"
                                 className="w-full border px-3 py-2"
                             />
@@ -382,14 +473,18 @@ const Index = () => {
                             </label>
                             <textarea
                                 rows="4"
+                                name="message"
+                                value={formData.message}
+                                onChange={handleInputChange}
                                 placeholder="Write your message"
                                 className="w-full border px-3 py-2"
                             />
                         </div>
 
                         <button
+                            type="submit"
                             className="mt-4 w-full md:w-full px-6 py-3 text-2xl font-medium text-white bg-blue-950 rounded-lg shadow-md 
-                   hover:bg-blue-700 transition duration-300 ease-in-out">
+                                hover:bg-blue-700 transition duration-300 ease-in-out">
                             Send request to apply
                         </button>
 
@@ -486,15 +581,15 @@ const Index = () => {
                     <div
                         ref={trendingRef}
                         className="
-      grid
-      place-items-center
-      md:block
-      overflow-hidden
-      md:overflow-x-auto
-      scroll-smooth
-      scrollbar-hide
-    ">
-                        <div className="flex gap-4 md:flex-nowrap">
+                            grid
+                            place-items-center
+                            md:block
+                            overflow-hidden
+                            md:overflow-x-auto
+                            scroll-smooth
+                            scrollbar-hide
+                    ">
+                    <div className="flex gap-4 md:flex-nowrap">
                             <TrendingRentIndexCarousel rent={mixedItems} />
                         </div>
                     </div>
