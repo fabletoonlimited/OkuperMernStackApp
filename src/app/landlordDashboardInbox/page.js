@@ -20,7 +20,7 @@ function Message({ id }) {
     const [activeConversation, setActiveConversation] = useState(null);
 
     const [selectedMessage, setSelectedMessage] = useState(null);
-    const [showProfile, setShowProfile] = useState(false);
+    const [showProfile, setShowProfile] = useState(false)
   
     useEffect(() => {
         const fetchMessageData = async () => {
@@ -49,7 +49,7 @@ function Message({ id }) {
     }, [id]);
 
 
-
+   const 
 
 
     const profilePic = backendMessage?.sender?.profilePic;
@@ -102,9 +102,10 @@ function Message({ id }) {
                                     <button
                                         onClick={() => {
                                             setShowProfile(selectedMessage);
+                                            setShowProfile === true ? 
                                         }}
                                         className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700">
-                                        Show Profile
+                                        
                                     </button>
 
                                     <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700">
@@ -166,7 +167,8 @@ function Message({ id }) {
                                             }
                                         />
                                     ) : showProfile ? (
-                                        <div className="p-8 border-t border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-black">
+                                            <div className="p-8 border-t border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-black">
+                                                
                                             {/* Avatar */}
                                             <h4 className="text-2xl font-bold mb-4 text-blue-950">
                                                 <Image
