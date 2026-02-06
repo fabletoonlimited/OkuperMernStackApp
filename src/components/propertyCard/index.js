@@ -46,7 +46,7 @@ export default function PropertyCard({
     const fetchProperties = async () => {
         try {
             const propertyCardRes = await fetch("/api/property", {
-                method: "POST",
+                method: "GET",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     _id,
