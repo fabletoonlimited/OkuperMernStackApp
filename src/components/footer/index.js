@@ -8,7 +8,7 @@ import Youtube from '../../../public/free-youtube-logo-icon-2431-thumb.png'
 
 function Footer() {
   return (
-    <div className="bg-gray-700 w-full text-white pt-10">
+    <div className="bg-gray-700 w-full text-white pt-3">
       <div className="max-w-5xl mx-auto text-center px-6 md:px-0">
         <p className="text-md font-light text-justify md:text-center">
           Okuper is committed to ensuring digital accessibility for individuals with disabilities.

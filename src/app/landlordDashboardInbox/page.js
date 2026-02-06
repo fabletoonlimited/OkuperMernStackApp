@@ -5,7 +5,6 @@ import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar"
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
 import { CldImage } from "next-cloudinary";
 import { toast, ToastContainer } from "react-toastify";
-import SubscriptionModal1 from "../../components/subscriptionModal1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import ComposeModal from "../../components/composeModal";
