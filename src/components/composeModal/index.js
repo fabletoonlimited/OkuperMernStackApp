@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const ComposeModal = ({
   onClose,
@@ -7,38 +8,68 @@ const ComposeModal = ({
   propertyId,
   conversation,
   senderType,
-  receiverType
+  receiverType,
+  onMessageSent,
 }) => {
-
   const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const message = {
-      sender: senderId,
-      senderType,
-      receiver: receiverId,
-      receiverType,
-      property: propertyId,
-      conversationId: conversation?._id,
-      content,
-    };
+    if (!content.trim()) {
+      toast.error("Please enter a message");
+      return;
+    }
 
-    console.log("Message to send:", message);
-    // Message sent successfully
+    if (!receiverId || !propertyId) {
+      toast.error("Missing receiver or property information");
+      return;
+    }
 
-    onClose();
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          receiverId,
+          receiverType,
+          propertyId,
+          content,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(error.error || "Failed to send message");
+        return;
+      }
+
+      const data = await res.json();
+      toast.success("Message sent successfully!");
+
+      if (onMessageSent) {
+        onMessageSent(data);
+      }
+
+      onClose();
+    } catch (err) {
+      console.error("Send message error:", err);
+      toast.error(err.message || "Failed to send message");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-6 px-10 w-full max-w-lg shadow-xl">
-
         <h2 className="text-3xl font-semibold py-5">Compose Message</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <div>
             <p className="font-medium">Sender:</p>
             <input
@@ -90,13 +121,13 @@ const ComposeModal = ({
 
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-800 text-white rounded-xl"
+              disabled={loading}
+              className="px-4 py-2 bg-blue-800 text-white rounded-xl disabled:bg-gray-400"
             >
-              Send
+              {loading ? "Sending..." : "Send"}
             </button>
           </div>
         </form>
-
       </div>
     </div>
   );

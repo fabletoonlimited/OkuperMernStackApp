@@ -4,7 +4,7 @@ import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Tenant from "../models/tenantModel.js";
 import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
-import Tenant from "../controllers/tenant.controller";
+// import Tenant from "../controllers/tenant.controller";
 
 // CREATE TENANT
 export async function POST(req) {

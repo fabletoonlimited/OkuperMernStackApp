@@ -6,7 +6,6 @@ const conversationSchema = new mongoose.Schema(
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // tenant and landlord both live in User model
         required: true,
       },
     ],
@@ -18,10 +17,13 @@ const conversationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
     },
-  }, { timestamps: true }
+  },
+  { timestamps: true },
 );
 
-export const Conversation = mongoose.model("Conversation", conversationSchema);
+export const Conversation =
+  mongoose.models.Conversation ||
+  mongoose.model("Conversation", conversationSchema);
 
 // Message Schema
 const messageSchema = new mongoose.Schema(
@@ -38,13 +40,13 @@ const messageSchema = new mongoose.Schema(
     },
     receiverType: {
       type: String,
-      enum: ["Tenant", "Landlord"],  // <-- dynamic reference
+      enum: ["Tenant", "Landlord"], // <-- dynamic reference
       required: true,
     },
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      refPath: "receiverType",  // <-- dynamic reference
+      refPath: "receiverType", // <-- dynamic reference
     },
     property: {
       type: mongoose.Schema.Types.ObjectId,
@@ -65,7 +67,8 @@ const messageSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const Message = mongoose.model("Message", messageSchema);
+export const Message =
+  mongoose.models.Message || mongoose.model("Message", messageSchema);
