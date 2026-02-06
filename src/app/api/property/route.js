@@ -1,181 +1,142 @@
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
-import {createProperty} from '../controllers/property.controller.js';
+import Property from "../models/propertyModel.js";
+import { createProperty } from "../controllers/property.controller.js";
 
-
-//CREATE A PROPERTY
+// CREATE A PROPERTY Upload
 export async function POST(req) {
-
   try {
     await dbConnect();
 
     const body = await req.json();
 
-    const {landlord, user, previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, price, category, propertyType, bed, bath, features, listedBy, savedHomes, unitsAvailable, rating, isVerified} = body;
-
-    if (!previewPic) {
-      return NextResponse.json(
-        { message: "At least one preview picture needs to be added" },
-        { status: 400 }
-      );
-    } 
-
-    if (!Img1 || !Img2 || !Img3) {
-      return NextResponse.json(
-        { message: "Upload at least three images" },
-        { status: 400 }
-      );
-    } 
-
-    if (!title) {
-      return NextResponse.json(
-        { message: "Please add a title to your property." },
-        { status: 400 }
-      );
-    } 
-
-    if (!address) {
-      return NextResponse.json(
-        { message: "Kindly add an address to your property." },
-        { status: 400 }
-      );
-    }
-
-    if (!price) {
-      return NextResponse.json(
-        { message: "Kindly add an price to your property." },
-        { status: 400 }
-      );
-    }
-
-    if (!category) {
-      return NextResponse.json(
-        { message: "Kindly add your property to a category." },
-        { status: 400 }
-      );
-    }
-
-    if (!unitsAvailable) {
-      return NextResponse.json(
-        { message: "Please input how many of this property is available." },
-        { status: 400 }
-      );
-    } 
-
-    if (!bed) {
-      return NextResponse.json(
-        { message: "Kindly add number of bed to your property." },
-        { status: 400 }
-      );
-    }
-
-    if (!bath) {
-      return NextResponse.json(
-        { message: "Kindly add number of bath to your property." },
-        { status: 400 }
-      );
-    }
-
-    if (!features) {
-      return NextResponse.json(
-        { message: "Kindly add property features." },
-        { status: 400 }
-      );
-    }
-
-    if (!listedBy) {
-      return NextResponse.json(
-        { message: "Kindly add name of who is listing this property" },
-        { status: 400 }
-      );
-    } 
-
-    // if (existingProperty) {
-    //   return NextResponse.json(
-    //     { message: "This property already exists in Database, create another." }, 
-    //     { status: 400 }
-    //   );
-    // }
-
-    //create New Property
-    const newProperty = await createProperty({
-      user,
-      landlord,
-      previewPic, 
-      Img1, 
-      Img2, 
-      Img3, 
-      Img4, 
-      Img5, 
-      Img6, 
-      title, 
-      address, 
-      price, 
-      category, 
-      unitsAvailable, 
-      propertyType, 
-      bed, 
+    let {
+      // user,
+      // landlord: landlordId,
+      previewPic,
+      Img1,
+      Img2,
+      Img3,
+      Img4,
+      Img5,
+      Img6,
+      title,
+      address,
+      price,
+      category,
+      propertyType,
+      bed,
       bath,
+      features,
+      listedBy,
+      savedHomes,
+      unitsAvailable,
       rating,
-      listedBy, 
-      features: //"buildingAmenities", "propertyAmenities", "neighbourhoodPostcode", "nearbyPlaces", 
-      savedHomes, 
+      isVerified,
+    } = body;
+
+    // Validation
+    // if (!landlordId) {
+    //   return NextResponse.json({ message: "Landlord ID is required" }, { status: 400 });
+    // }
+    if (!previewPic || !Img1 || !Img2 || !Img3) {
+      return NextResponse.json({ message: "Please upload at least 3 images" }, { status: 400 });
+    }
+    if (!title || !address || !price || !category || !unitsAvailable || !bed || !bath || !listedBy) {
+      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    }
+
+    // Extract **just the URLs** if frontend sent objects
+    const getUrl = (img) => (Array.isArray(img) ? img[0]?.url || img[0] : img);
+
+    previewPic = getUrl(previewPic);
+    Img1 = getUrl(Img1);
+    Img2 = getUrl(Img2);
+    Img3 = getUrl(Img3);
+    Img4 = getUrl(Img4);
+    Img5 = getUrl(Img5);
+    Img6 = getUrl(Img6);
+
+    // Format features
+    const featuresPayload = {
+      buildingAmenities: features?.buildingAmenities?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
+      propertyAmenities: features?.propertyAmenities?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
+      neighbourhoodPostcode: features?.neighbourhoodPostcode || "00000",
+      nearbyPlaces: features?.nearbyPlaces?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
+    };
+
+    const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();
+    const validPropertyType = propertyType === "Appartment" ? "Apartment" : propertyType;
+
+    const newProperty = await createProperty({
+      // user,
+      // landlordId,
+      previewPic,
+      Img1,
+      Img2,
+      Img3,
+      Img4,
+      Img5,
+      Img6,
+      title,
+      address: formattedAddress,
+      price,
+      category,
+      unitsAvailable,
+      propertyType: validPropertyType,
+      bed,
+      bath,
+      features: featuresPayload,
+      listedBy,
+      savedHomes: savedHomes ?? [],
       rating,
-      isVerified
+      isVerified,
     });
 
-    return NextResponse.json(
-      { 
-        success: true,
-        property: {
-          _id: newProperty._id,
-          previewPic: newProperty.previewPic,
-          title: newProperty.title,
-          price: newProperty.price,
-          category: newProperty.category,
-          listedBy: newProperty.listedBy
-        }, 
-        message: "Property created successfully!"
-      }, 
-      {status: 201}
-    );
+    return NextResponse.json({
+      success: true,
+      property: {
+        _id: newProperty._id,
+        previewPic: newProperty.previewPic,
+        title: newProperty.title,
+        price: newProperty.price,
+        category: newProperty.category,
+        listedBy: newProperty.listedBy
+      },
+      message: "Property created successfully!"
+    }, { status: 201 });
 
   } catch (error) {
-    console.error("Propert creation error:", error);
-    return NextResponse.json(
-      { message: error.message || "Server error, something went wrong" },
-      { status: 500 }
-    );
+    console.error("Property creation error:", error);
+    return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });
   }
 }
 
-//GET PROPERTIES
-export async function GET(request) {
-  await dbConnect();
 
+// GET PROPERTIES
+export async function GET(request) {
   try {
+    await dbConnect();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const listedBy = searchParams.get("listedBy");
 
-    if (id || listedBy) {
-      const property = await Property
-      .findById(id)
-    
-    if (!property || !listedBy) {
-      return NextResponse.json(
-        { message: "Property not found" },
-        { status: 404 }
-      );
+    if (id) {
+      const property = await Property.findById(id);
+      if (!property) return NextResponse.json({ message: "Property not found" }, { status: 404 });
+      return NextResponse.json(property, { status: 200 });
     }
-      return NextResponse.json(property, listedBy, { status: 200 });
-    } 
 
+    if (listedBy) {
+      const properties = await Property.find({ listedBy }).sort({ createdAt: -1 });
+      return NextResponse.json(properties, { status: 200 });
+    }
+
+    const properties = await Property.find().sort({ createdAt: -1 });
+    return NextResponse.json(properties, { status: 200 });
   } catch (err) {
-    return NextResponse.json(
-      { message: err.message },
-      { status: 500 }
-    );
+    console.error("GET /api/property error:", err);
+    return NextResponse.json({ message: err.message || "Failed to fetch properties" }, { status: 500 });
   }
 }
 
@@ -184,83 +145,37 @@ export async function PUT(request) {
   try {
     await dbConnect();
     const body = await request.json();
-
     const { listedBy, _id, ...updateData } = body;
 
-    if (!_id && !listedBy) {
-      return NextResponse.json(
-        { message: "Property ID or listedBy is required" },
-        { status: 400 }
-      );
-    }
+    if (!_id && !listedBy) return NextResponse.json({ message: "Property ID or listedBy is required" }, { status: 400 });
 
     const query = _id ? { _id } : { listedBy };
-    
-    const updatedProperty = await Property
-    .findOneAndUpdate(
-      query,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    )
+    const updatedProperty = await Property.findOneAndUpdate(query, { $set: updateData }, { new: true, runValidators: true });
 
-    if (!updatedProperty) {
-      return NextResponse.json(
-        { message: "Property not found" },
-        { status: 404 }
-      );
-    }
+    if (!updatedProperty) return NextResponse.json({ message: "Property not found" }, { status: 404 });
 
-    return NextResponse.json(
-      { 
-        success: true, 
-        property: updatedProperty,
-        message: "Property updated successfully" 
-      }, 
-      { status: 200 }
-    );
-
+    return NextResponse.json({ success: true, property: updatedProperty, message: "Property updated successfully" }, { status: 200 });
   } catch (error) {
     console.error("❌ API ERROR:", error);
-    return NextResponse.json(
-      { message: error.message || "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });
   }
 }
 
-// DELETE Prperty
-export async function PROPERTY(request) {
-  await dbConnect();
-
+// DELETE PROPERTY
+export async function DELETE(request) {
   try {
+    await dbConnect();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json(
-        { message: "Property ID is required" },
-        { status: 400 }
-      );
-    }
+    if (!id) return NextResponse.json({ message: "Property ID is required" }, { status: 400 });
 
     const deletedProperty = await Property.findByIdAndDelete(id);
+    if (!deletedProperty) return NextResponse.json({ message: "Property not found" }, { status: 404 });
 
-    if (!deletedProperty) {
-      return NextResponse.json(
-        { message: "Property not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { success: true, message: "Property deleted successfully" }, 
-      { status: 200 }
-    );
-
+    return NextResponse.json({ success: true, message: "Property deleted successfully" }, { status: 200 });
   } catch (err) {
-    return NextResponse.json(
-      { message: err.message },
-      { status: 500 }
-    );
+    console.error("DELETE /api/property error:", err);
+    return NextResponse.json({ message: err.message }, { status: 500 });
   }
 }

@@ -3,7 +3,9 @@ import React, { useState, useEffect } from "react";
 import { faMagnifyingGlass, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link"
-import {mockProperties} from "../../app/api/models/mockProperty.js";
+// import {mockProperties} from "../../app/api/models/mockProperty.js";
+import { useRouter } from "next/navigation";
+// import property from "@/data/property.js";
 
 
 function FilterNavbarIndex() {
@@ -15,57 +17,64 @@ function FilterNavbarIndex() {
         query: "",
     });
 
-    const pillSelect =
-        "appearance-none bg-white h-14 px-4 pr-10 text-base rounded-lg border border-gray-300 flex items-center";
+    const [properties, setProperties] = useState([]);
+
+    const pillSelect = "appearance-none bg-white h-14 px-4 pr-10 text-base rounded-lg border border-gray-300 flex items-center";
 
     const updateFilter = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
 
-    // Sorting helper
+    // Search helper
     const sortOptions = (options) => {
         return [...options].sort((a, b) => {
-            if (typeof a === "object" && typeof b === "object") return a.value - b.value;
+            if (typeof a === "object" && typeof b === "object") 
+                return a.value - b.value;
             const numA = Number(a);
             const numB = Number(b);
-            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            if (!isNaN(numA) && !isNaN(numB)) 
+                return numA - numB;
             return String(a).localeCompare(String(b));
         });
     };
 
-    // ✅ Generate options dynamically from mockProperties
-    const categories = [...new Set(mockProperties.map((p) => p.category))];
-    const prices = sortOptions([...new Set(mockProperties.map((p) => p.price))]);
-    const ratings = [...new Set(mockProperties.map((p) => Math.floor(p.rating)))];
-    const propertiesType = [...new Set(mockProperties.map((p) => p.propertyType))];
+    // ✅ FETCH PROPERTIES FROM MONGODB
+    useEffect(() => {
+        const fetchProperties = async () => {
+        try {
+            const res = await fetch("/api/property", 
+                { method: "GET" });
+            const data = await res.json();
 
-    const filterConfig = [
-        { key: "category", placeholder: "For Rent", options: categories },
-        { key: "price", placeholder: "Price", options: prices },
-        { key: "rating", placeholder: "Bed & Bath", options: ratings, suffix: "+ stars" },
-        { key: "propertyType", placeholder: "Home type", options: propertiesType },
-    ];
-useEffect(() => {
-    const checkAuth = async () => {
-      const res = await fetch("/api/auth/me/", {
-        credentials: "include",
-      });
+            if (!res.ok) {
+            console.error(data.message || "Failed to fetch properties");
+            return;
+            }
 
-      if (res.ok) {
-        router.replace("/landlordDashboard");
-      }
+            setProperties(data.properties || []);
+        } catch (err) {
+            console.error("Fetch error:", err);
+        }
     };
-    checkAuth();
+
+    fetchProperties();
   }, []);
 
+    // ✅ Generate options dynamically 
+    const categories = [...new Set(properties.map((p) => p.category))];
+    const prices = sortOptions([...new Set(properties.map((p) => p.price))]);
+    const ratings = [...new Set(properties.map((p) => Math.floor(p.rating)))];
+    const propertiesType = [...new Set(properties.map((p) => p.propertyType))];
 
-    useEffect(() => {
-        const savedHome = async () => {
-        const savedHomeRes = await fetch ("/api/savedHomes", {
-        credentials: "include"
-        })
-    }})
-  
+    const filterConfig = [
+        { key: "category", placeholder: "Categories", options: categories },
+        { key: "price", placeholder: "Price", options: prices },
+        { key: "rating", placeholder: "Rating", options: ratings, suffix: "+ stars" },
+        { key: "propertyType", placeholder: "Property type", options: propertiesType },
+    ];
+
+    const router = useRouter();
+
     return (
         <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-center gap-5">
             {/* Search */}
