@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link"
 // import {mockProperties} from "../../app/api/models/mockProperty.js";
 import { useRouter } from "next/navigation";
+import { Allan } from "next/font/google";
 // import property from "@/data/property.js";
 
 
@@ -13,6 +14,7 @@ function FilterNavbarIndex() {
         category: "all",
         price: "all",
         rating: "all",
+        state: "all",
         propertyType: "all",
         query: "",
     });
@@ -24,52 +26,67 @@ function FilterNavbarIndex() {
     const updateFilter = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
-
     // Search helper
     const sortOptions = (options) => {
         return [...options].sort((a, b) => {
             if (typeof a === "object" && typeof b === "object") 
                 return a.value - b.value;
+
             const numA = Number(a);
             const numB = Number(b);
+
             if (!isNaN(numA) && !isNaN(numB)) 
                 return numA - numB;
+
             return String(a).localeCompare(String(b));
         });
     };
 
     // ✅ FETCH PROPERTIES FROM MONGODB
     useEffect(() => {
+<<<<<<< HEAD
         const fetchProperties = async () => {
         try {
             const res = await fetch("./api/property",
                 { method: "GET" });
+=======
+        const fetchFilterNav = async () => {
+         try {
+            const res = await fetch("/api/property", {
+            method: "GET",
+            cache: "no-store",
+        });
+
+>>>>>>> c62e38b81ac3654689ac4b0238eaef12cda9fad1
             const data = await res.json();
 
             if (!res.ok) {
-            console.error(data.message || "Failed to fetch properties");
+                console.error(data.message || "Failed to fetch properties");
             return;
             }
+            const list = Array.isArray(data) ? data : data.properties;
 
-            setProperties(data.properties || []);
+            setProperties(list || [])
         } catch (err) {
             console.error("Fetch error:", err);
         }
     };
 
-    fetchProperties();
+    fetchFilterNav();
   }, []);
 
     // ✅ Generate options dynamically 
     const categories = [...new Set(properties.map((p) => p.category))];
     const prices = sortOptions([...new Set(properties.map((p) => p.price))]);
     const ratings = [...new Set(properties.map((p) => Math.floor(p.rating)))];
+    const state = [...new Set(properties.map((p) => (p.state)))];
     const propertiesType = [...new Set(properties.map((p) => p.propertyType))];
     const state = [...new Set(properties.map((p) => p.state))];
 
     const filterConfig = [
         { key: "category", placeholder: "Categories", options: categories },
         { key: "price", placeholder: "Price", options: prices },
+<<<<<<< HEAD
         {
             key: "rating",
             placeholder: "Rating",
@@ -86,12 +103,21 @@ function FilterNavbarIndex() {
             placeholder: "State",
             options: state,
         },
+=======
+        { key: "rating", placeholder: "Rating", options: ratings, suffix: "+ stars" },
+        { key: "state", placeholder: "State", options: state },
+        { key: "propertyType", placeholder: "Property type", options: propertiesType },
+>>>>>>> c62e38b81ac3654689ac4b0238eaef12cda9fad1
     ];
 
     const router = useRouter();
 
     return (
+<<<<<<< HEAD
         <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-around gap-6">
+=======
+        <form className="flex items-center bg-blue-900 px-8 py-7.5 justify-center gap-5">
+>>>>>>> c62e38b81ac3654689ac4b0238eaef12cda9fad1
             {/* Search */}
             <div className="relative">
                 <input
@@ -101,11 +127,9 @@ function FilterNavbarIndex() {
                     placeholder="Search"
                     className="h-14 w-80 rounded-lg bg-white pl-4 pr-10 text-sm text-gray-700 outline-none"
                 />
-                <Link href={"/"}>
-                    <button className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <FontAwesomeIcon icon={faMagnifyingGlass} className="text-black text-lg" />
-                    </button>
-                </Link>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className="text-black text-lg" />
+                </span>
             </div>
 
             {/* Filters */}
@@ -117,8 +141,9 @@ function FilterNavbarIndex() {
                         onChange={(e) => updateFilter(key, e.target.value)}
                     >
                         <option value="all">{placeholder}</option>
+
                         {options.map((option) => (
-                            <option key={option} value={option}>
+                            <option key={String (option)} value={String (option)}>
                                 {suffix ? `${option}${suffix}` : option}
                             </option>
                         ))}
@@ -133,12 +158,10 @@ function FilterNavbarIndex() {
 
             {/* Right icon */}
             <div className="h-14 flex items-center rounded-lg justify-center text-white hover:bg-white/10 gap-1 pb-3">
-                <p className="text-sm mt-2 font-medium">
-                    {/* `${savedHome}` */}
-                    </p>
+                <p className="text-sm mt-2 font-medium"></p>
                 <img src="/houseIcon.png" alt="Home Icon" className="h-10 mt-4" /> 
             </div>
-        </div>
+        </form>
     );
 }
 

@@ -158,8 +158,6 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
       "7Bath": "7Bath",
       "8Bath": "8Bath",
     };
-
-
     
     const bed = formData.bed;
     const bath = formData.bath;
