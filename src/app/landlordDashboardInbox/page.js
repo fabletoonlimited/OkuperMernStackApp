@@ -161,6 +161,9 @@ function LandlordInbox() {
                                           width={60}
                                           height={60}
                                           crop="fill"
+                                          bg-white
+                                          shadow-md
+                                          rounded-md
                                           alt="profile"
                                       />
                                   )}
@@ -187,6 +190,7 @@ function LandlordInbox() {
                               {loading ? (
                                   <p className="p-4 text-gray-500">
                                       Loading conversations...
+                                      
                                   </p>
                               ) : conversations.length === 0 ? (
                                   <p className="p-4 text-gray-500">
