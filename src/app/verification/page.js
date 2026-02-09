@@ -5,7 +5,7 @@ import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
 const verication = () => {
   return (
       <div>
-          <LandlordDashboardSidebar  />
+          <LandlordDashboardSidebar />
           <div className="bg-white shadow-md p-10 rounded-md mb-6 ">
               <h3 className="text-5xl font-bold text-blue-950">
                   Dear, Tenant!
@@ -33,10 +33,27 @@ const verication = () => {
                       </p>
                   </div>
                   <div className="ml-16">
-                      <input placeholder="" className="w-full h-16 border-2 border-2xl  " />
+                      <input
+                          placeholder=""
+                          className="w-full h-16 border-2 border-2xl  "
+                      />
                   </div>
               </div>
-               <LandlordDashboardFooter/>
+              <div className=" mb-6 flex p-10">
+                  <div>
+                      <p className="mt-5 text-black text-2xl font-semibold">
+                          Email:
+                      </p>
+                  </div>
+                  <div className="ml-16">
+                      <p 
+                          className="w-full h-16 border-2 border-2xl  "
+                      >
+                          titoluwagiwa@gmail.com
+                          </p>
+                  </div>
+              </div>
+              <LandlordDashboardFooter />
           </div>
       </div>
   );
