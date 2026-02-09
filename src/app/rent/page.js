@@ -45,6 +45,13 @@ function Rent() {
         fetchProperties();
     }, []);
 
+//     const fetchProperties = async() => {
+//         try {
+//             res = await fetch("./api/property")
+            
+//       }
+//   }
+      
     return (
         <>
             <FilterNavbarIndex />

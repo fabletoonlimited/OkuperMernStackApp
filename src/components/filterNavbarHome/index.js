@@ -19,7 +19,7 @@ function FilterNavbarIndex() {
 
     const [properties, setProperties] = useState([]);
 
-    const pillSelect = "appearance-none bg-white h-14 px-4 pr-10 text-base rounded-lg border border-gray-300 flex items-center";
+    const pillSelect = "appearance-none bg-white h-14 W-26 px-4 pr-20 text-base text-2xl rounded-lg border border-gray-300 flex items-center";
 
     const updateFilter = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
@@ -65,18 +65,33 @@ function FilterNavbarIndex() {
     const prices = sortOptions([...new Set(properties.map((p) => p.price))]);
     const ratings = [...new Set(properties.map((p) => Math.floor(p.rating)))];
     const propertiesType = [...new Set(properties.map((p) => p.propertyType))];
+    const state = [...new Set(properties.map((p) => p.state))];
 
     const filterConfig = [
         { key: "category", placeholder: "Categories", options: categories },
         { key: "price", placeholder: "Price", options: prices },
-        { key: "rating", placeholder: "Rating", options: ratings, suffix: "+ stars" },
-        { key: "propertyType", placeholder: "Property type", options: propertiesType },
+        {
+            key: "rating",
+            placeholder: "Rating",
+            options: ratings,
+            suffix: "+ stars",
+        },
+        {
+            key: "propertyType",
+            placeholder: "Property type",
+            options: propertiesType,
+        },
+        {
+            key: "state",
+            placeholder: "State",
+            options: state,
+        },
     ];
 
     const router = useRouter();
 
     return (
-        <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-center gap-5">
+        <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-around gap-6">
             {/* Search */}
             <div className="relative">
                 <input
