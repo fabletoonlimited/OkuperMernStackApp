@@ -42,7 +42,7 @@ function FilterNavbarIndex() {
     useEffect(() => {
         const fetchProperties = async () => {
         try {
-            const res = await fetch("/api/property", 
+            const res = await fetch("./api/models/propertyModel", 
                 { method: "GET" });
             const data = await res.json();
 
