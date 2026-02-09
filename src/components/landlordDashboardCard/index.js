@@ -37,7 +37,7 @@ const index = () => {
                       href="/propertyListing"
                       className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white ">
                       <button className="md:p-8 md:m-0 mt-3 cursor-pointer text-sm">
-                          Update Your profile{" "}
+                          Upload Your property{" "}
                       </button>
                   </Link>
               </div>

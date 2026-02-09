@@ -24,6 +24,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
     Img5: "",
     title: "",
     address: "",
+    state: "",
     price: "",
     category: "",
     propertyType: "",
@@ -88,13 +89,15 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
 
       setImagePreviews((prev) => ({
         ...prev,
-        [imgKey]: URL.createObjectURL(img),
+        [imgKey]: uploadResult.secure_url,
+        // [imgKey]: URL.createObjectURL(img),
       }));
 
       // wrap image in array object
       setFormData((prev) => ({
         ...prev,
-        [imgKey]: [{ publicId: "", url: uploadResult.secure_url }],
+         [imgKey]: uploadResult.secure_url,
+        // [imgKey]: [{ publicId: "", url: uploadResult.secure_url }],
       }));
 
       toast.success(`${imgKey} Image uploaded successfully`);
@@ -104,6 +107,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
     }
   };
 
+  //form text
   const handleInputChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -130,40 +134,91 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
       Office: "Other",
     };
 
+    const propertyType = propertyTypeMap[formData.propertyType] || "Other";
+
     const bedMap = {
-      "1Bdr": "1",
-      "2Bdr": "2",
-      "3Bdr": "3",
-      "4Bdr": "4",
-      "5Bdr": "5",
-      "6Bdr": "6",
-      "7Bdr": "7",
-      "8Bdr": "8",
+      // "1Bdr": "1",
+      "1Bdr": "1Bdr",
+      "2Bdr": "2Bdr",
+      "3Bdr": "3Bdr",
+      "4Bdr": "4Bdr",
+      "5Bdr": "5Bdr",
+      "6Bdr": "6Bdr",
+      "7Bdr": "7Bdr",
+      "8Bdr": "8Bdr",
     };
 
     const bathMap = {
-      "1Bath": "1",
-      "2Bath": "2",
-      "3Bath": "3",
-      "4Bath": "4",
-      "5Bath": "5",
-      "6Bath": "6",
-      "7Bath": "7",
-      "8Bath": "8",
+      "1Bath": "1Bath",
+      "2Bath": "2Bath",
+      "3Bath": "3Bath",
+      "4Bath": "4Bath",
+      "5Bath": "5Bath",
+      "6Bath": "6Bath",
+      "7Bath": "7Bath",
+      "8Bath": "8Bath",
     };
 
-    const propertyType = propertyTypeMap[formData.propertyType] || "Other";
-    const bed = bedMap[formData.bed] || "0";
-    const bath = bathMap[formData.bath] || "0";
+
+    
+    const bed = formData.bed;
+    const bath = formData.bath;
+
+    const stateMap = {
+      Abia: "Abia", 
+      Adamawa: "Adamawa", 
+      akwaIbom: "Akwa Ibom", 
+      Anambra: "Anambra", 
+      Bauchi: "Bauchi", 
+      Bayelsa: "Bayelsa", 
+      Benue: "Benue", 
+      Borno: "Borno", 
+      crossRiver: "Cross River", 
+      Delta: "Delta",
+      Ebonyi: "Ebonyi", 
+      Edo: "Edo", 
+      Ekiti: "Ekiti", 
+      Enugu: "Enugu", 
+      Gombe: "Gombe", 
+      Imo: "Imo", 
+      Jigawa: "Jigawa", 
+      Kaduna: "Kaduna", 
+      Kano: "Kano", 
+      Katsina: "Katsina", 
+      Kebbi: "Kebbi", 
+      Kogo: "Kogi", 
+      Kwara: "Kwara",
+      Lagos: "Lagos", 
+      Nasarawa: "Nasarawa", 
+      Niger: "Niger", 
+      Ogun: "Ogun", 
+      Ondo: "Ondo", 
+      Osun: "Osun", 
+      Oyo: "Oyo", 
+      Plateau: "Plateau", 
+      Rivers: "Rivers", 
+      Sokoto: "Sokoto", 
+      Taraba: "Taraba", 
+      Yobe: "Yobe", 
+      Zamfara: "Zamfara"
+    }
+
+   const state = formData.state
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+
 
     if (
-      // !formData.landlord ||
       !formData.previewPic ||
       !formData.Img1 ||
       !formData.Img2 ||
       !formData.Img3 ||
       !formData.title ||
-      !formData.address||
+      !formData.address ||
+      !state ||
       !formData.price ||
       !formData.category ||
       !formData.unitsAvailable ||
@@ -197,7 +252,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
         : [],
     };
 
-    const formattedAddress = `${formData.address.line1} ${formData.address.line2}`.trim();
+    // const formattedAddress = `${formData.address.line1} ${formData.address.line2}`.trim();
 
     try {
       const res = await fetch("/api/property", {
@@ -209,7 +264,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
           bed,
           bath,
           features: featuresPayload,
-          address: formattedAddress,
+          // address: formattedAddress,
         }),
       });
 
@@ -441,27 +496,34 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
                 <input
                   type="text"
                   name="address"
-                  value={formData.address.line1}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      address: { ...prev.address, line1: e.target.value },
-                    }))
-                  }
-                  placeholder="Address Line 1"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  // {(e) =>
+                  //   setFormData((prev) => ({
+                  //     ...prev,
+                  //     address: { ...prev.address, line1: e.target.value },
+                  //   }))
+                  // }
+                  placeholder="Address Line"
                   className="border border-[#233670] md:w-[850px] w-full pl-5 font-medium md:text-2xl md:h-[67px] h-8"
                 />
+              </span>
+            </li>
+            <li className="md:flex">
+              <h5 className="md:mt-4">State:</h5>
+              <span className="md:ml-15 space-y-5">
                 <input
                   type="text"
-                  name="address"
-                  value={formData.address.line2}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      address: { ...prev.address, line2: e.target.value },
-                    }))
-                  }
-                  placeholder="Address Line 2"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  // {(e) =>
+                  //   setFormData((prev) => ({
+                  //     ...prev,
+                  //     address: { ...prev.address, line2: e.target.value },
+                  //   }))
+                  // }
+                  placeholder="State"
                   className="border-[#233670] border md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
                 />
               </span>
@@ -664,7 +726,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
               Building Amenities:
               <input
                 type="text"
-                name="buidlingAmenities"
+                name="buildingAmenities"
                 value={extraFeatures.buildingAmenities}
                 onChange={(e) =>
                   setExtraFeatures((prev) => ({

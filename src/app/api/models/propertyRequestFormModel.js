@@ -8,10 +8,10 @@ const propertyRequestFormSchema = new mongoose.Schema(
       index: true,
     },
 
-    // lastName: {
-    //   type: String,
-    //   required: true,
-    // },
+    lastName: {
+      type: String,
+      required: true,
+    },
 
     phone: {
       type: String,
