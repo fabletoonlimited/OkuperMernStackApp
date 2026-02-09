@@ -17,6 +17,7 @@ import StarRating from "@/components/starRating/starRating";
 import property from "../../data/property";
 import { toast, ToastContainer } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Index = () => {
     const router = useRouter();
@@ -68,19 +69,19 @@ const Index = () => {
 
     const [selectedImage, setSelectedImage] = useState(null);
 
-        const images = [
-            "/property-image.jpg",
-            "/property-image.jpg",
-            "/property-image.jpg",
-            "/property-image.jpg",
-            "/property-image.jpg",
-        ];
+    const images = [
+        "/property-image.jpg",
+        "/property-image.jpg",
+        "/property-image.jpg",
+        "/property-image.jpg",
+        "/property-image.jpg",
+    ];
 
-     const [formData, setFormData] = useState({
-  firstName: "",
-  lastName: "",
-  phone: "",
-  message: "",
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        message: "",
 });
 
 const handleInputChange = (e) => {
@@ -106,7 +107,7 @@ const handlePropertyRequestForm = async (e) => {
   if (
     !formData.firstName ||
     !formData.lastName ||
-    !formData.phone ||
+    // !formData.phone ||
     !formData.message
   ) {
     toast.error("Please fill all required fields");
@@ -117,17 +118,17 @@ const handlePropertyRequestForm = async (e) => {
     const token = localStorage.getItem("token");
 
     const res = await fetch("/api/propertyRequestForm", {
-      method: "POST",
-      headers: {
+        method: "POST",
+        headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        ...formData,
-        userId: "userId",
-        propertyId: "propertyId",
-        tenantId: "tenantId",
-      }),
+    },
+        body: JSON.stringify({
+            ...formData,
+            userId: "userId",
+            propertyId: "propertyId",
+            tenantId: "tenantId",
+        }),
     });
 
     const data = await res.json();
@@ -488,7 +489,7 @@ const handlePropertyRequestForm = async (e) => {
                         <div className="mt-4">
                             <label className="block text-lg mb-1">Phone</label>
                             <input
-                                type="number"
+                                type="tel"
                                 value={formData.phone}
                                 onChange={handleInputChange}
                                 name="Phone"

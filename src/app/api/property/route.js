@@ -12,7 +12,7 @@ export async function POST(req) {
 
     let {
       // user,
-      // landlord: landlordId,
+      landlord: landlordId,
       previewPic,
       Img1,
       Img2,
@@ -22,6 +22,7 @@ export async function POST(req) {
       Img6,
       title,
       address,
+      state,
       price,
       category,
       propertyType,
@@ -40,10 +41,14 @@ export async function POST(req) {
     //   return NextResponse.json({ message: "Landlord ID is required" }, { status: 400 });
     // }
     if (!previewPic || !Img1 || !Img2 || !Img3) {
-      return NextResponse.json({ message: "Please upload at least 3 images" }, { status: 400 });
+      return NextResponse.json(
+      { message: "Please upload at least 3 images and a preview pic" }, 
+      { status: 400 });
     }
-    if (!title || !address || !price || !category || !unitsAvailable || !bed || !bath || !listedBy) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    if (!title || !address || !state || !price || !category || !unitsAvailable || !bed || !bath || !listedBy) {
+      return NextResponse.json(
+        { message: "Missing required fields" }, 
+        { status: 400 });
     }
 
     // Extract **just the URLs** if frontend sent objects
@@ -65,12 +70,12 @@ export async function POST(req) {
       nearbyPlaces: features?.nearbyPlaces?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
     };
 
-    const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();
+    // const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();
     const validPropertyType = propertyType === "Appartment" ? "Apartment" : propertyType;
 
     const newProperty = await createProperty({
       // user,
-      // landlordId,
+      landlordId,
       previewPic,
       Img1,
       Img2,
@@ -79,7 +84,8 @@ export async function POST(req) {
       Img5,
       Img6,
       title,
-      address: formattedAddress,
+      address,
+      state,
       price,
       category,
       unitsAvailable,

@@ -13,6 +13,7 @@ export const createProperty = async (data) => {
     Img6,
     title,
     address,
+    state,
     price,
     category,
     propertyType,
@@ -38,16 +39,17 @@ export const createProperty = async (data) => {
   if (!previewPic) throw new Error("Please upload a preview picture");
   if (!Img1 || !Img2 || !Img3) throw new Error("Please upload at least 3 images");
   if (!title) throw new Error("Missing property title");
-  if (!address) throw new Error("Missing address fields");
-  if (!price) throw new Error("Missing price fields");
-  if (!category) throw new Error("Missing category fields");
+  if (!address) throw new Error("Missing address field");
+  if (!state) throw new Error("Missing state field");
+  if (!price) throw new Error("Missing price field");
+  if (!category) throw new Error("Missing category field");
   if (!unitsAvailable) throw new Error("Property units available missing");
   if (!bed) throw new Error("At least one number of bed is required");
   if (!bath) throw new Error("At least one number of bath is required");
   if (!listedBy) throw new Error("Property listed by is required");
 
   // Format address safely
-  const formattedAddress = `${address?.line1 || ""} ${address?.line2 || ""}`.trim();
+  // const formattedAddress = `${address?.line1 || ""} ${address?.line2 || ""}`.trim();
 
   // Use **strings** for images (your schema expects string)
   previewPic = Array.isArray(previewPic) ? previewPic[0]?.url || previewPic[0] || previewPic : previewPic;
@@ -72,7 +74,9 @@ export const createProperty = async (data) => {
       Img5,
       Img6,
       title,
-      address: formattedAddress,
+      // address: formattedAddress,
+      address,
+      state,
       price,
       category,
       unitsAvailable,
