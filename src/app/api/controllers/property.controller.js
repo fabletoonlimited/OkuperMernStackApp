@@ -65,7 +65,7 @@ export const createProperty = async (data) => {
   try {
     const newProperty = await Property.create({
       // user,
-      // landlordId,
+      landlordId,
       previewPic,
       Img1,
       Img2,
