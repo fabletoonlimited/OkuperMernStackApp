@@ -64,10 +64,10 @@ export async function POST(req) {
 
     // Format features
     const featuresPayload = {
-      buildingAmenities: features?.buildingAmenities?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
-      propertyAmenities: features?.propertyAmenities?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
+      buildingAmenities: features?.buildingAmenities || [],
+      propertyAmenities: features?.propertyAmenities || [],
       neighbourhoodPostcode: features?.neighbourhoodPostcode || "00000",
-      nearbyPlaces: features?.nearbyPlaces?.split?.(",").map(f => f.trim()).filter(Boolean) || [],
+      nearbyPlaces: features?.nearbyPlaces || [],
     };
 
     // const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();

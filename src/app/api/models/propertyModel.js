@@ -72,10 +72,10 @@ const propertySchema = new mongoose.Schema(
     },
 
     features: {
-      buildingAmenities: { type: [String], default: [] },
-      propertyAmenities: { type: [String], default: [] },
+      buildingAmenities: { type: String, default: [] },
+      propertyAmenities: { type: String, default: [] },
       neighbourhoodPostcode: { type: String, default: "00000" },
-      nearbyPlaces: { type: [String], default: [] },
+      nearbyPlaces: { type: String},
     },
 
     listedBy: { type: String, required: true },
@@ -85,8 +85,8 @@ const propertySchema = new mongoose.Schema(
     savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
     rating: { type: Number, min: 0, max: 5, default: 0 },
     isVerified: { type: Boolean, default: true },
-    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: false}, 
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: false },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
+    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord"},
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
   },
   { timestamps: true }

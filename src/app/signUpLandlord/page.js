@@ -116,7 +116,7 @@ const page = () => {
         toast.error(landlord.message || "Failed to create landlord");
         return;
       }
-
+    
       // Generate and send OTP
       const otpRes = await fetch("/api/otp", {
         method: "POST",

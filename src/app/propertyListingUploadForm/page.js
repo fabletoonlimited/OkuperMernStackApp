@@ -279,15 +279,19 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
         case "Rent":
           router.push("/rent");
           break;
+          
         case "Buy":
           router.push("/buy");
           break;
+
         case "Sell":
           router.push("/sell");
           break;
+
         case "Shortlet":
           router.push("/shortlet");
           break;
+        
         default:
           router.push("/allProperties");
       }
@@ -316,6 +320,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
       <div className="bg-white md:w-[1300px] md:h-auto h-750 md:m-8 m-4 md:flex">
         <form onSubmit={handlePropertyUpload}>
           <ul className="font-semibold md:text-2xl md:space-y-10 space-y-8 p-10 md:pt-20 md:ml-18 ">
+            
             {/* Picture Upload Section */}
             <div className="md:flex gap-5 md:ml-8 mb-10">
               <h5 className="mt-4 -ml-7">Pictures:</h5>

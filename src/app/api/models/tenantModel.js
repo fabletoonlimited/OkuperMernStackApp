@@ -17,6 +17,11 @@ const tenantSchema = new mongoose.Schema(
         default: false
     },
 
+    isSubscribed: {
+      type: Boolean,
+      default: false
+    },
+
     role: {
         type: String, 
         default: "tenant"
@@ -26,8 +31,9 @@ const tenantSchema = new mongoose.Schema(
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
     tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc"},
     tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
-    messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
+    message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
+    property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
 
 }, {timestamps: true});
 

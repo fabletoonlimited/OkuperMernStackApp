@@ -20,7 +20,11 @@ export async function GET() {
       new TextEncoder().encode(process.env.JWT_SECRET)
     );
 
-    return NextResponse.json({ authenticated: true }, { status: 200 });
+    return NextResponse.json(
+      { authenticated: true }, 
+      { status: 200 }
+    );
+      
   } catch (error) {
     return NextResponse.json(
       { authenticated: false, message: "Invalid or expired token" },

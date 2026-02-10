@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
-import Landlord from "../models/landlordModel.js";
+import Landlord from "../models/landlordModel.js"; //This import is wrong. Its meant to be imported from controllers
 import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
 // import {signupLandlord, getLandlord, getAllLandlord, updateLandlord, deleteLandlord} from "../controllers/landlord.controller.js"
 
@@ -47,6 +47,7 @@ export async function POST(req) {
       survey,
       terms,
       isVerified: false,
+      isSubscribed: false,
       role: "landlord",
     });
 

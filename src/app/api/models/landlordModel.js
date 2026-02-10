@@ -17,6 +17,11 @@ const landlordSchema = new mongoose.Schema(
       default: false
     },
 
+    isSubscribed: {
+      type: Boolean,
+      default: false
+    },
+
     role: {
       type: String,
       default: "landlord",
@@ -26,8 +31,8 @@ const landlordSchema = new mongoose.Schema(
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
     landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc"},
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
-    messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
-    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
+    message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
+    property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     
   }, { timestamps: true }
 );

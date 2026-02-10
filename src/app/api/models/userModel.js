@@ -31,11 +31,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
     },
+
     referralCount: {
       type: Number,
       default: 0,
@@ -44,8 +46,8 @@ const userSchema = new mongoose.Schema(
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord" },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant" },
     admin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
-  },
-  { timestamps: true },
+    
+  }, { timestamps: true },
 );
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

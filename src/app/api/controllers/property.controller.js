@@ -3,7 +3,7 @@ import Property from "../models/propertyModel.js";
 export const createProperty = async (data) => {
   let {
     // user,
-    // landlord: landlordId,
+    landlord: landlordId,
     previewPic,
     Img1,
     Img2,
@@ -16,23 +16,27 @@ export const createProperty = async (data) => {
     state,
     price,
     category,
+    unitsAvailable,
     propertyType,
     bed,
     bath,
-    features,
+    rating,
     listedBy,
     savedHomes,
-    unitsAvailable,
-    rating,
+    features,
+    // buildingAmenities,
+    // propertyAmenities,
+    // neighbourhoodPostcode,
+    // nearbyPlaces,
     isVerified,
   } = data;
 
   // Ensure features is always safe
   const safeFeatures = features ?? {
-    buildingAmenities: [],
-    propertyAmenities: [],
+    buildingAmenities: "",
+    propertyAmenities: "",
     neighbourhoodPostcode: "",
-    nearbyPlaces: [],
+    nearbyPlaces: "",
   };
 
   // Validate required fields

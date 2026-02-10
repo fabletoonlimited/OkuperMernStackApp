@@ -14,6 +14,8 @@ export const signupLandlord = async (data) => {
     referalCode,
     surveyInputField,
     terms,
+    isSubscribed,
+    isVerified,
   } = data;
 
   if (
@@ -37,6 +39,9 @@ export const signupLandlord = async (data) => {
       referalCode,
       survey: surveyInputField,
       terms,
+      referralCode,
+      isSubscribed,
+      isVerified,
       role: "Landlord",
     });
 
