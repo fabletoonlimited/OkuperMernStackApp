@@ -30,6 +30,10 @@ export async function POST(req) {
       bath,
       features,
       listedBy,
+      buildingAmenities,
+      propertyAmenities,
+      neighbourhoodPostcode,
+      nearbyPlaces,
       savedHomes,
       unitsAvailable,
       rating,
@@ -45,7 +49,7 @@ export async function POST(req) {
       { message: "Please upload at least 3 images and a preview pic" }, 
       { status: 400 });
     }
-    if (!title || !address || !state || !price || !category || !unitsAvailable || !bed || !bath || !listedBy) {
+    if (!title || !address || !state || !price || !category || !unitsAvailable || !bed || !bath || !listedBy || !buildingAmenities || !propertyAmenities || !neighbourhoodPostcode || !nearbyPlaces) {
       return NextResponse.json(
         { message: "Missing required fields" }, 
         { status: 400 });
@@ -63,12 +67,12 @@ export async function POST(req) {
     Img6 = getUrl(Img6);
 
     // Format features
-    const featuresPayload = {
-      buildingAmenities: features?.buildingAmenities || [],
-      propertyAmenities: features?.propertyAmenities || [],
-      neighbourhoodPostcode: features?.neighbourhoodPostcode || "00000",
-      nearbyPlaces: features?.nearbyPlaces || [],
-    };
+    // const featuresPayload = {
+    //   buildingAmenities: features?.buildingAmenities || [],
+    //   propertyAmenities: features?.propertyAmenities || [],
+    //   neighbourhoodPostcode: features?.neighbourhoodPostcode || "00000",
+    //   nearbyPlaces: features?.nearbyPlaces || [],
+    // };
 
     // const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();
     const validPropertyType = propertyType === "Appartment" ? "Apartment" : propertyType;
@@ -92,10 +96,16 @@ export async function POST(req) {
       propertyType: validPropertyType,
       bed,
       bath,
-      features: featuresPayload,
-      listedBy,
-      savedHomes: savedHomes ?? [],
       rating,
+
+      // features: featuresPayload,
+      listedBy,
+      buildingAmenities,
+      propertyAmenities,
+      neighbourhoodPostcode,
+      nearbyPlaces,
+      savedHomes: savedHomes ?? [],
+     
       isVerified,
     });
 

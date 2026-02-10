@@ -71,12 +71,12 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    features: {
-      buildingAmenities: { type: String, default: [] },
-      propertyAmenities: { type: String, default: [] },
+    // features: {
+      buildingAmenities: { type: String, default: "" },
+      propertyAmenities: { type: String, default: "" },
       neighbourhoodPostcode: { type: String, default: "00000" },
-      nearbyPlaces: { type: String},
-    },
+      nearbyPlaces: { type: String, default: "" },
+    // },
 
     listedBy: { type: String, required: true },
 
