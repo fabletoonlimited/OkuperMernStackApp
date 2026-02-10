@@ -442,15 +442,9 @@ const handlePropertyRequestForm = async (e) => {
 
                 {/* REQUEST TO APPLY FORM */}
                 <div className="mt-10 flex flex-col md:flex-row gap-6">
-<<<<<<< HEAD
-                    <form
-                        className="flex-1 p-4 md:p-6 rounded-lg md:border-0"
-                        id="form">
-=======
                     <form 
                         onSubmit={handlePropertyRequestForm}
                         className="flex-1 p-4 md:p-6 rounded-lg md:border-0">
->>>>>>> 62b273912bc80334bb3c12ddcbc591a8c72c172d
                         <h3 className="text-3xl md:text-3xl md:font-medium font-medium mb-4">
                             Request to apply
                         </h3>
