@@ -13,7 +13,7 @@ export async function POST(req) {
 
     let {
       // user,
-      landlord: landlordId,
+      landlordId,
       previewPic,
       Img1,
       Img2,
@@ -45,6 +45,8 @@ export async function POST(req) {
     // if (!landlordId) {
     //   return NextResponse.json({ message: "Landlord ID is required" }, { status: 400 });
     // }
+
+    
     if (!previewPic || !Img1 || !Img2 || !Img3) {
       return NextResponse.json(
       { message: "Please upload at least 3 images and a preview pic" }, 
@@ -80,7 +82,7 @@ export async function POST(req) {
 
     const newProperty = await createProperty({
       // user,
-      landlordId,
+      landlord: landlordId,
       previewPic,
       Img1,
       Img2,
