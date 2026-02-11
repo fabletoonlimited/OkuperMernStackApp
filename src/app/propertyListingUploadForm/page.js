@@ -14,8 +14,10 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
 
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
+  const [landlordId, setLandlordId] = useState(null);
+  
   const [formData, setFormData] = useState({
-    // landlord: currentUserId || "",
+    landlord: landlordId || "",
     previewPic: "",
     Img1: "",
     Img2: "",
