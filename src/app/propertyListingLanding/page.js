@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import React from 'react'
-import Landlord from "@/app/api/models/landlordModel"
+import React from 'react';
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar/index.js";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter/index.js";
 import PropertyUploadLanding from "../../components/PropertyUploadLanding/index.js";
-import { useEffect, useRouter } from "next/router.js";
-import SubscriptionModal from "../../components/subscriptionModal1"
+import { useRouter } from "next/navigation";
+import { useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
@@ -22,45 +21,39 @@ const page = () => {
         }));
     };
 
-     const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
         cardNo: "",
         cvv2: "",
         expDate: "",
-      });
+    });
 
-        const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-        const [error, setError] = useState("");
+    const handlePayment = async (e) => {
+        e.preventDefault();
+        setError("");
 
-        const trimmedEmail = email.trim().toLowerCase();
-
-        const handlePayment = async (e) => {
-            e.preventDefault();
-            setError("");
-
-           if (
-                !formData.firstName ||
-                !formData.lastName ||
-                !cardNo ||
-                !cvv2 || 
-                !expDate
-                ) {
-                    toast.error("Please fill all required fields");
-                    return;
-                }
+        if (
+            !formData.firstName ||
+            !formData.lastName ||
+            !cardNo ||
+            !cvv2 || 
+            !expDate) 
+            { toast.error("Please fill all required fields");
+                return;
+            }
           
           //Check if landlord Email Exists in DB
-          const existingLandlord = await Landlord.findOne({ email: trimmedEmail });
+          const existingLandlord = await Landlord.findOne({ email });
                 
         try{
           //Generate Subscription
-          const subscriptionRes = await fetch("api/landlordSubscription", {
+          const subscriptionRes = await fetch("api/payment", {
             method: "POST",
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify({
               action: "generate",
-              email: trimmedEmail,
+              email,
               cardNo: formData.cardNo,
               cvv2: formData.cvv2,
               expDate: formData.expDate,
@@ -76,10 +69,9 @@ const page = () => {
     
           const subscriptionData = await subscriptionRes.json();
           console.log("Payment receipt sent to:", formData.email);
-    
-    
           // Open Set payment modal
-            setShowSubscriptionModal(true);
+          
+            setPaymentModal(true);
     
         } catch (err) {
             console.error(err);
@@ -108,7 +100,10 @@ const page = () => {
                     Please use the form below to upload two FREE your property.
                 </p>
             </div>
+
+            {/*Body */}
           <PropertyUploadLanding />
+
           <LandlordDashboardFooter />
       </div>
   );

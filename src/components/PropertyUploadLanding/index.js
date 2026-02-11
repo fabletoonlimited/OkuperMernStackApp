@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import SubscriptionModal2 from "../../components/subscriptionModal2";
+// import SubscriptionModal2 from "../../components/subscriptionModal2";
 
 const Index = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -107,7 +107,7 @@ const Index = () => {
             {latestProperty ? "Start uploading" : "Uploaded"}
           </button>
 
-          <SubscriptionModal2 isOpen={isOpen} onClose={() => setIsOpen(false)} />
+          {/* <SubscriptionModal2 isOpen={isOpen} onClose={() => setIsOpen(false)} /> */}
         </div>
       </div>
     </div>

@@ -39,7 +39,7 @@ export const signupLandlord = async (data) => {
       referalCode,
       survey: surveyInputField,
       terms,
-      referralCode,
+      referalCode,
       isSubscribed,
       isVerified,
       role: "Landlord",
