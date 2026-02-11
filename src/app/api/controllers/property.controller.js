@@ -23,21 +23,21 @@ export const createProperty = async (data) => {
     rating,
     listedBy,
     savedHomes,
-    features,
-    // buildingAmenities,
-    // propertyAmenities,
-    // neighbourhoodPostcode,
-    // nearbyPlaces,
+    // features,
+    buildingAmenities,
+    propertyAmenities,
+    neighbourhoodPostcode,
+    nearbyPlaces,
     isVerified,
   } = data;
 
   // Ensure features is always safe
-  const safeFeatures = features ?? {
-    buildingAmenities: "",
-    propertyAmenities: "",
-    neighbourhoodPostcode: "",
-    nearbyPlaces: "",
-  };
+  // const safeFeatures = features ?? {
+  //   buildingAmenities: "",
+  //   propertyAmenities: "",
+  //   neighbourhoodPostcode: "",
+  //   nearbyPlaces: "",
+  // };
 
   // Validate required fields
   if (!previewPic) throw new Error("Please upload a preview picture");
@@ -87,8 +87,12 @@ export const createProperty = async (data) => {
       propertyType,
       bed,
       bath,
-      features: safeFeatures,
+      // features: safeFeatures,
       listedBy,
+      buildingAmenities,
+      propertyAmenities,
+      neighbourhoodPostcode,
+      nearbyPlaces,
       savedHomes,
       rating: rating || 0,
       isVerified: isVerified ?? true,

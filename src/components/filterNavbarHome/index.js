@@ -44,20 +44,10 @@ function FilterNavbarIndex() {
 
     // ✅ FETCH PROPERTIES FROM MONGODB
     useEffect(() => {
-<<<<<<< HEAD
-        const fetchProperties = async () => {
+        const fetchFilterNav = async () => {
         try {
             const res = await fetch("./api/property",
                 { method: "GET" });
-=======
-        const fetchFilterNav = async () => {
-         try {
-            const res = await fetch("/api/property", {
-            method: "GET",
-            cache: "no-store",
-        });
-
->>>>>>> c62e38b81ac3654689ac4b0238eaef12cda9fad1
             const data = await res.json();
 
             if (!res.ok) {
@@ -81,12 +71,11 @@ function FilterNavbarIndex() {
     const ratings = [...new Set(properties.map((p) => Math.floor(p.rating)))];
     const state = [...new Set(properties.map((p) => (p.state)))];
     const propertiesType = [...new Set(properties.map((p) => p.propertyType))];
-    const state = [...new Set(properties.map((p) => p.state))];
+
 
     const filterConfig = [
         { key: "category", placeholder: "Categories", options: categories },
         { key: "price", placeholder: "Price", options: prices },
-<<<<<<< HEAD
         {
             key: "rating",
             placeholder: "Rating",
@@ -103,21 +92,12 @@ function FilterNavbarIndex() {
             placeholder: "State",
             options: state,
         },
-=======
-        { key: "rating", placeholder: "Rating", options: ratings, suffix: "+ stars" },
-        { key: "state", placeholder: "State", options: state },
-        { key: "propertyType", placeholder: "Property type", options: propertiesType },
->>>>>>> c62e38b81ac3654689ac4b0238eaef12cda9fad1
     ];
 
     const router = useRouter();
 
     return (
-<<<<<<< HEAD
-        <div className="flex items-center bg-blue-900 px-8 py-7.5 justify-around gap-6">
-=======
-        <form className="flex items-center bg-blue-900 px-8 py-7.5 justify-center gap-5">
->>>>>>> c62e38b81ac3654689ac4b0238eaef12cda9fad1
+        <form className="flex items-center bg-blue-900 px-8 py-7.5 justify-around gap-6">
             {/* Search */}
             <div className="relative">
                 <input

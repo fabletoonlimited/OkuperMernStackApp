@@ -31,12 +31,12 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
     unitsAvailable: "",
     bed: "",
     bath: "",
-    features: {
-      buildingAmenities: [],
-      propertyAmenities: [],
-      neighbourhoodPostcode: "",
-      nearbyPlaces: [],
-    },
+    // features: {
+    buildingAmenities: "",
+    propertyAmenities: "",
+    neighbourhoodPostcode: "",
+    nearbyPlaces: "",
+    // },
     listedBy: "",
   });
 
@@ -222,33 +222,37 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
       !formData.unitsAvailable ||
       !bed ||
       !bath ||
-      !formData.listedBy
+      !formData.listedBy ||
+      !formData.buildingAmenities ||
+      !formData.propertyAmenities ||
+      !formData.neighbourhoodPostcode ||
+      !formData.nearbyPlaces
     ) {
       toast.error("Please fill all required fields");
       return;
     }
 
-    const featuresPayload = {
-      buildingAmenities: extraFeatures.buildingAmenities
-        ? extraFeatures.buildingAmenities
-            .split(",")
-            .map((f) => f.trim())
-            .filter(Boolean)
-        : [],
-      propertyAmenities: extraFeatures.propertyAmenities
-        ? extraFeatures.propertyAmenities
-            .split(",")
-            .map((f) => f.trim())
-            .filter(Boolean)
-        : [],
-      neighbourhoodPostcode: extraFeatures.neighbourhoodPostcode || "00000",
-      nearbyPlaces: extraFeatures.nearbyPlaces
-        ? extraFeatures.nearbyPlaces
-            .split(",")
-            .map((f) => f.trim())
-            .filter(Boolean)
-        : [],
-    };
+    // const featuresPayload = {
+    //   buildingAmenities: extraFeatures.buildingAmenities
+    //     ? extraFeatures.buildingAmenities
+    //         .split(",")
+    //         .map((f) => f.trim())
+    //         .filter(Boolean)
+    //     : [],
+    //   propertyAmenities: extraFeatures.propertyAmenities
+    //     ? extraFeatures.propertyAmenities
+    //         .split(",")
+    //         .map((f) => f.trim())
+    //         .filter(Boolean)
+    //     : [],
+    //   neighbourhoodPostcode: extraFeatures.neighbourhoodPostcode || "00000",
+    //   nearbyPlaces: extraFeatures.nearbyPlaces
+    //     ? extraFeatures.nearbyPlaces
+    //         .split(",")
+    //         .map((f) => f.trim())
+    //         .filter(Boolean)
+    //     : [],
+    // };
 
     // const formattedAddress = `${formData.address.line1} ${formData.address.line2}`.trim();
 
@@ -261,7 +265,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
           propertyType,
           bed,
           bath,
-          features: featuresPayload,
+          // features: featuresPayload,
           // address: formattedAddress,
         }),
       });
@@ -730,13 +734,15 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
               <input
                 type="text"
                 name="buildingAmenities"
-                value={extraFeatures.buildingAmenities}
-                onChange={(e) =>
-                  setExtraFeatures((prev) => ({
-                    ...prev,
-                    buildingAmenities: e.target.value,
-                  }))
-                }
+                value={formData.buildingAmenities}
+                onChange={handleInputChange}
+                // value={extraFeatures.buildingAmenities}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     buildingAmenities: e.target.value,
+                //   }))
+                // }
                 placeholder="Prepaid meter, All room en-suite, etc."
                 className="border border-[#233670] md:w-[770px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl md:ml-6h-8"
               />
@@ -747,13 +753,15 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
               <input
                 type="text"
                 name="propertyAmenities"
-                value={extraFeatures.propertyAmenities}
-                onChange={(e) =>
-                  setExtraFeatures((prev) => ({
-                    ...prev,
-                    propertyAmenities: e.target.value,
-                  }))
-                }
+                value={formData.propertyAmenities}
+                onChange={handleInputChange}
+                // value={extraFeatures.propertyAmenities}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     propertyAmenities: e.target.value,
+                //   }))
+                // }
                 placeholder="Standby security, 24hrs light,Standby Generator, etc."
                 className="border border-[#233670] md:w-[747px] w-full md:h-[67px] pl-5 font-medium h-10 md:text-2xl md:ml-6"
               />
@@ -764,13 +772,15 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
               <input
                 type="text"
                 name="neighbourhoodPostcode"
-                value={extraFeatures.neighbourhoodPostcode}
-                onChange={(e) =>
-                  setExtraFeatures((prev) => ({
-                    ...prev,
-                    neighbourhoodPostcode: e.target.value,
-                  }))
-                }
+                value={formData.neighbourhoodPostcode}
+                onChange={handleInputChange}
+                // value={extraFeatures.neighbourhoodPostcode}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     neighbourhoodPostcode: e.target.value,
+                //   }))
+                // }
                 placeholder="00000"
                 className="border border-[#233670] md:w-[670px] md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 w-full h-10"
               />
@@ -781,13 +791,15 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
               <input
                 type="text"
                 name="nearbyPlaces"
-                value={extraFeatures.nearbyPlaces}
-                onChange={(e) =>
-                  setExtraFeatures((prev) => ({
-                    ...prev,
-                    nearbyPlaces: e.target.value,
-                  }))
-                }
+                value={formData.nearbyPlaces}
+                onChange={handleInputChange}
+                // value={extraFeatures.nearbyPlaces}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     nearbyPlaces: e.target.value,
+                //   }))
+                // }
                 placeholder="Schools, Malls, Govt hospitals, Central Mosque, etc."
                 className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
               />
