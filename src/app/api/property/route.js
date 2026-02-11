@@ -134,20 +134,26 @@ export async function GET(request) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
+
     const id = searchParams.get("id");
-    const listedBy = searchParams.get("listedBy");
+    const landlordId = searchParams.get("landlordId");
 
     if (id) {
       const property = await Property.findById(id);
-      if (!property) return NextResponse.json({ message: "Property not found" }, { status: 404 });
+      if (!property) 
+        return NextResponse.json({ message: "Property not found" }, 
+        { status: 404 });
       return NextResponse.json(property, { status: 200 });
     }
 
-    if (listedBy) {
-      const properties = await Property.find({ listedBy }).sort({ createdAt: -1 });
+    if (landlordId) {
+      const properties = await Property.find({ landlord: landlordId })
+      .sort({ createdAt: -1 
+      });
       return NextResponse.json(properties, { status: 200 });
     }
 
+    //fallback for all properties
     const properties = await Property.find().sort({ createdAt: -1 });
     return NextResponse.json(properties, { status: 200 });
   } catch (err) {

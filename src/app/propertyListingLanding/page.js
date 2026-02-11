@@ -44,7 +44,9 @@ const page = () => {
             }
           
           //Check if landlord Email Exists in DB
-          const existingLandlord = await Landlord.findOne({ email });
+          const existingLandlord = await landlord.findOne({ email });
+
+          const landlordId = localStorage.getItem("landlordId")
                 
         try{
           //Generate Subscription

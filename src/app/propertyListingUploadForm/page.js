@@ -262,6 +262,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          landlord: landlordId,
           propertyType,
           bed,
           bath,
