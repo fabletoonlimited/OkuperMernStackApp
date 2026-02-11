@@ -3,7 +3,7 @@ import Property from "../models/propertyModel.js";
 export const createProperty = async (data) => {
   let {
     // user,
-    landlord: landlordId,
+    landlordId,
     previewPic,
     Img1,
     Img2,
@@ -69,7 +69,7 @@ export const createProperty = async (data) => {
   try {
     const newProperty = await Property.create({
       // user,
-      landlordId,
+      landlord:landlordId,
       previewPic,
       Img1,
       Img2,
@@ -99,6 +99,7 @@ export const createProperty = async (data) => {
     });
 
     return newProperty;
+    
   } catch (dbError) {
     console.error("DB error:", dbError);
     throw new Error("Failed to create property");

@@ -186,93 +186,88 @@ const index = () => {
                   />
               </div>
 
-              {/* Address Verification */}
-              <div
-                  className="space-y-2 rounded-lg bg-white md:w-[310px] w-46 md:h-[250px] h-auto p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="text-blue-950 font-bold mb-3">
-                      Address Verification
-                  </h4>
+        <div
+          className="md:px-10 -space-y-3 rounded-lg bg-white md:w-[310px] md:h-[250px] h-auto w-46 px-5 p-5 md:p-8 mb-4"
+          style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}
+        >
+          <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
+            Address Verification
+          </h4>
+          <p className="md:text-justify">
+            Verify your listing by providing the required documentation
+          </p>
+          <Link
+            href="./"
+            className="bg-blue-900 md:p-2 p-3 rounded-xl  text-white"
+          >
+            <button className="md:p-8 md:m-0 mt-10 cursor-pointer text-sm ">
+              Update Your profile{" "}
+            </button>
+          </Link>
+        </div>
 
-                  <p className="md:text-justify">
-                      Verify your listing by providing the required
-                      documentation
-                  </p>
+        <div
+          className="md:px-10 space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] h-auto px-5 p-5 md:p-8 mb-4 w-46"
+          style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}
+        >
+          <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
+            Profile Picture
+          </h4>
+          <p className="text-justify">
+            Add a profile picture to help the guests know you better
+          </p>
+          <Link
+            href="./"
+            className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white "
+          >
+            <button className="md:p-8 md:m-0  cursor-pointer mt-8 text-sm">
+              Update Your profile{" "}
+            </button>
+          </Link>
+        </div>
 
-                  <Link href="/verification">
-                      <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
-                              Verify Your Address
-                          </button>
-                      </div>
-                  </Link>
-              </div>
+        <div
+          className="md:px-10 space-y-2  rounded-lg bg-white md:w-[310px] md:h-[250px] h-auto px-5 p-5 md:p-8 mb-4 w-46"
+          style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}
+        >
+          <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
+            Property Preference
+          </h4>
+          <p className="text-justify">
+            These preferences will help us match better with homes
+          </p>
+          <Link
+            href="./"
+            className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white "
+          >
+            <button className="md:p-8 md:m-0 mt-8 cursor-pointer text-sm">
+              Update Your profile{" "}
+            </button>
+          </Link>
+        </div>
 
-              {/* Profile Picture */}
-              <div
-                  className="space-y-2 rounded-lg bg-white md:w-[310px] w-46 md:h-[250px] h-auto p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="text-blue-950 font-bold mb-3">
-                      Profile Picture
-                  </h4>
-
-                  <p className="text-justify">
-                      Add a profile picture to help the guests know you better
-                  </p>
-
-                  <Link href="./">
-                      <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
-                              Add Picture
-                          </button>
-                      </div>
-                  </Link>
-              </div>
-
-              {/* Property Preference */}
-              <div
-                  className="space-y-2 rounded-lg bg-white md:w-[310px] w-46 md:h-[250px] h-auto p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="text-blue-950 font-bold mb-3">
-                      Property Preference
-                  </h4>
-
-                  <p className="text-justify">
-                      These preferences will help us match better with homes
-                  </p>
-
-                  <Link href="./">
-                      <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
-                              Update Preferences
-                          </button>
-                      </div>
-                  </Link>
-              </div>
-
-              {/* Account Details */}
-              <div
-                  className="space-y-2 rounded-lg bg-white md:w-[310px] w-46 md:h-[250px] h-auto p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="text-blue-950 font-bold mb-3">
-                      Account Details
-                  </h4>
-
-                  <p className="md:text-justify">
-                      Add your account details to enable us forward your tenants
-                      payments after finalizing home
-                  </p>
-
-                  <Link href="./">
-                       <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-1">
-                              Add Account 
-                          </button>
-                      </div>
-                  </Link>
-              </div>
-          </div>
+        <div
+          className=" md:px-10 rounded-lg bg-white md:w-[310px] md:h-[250px] h-auto px-5 p-5 mmd:p-8 mb-4 w-46"
+          style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}
+        >
+          <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
+            Account Details
+          </h4>
+          <p className="md:w-60 mt-2 md:text-justify">
+            Add your account details to enable us forward your tenants payments
+            after finalizing home
+          </p>
+          <Link
+            href="./"
+            className="bg-blue-900 md:p-2 p-3 rounded-xl  text-white "
+          >
+            <button className="md:p-8 md:m-0 mt-4 cursor-pointer text-sm">
+              Update Your profile{" "}
+            </button>
+          </Link>
+        </div>
       </div>
+    </div>
   );
 };
 

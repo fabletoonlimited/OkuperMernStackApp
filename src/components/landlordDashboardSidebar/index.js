@@ -102,7 +102,7 @@ const index = () => {
             <li>Messages</li>
           </Link>
 
-          <Link href="/propertyListing">
+          <Link href="/propertyListingLanding">
             <li> Listings </li>
           </Link>
 
