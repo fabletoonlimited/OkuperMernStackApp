@@ -203,7 +203,7 @@ const index = () => {
             Verify your listing by providing the required documentation
           </p>
           <Link
-            href="./"
+            href="/verification"
             className="bg-blue-900 md:p-2 p-3 rounded-xl  text-white"
           >
             <button className="md:p-8 md:m-0 mt-10 cursor-pointer text-sm ">
@@ -223,7 +223,7 @@ const index = () => {
             Add a profile picture to help the guests know you better
           </p>
           <Link
-            href="./"
+            href=""
             className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white "
           >
             <button className="md:p-8 md:m-0  cursor-pointer mt-8 text-sm">
@@ -243,7 +243,7 @@ const index = () => {
             These preferences will help us match better with homes
           </p>
           <Link
-            href="./"
+            href=""
             className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white "
           >
             <button className="md:p-8 md:m-0 mt-8 cursor-pointer text-sm">
@@ -264,7 +264,7 @@ const index = () => {
             after finalizing home
           </p>
           <Link
-            href="./"
+            href=""
             className="bg-blue-900 md:p-2 p-3 rounded-xl  text-white "
           >
             <button className="md:p-8 md:m-0 mt-4 cursor-pointer text-sm">

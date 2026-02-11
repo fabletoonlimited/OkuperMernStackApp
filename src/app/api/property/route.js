@@ -2,6 +2,7 @@ import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Property from "../models/propertyModel.js";
 import { createProperty } from "../controllers/property.controller.js";
+import mongoose from "mongoose";
 
 // CREATE A PROPERTY Upload
 export async function POST(req) {
@@ -146,11 +147,15 @@ export async function GET(request) {
       return NextResponse.json(property, { status: 200 });
     }
 
-    if (landlordId) {
+    if (landlordId && mongoose.Types.ObjectId.isValid(landlordId)) {
       const properties = await Property.find({ landlord: landlordId })
       .sort({ createdAt: -1 
       });
       return NextResponse.json(properties, { status: 200 });
+    }
+
+    if (landlordId && !mongoose.Types.ObjectId.isValid(landlordId)) {
+      return NextResponse.json([], { status: 200 });
     }
 
     //fallback for all properties

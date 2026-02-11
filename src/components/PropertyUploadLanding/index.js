@@ -11,10 +11,28 @@ const Index = () => {
     setLoading(false);
   }, []);
 
-  const landlordId = localStorage.getItem("landlordId");
+  // const landlordId = localStorage.getItem("landlordId");
+
+  const [landlordId, setLandlordId] = useState(null);
+
+  useEffect(() => {
+    const getMe = async () => {
+      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      const data = await res.json();
+
+      if (res.ok) {
+        setLandlordId(data?.user?._id || data?.landlord?._id || data?._id);
+      }
+    };
+
+    getMe();
+  }, []);
+
 
   // Fetch properties
   useEffect(() => {
+    if (!landlordId) return;
+    
     const fetchProperties = async () => {
       try {
         const res = await fetch(`/api/property?landlordId=${landlordId}`, {
@@ -25,6 +43,8 @@ const Index = () => {
         const data = await res.json();
         if (!res.ok) return;
 
+        console.log("MY PROPERTIES:", data)
+
         const list = Array.isArray(data) ? data : data?.properties;
         setProperties(list || []);
       } catch (err) {
@@ -33,7 +53,7 @@ const Index = () => {
     };
 
     fetchProperties();
-  }, []);
+  }, [landlordId]);
 
   // create 3 slots
   const slots = [0, 1, 2];

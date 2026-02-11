@@ -43,8 +43,8 @@ const page = () => {
                 return;
             }
           
-          //Check if landlord Email Exists in DB
-          const existingLandlord = await landlord.findOne({ email });
+        //   //Check if landlord Email Exists in DB
+        //   const existingLandlord = await landlord.findOne({ email });
 
           const landlordId = localStorage.getItem("landlordId")
                 
