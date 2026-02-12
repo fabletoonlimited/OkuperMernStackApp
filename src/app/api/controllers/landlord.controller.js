@@ -1,48 +1,54 @@
 import Landlord from "../models/landlordModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { NextResponse } from "next/server";
 
 //Signup Landlord
 export const signupLandlord = async (data) => {
   const {
+    userId,
     firstName,
     lastName,
     email,
     password,
     otp,
+    referralCode,
     referalCode,
+    survey,
     surveyInputField,
     terms,
     isSubscribed,
     isVerified,
   } = data;
 
-  if (
-    !firstName || !lastName || !email || !password || !terms) {
-    throw new Error ("Kindly fill all fields required");
+  if (!firstName || !lastName || !email || !password || !terms) {
+    return { status: 400, message: "Kindly fill all fields required" };
   }
 
+  const normalizedEmail = email.trim().toLowerCase();
+
   //check if landlord exists in DB
-  const existingUser = await Landlord.findOne({ email });
+  const existingUser = await Landlord.findOne({ email: normalizedEmail });
   if (existingUser) {
-    throw new Error("Landlord already exist!! Please login");
+    return {
+      status: 400,
+      message: "Landlord already exist!! Please login",
+    };
   }
 
   try {
     const newLandlord = new Landlord({
+      user: userId,
       firstName,
       lastName,
-      email,
+      email: normalizedEmail,
       password,
       otp,
-      referalCode,
-      survey: surveyInputField,
+      referralCode: referralCode || referalCode,
+      survey: survey ?? surveyInputField,
       terms,
-      referalCode,
       isSubscribed,
       isVerified,
-      role: "Landlord",
+      role: "landlord",
     });
 
     await newLandlord.save();
@@ -54,7 +60,7 @@ export const signupLandlord = async (data) => {
 
       await resend.emails.send({
         from: process.env.SEND_OTP_FROM || "noreply@okuper.com",
-        to: email,
+        to: normalizedEmail,
         subject: "Welcome to Okuper!",
         html: `
                   <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -79,18 +85,21 @@ export const signupLandlord = async (data) => {
       console.error("Failed to send welcome email:", emailError);
     }
 
-    return(
-      {
-        success: true,
-        message: "New Landlord created Successfully",
-        user: newLandlord,
-      }
-    );
-    
+    return {
+      status: 201,
+      success: true,
+      message: "New Landlord created Successfully",
+      landlord: {
+        _id: newLandlord._id,
+        firstName: newLandlord.firstName,
+        lastName: newLandlord.lastName,
+        email: newLandlord.email,
+        isVerified: newLandlord.isVerified,
+      },
+    };
   } catch (error) {
     console.error(error);
-    throw new Error ("Something went wrong"
-    );
+    return { status: 500, message: "Something went wrong" };
   }
 };
 
@@ -99,7 +108,7 @@ export const loginLandlord = async (data) => {
     const { email, password } = data;
 
     if (!email || !password) {
-      throw new Error ("Email and password are required" );
+      return { status: 400, message: "Email and password are required" };
     }
 
     // Normalize email (trim and lowercase to match signup)
@@ -107,9 +116,13 @@ export const loginLandlord = async (data) => {
 
     const landlord = await Landlord.findOne({ email: normalizedEmail });
 
+    if (!landlord) {
+      return { status: 404, message: "landlord not found with this email" };
+    }
+
     const isMatch = await bcrypt.compare(password, landlord.password);
     if (!isMatch) {
-      throw new Error ("Invalid password");
+      return { status: 401, message: "Invalid password" };
     }
 
     //create a token
@@ -119,64 +132,34 @@ export const loginLandlord = async (data) => {
       { expiresIn: "1d" }, //1day
     );
 
-    const response = NextResponse.json(
-      {
-        success: true,
-        landlord: {
-          id: landlord._id,
-          name: `${landlord.firstName} ${landlord.lastName}`,
-          email: landlord.email,
-        },
-        message: "Login successful",
+    return {
+      status: 200,
+      token,
+      success: true,
+      landlord: {
+        id: landlord._id,
+        name: `${landlord.firstName} ${landlord.lastName}`,
+        email: landlord.email,
       },
-      { status: 200 },
-    );
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path:"/",
-      maxAge: 24 * 60 * 60 * 1000, // 1day
-    });
-     
-  if (!normalizedEmail || !landlord) {
-    throw new Error ("landlord not found with this email" );
-  }  
-    return response;
-
+      message: "Login successful",
+    };
   } catch (err) {
     console.error("Login Error:", err.message);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    return { status: 500, message: "Server error" };
   }
 };
 
 export const getLandlord = async (data) => {
   try {
-    const { _id } = data.landlord;
+    const { id, email } = data;
 
-    const landlord = await Landlord.findById(_id)
-      .populate("User")
-      .populate("Otp")
-      .populate("LandlordKyc")
-      .populate("LandlordDashboard")
-      .populate("Property");
-
-    if (!landlord) {
-      throw new Error ( "Landlord not found");
+    if (!id && !email) {
+      return { status: 400, message: "Landlord ID or email is required" };
     }
-    return {
-      success: true, 
-      landlord
-    };
-  } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
-  }
-};
 
-export const getAllLandlord = async (data) => {
-  try {
-    const allLandlord = await Landlord.find()
+    const query = id ? { _id: id } : { email: email.trim().toLowerCase() };
+
+    const landlord = await Landlord.findOne(query)
       .select("-password")
       .populate("User")
       .populate("Otp")
@@ -184,75 +167,85 @@ export const getAllLandlord = async (data) => {
       .populate("LandlordDashboard")
       .populate("Property");
 
-    return {
-      success: true, 
-      allLandlord};
+    if (!landlord) {
+      return { status: 404, message: "Landlord not found" };
+    }
+
+    return { status: 200, success: true, landlord };
   } catch (error) {
-    return NextResponse.json(
-      { message: "error getting landlord" },
-      { status: 500 },
-    );
+    return { status: 500, message: error.message || "Server error" };
+  }
+};
+
+export const getAllLandlord = async () => {
+  try {
+    const landlords = await Landlord.find()
+      .select("-password")
+      .populate("User")
+      .populate("Otp")
+      .populate("LandlordKyc")
+      .populate("LandlordDashboard")
+      .populate("Property");
+
+    return { status: 200, success: true, landlords };
+  } catch (error) {
+    return { status: 500, message: "error getting landlord" };
   }
 };
 
 export const updateLandlord = async (data) => {
   try {
-    const body = await data.json();
-    const { _id, firstName, lastName, email } = body;
+    const { _id, email, ...updateData } = data;
 
-    // only self-update or admin
-    if (data.landlord && req.landlord._id !== _id && !req.admin) {
-     throw new Error("You are unauthorized");
+    if (!_id && !email) {
+      return { status: 400, message: "Landlord ID or email is required" };
     }
 
-    const landlord = await Landlord.findByIdAndUpdate(
-      _id,
-      { firstName, lastName, email },
+    const query = _id ? { _id } : { email: email.trim().toLowerCase() };
+    const landlord = await Landlord.findOneAndUpdate(
+      query,
+      { $set: updateData },
       { new: true, runValidators: true },
     ).select("-password");
 
     if (!landlord) {
-      throw new Error("Landlord not found" );
+      return { status: 404, message: "Landlord not found" };
     }
 
-    return({
-        success: true,
-        message: "Landlord updated successfully",
-        landlord,
-      });
+    return {
+      status: 200,
+      success: true,
+      message: "Landlord updated successfully",
+      landlord,
+    };
   } catch (error) {
-    return NextResponse.json(
-      { message: "something went wrong", error: error.message },
-      { status: 500 },
-    );
+    return { status: 500, message: error.message || "Server error" };
   }
 };
 
-export const deleteLandlord = async (req) => {
+export const deleteLandlord = async (data) => {
   try {
-    const { searchParams } = new URL(req.url);
-    const _id = searchParams.get("_id");
+    const { id } = data;
 
-    if (!_id) {
-      throw new Error("Landlord ID is required");
+    if (!id) {
+      return { status: 400, message: "Landlord ID is required" };
     }
 
-    const deletedLandlord = await Landlord.findByIdAndDelete(_id);
+    const deletedLandlord = await Landlord.findByIdAndDelete(id);
 
     if (!deletedLandlord) {
-     throw new Error ("Landlord not found");
+      return { status: 404, message: "Landlord not found" };
     }
 
-    return (
-      { message: "Landlord deleted successfully", 
-        landlord: deletedLandlord 
-      }
-    );
+    return {
+      status: 200,
+      success: true,
+      message: "Landlord deleted successfully",
+      landlord: deletedLandlord,
+    };
   } catch (error) {
     console.error("Delete error:", error);
-    return NextResponse.json(
-      { error: "Cannot delete Landlord" },
-    );
+    return { status: 500, message: "Cannot delete Landlord" };
   }
 };
 
@@ -266,13 +259,11 @@ export const arrayUpload = async (data) => {
       files.map((file) => streamUpload(file, "images")),
     );
 
-    return (
-      { 
-        success: true,
-        message: "Upload successful", 
-        uploads 
-      }
-    )
+    return {
+      success: true,
+      message: "Upload successful",
+      uploads,
+    };
   } catch (error) {
     return NextResponse.json(
       { message: error.message || "Upload failed" },
