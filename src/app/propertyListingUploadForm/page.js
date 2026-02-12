@@ -14,8 +14,10 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
 
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
+  const [landlordId, setLandlordId] = useState(null);
+  
   const [formData, setFormData] = useState({
-    // landlord: currentUserId || "",
+    landlord: landlordId || "",
     previewPic: "",
     Img1: "",
     Img2: "",
@@ -262,6 +264,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          landlord: landlordId,
           propertyType,
           bed,
           bath,

@@ -1,9 +1,10 @@
 import Property from "../models/propertyModel.js";
+import Landlord from "../models/landlordModel.js"
 
 export const createProperty = async (data) => {
   let {
     // user,
-    landlord: landlordId,
+    landlordId,
     previewPic,
     Img1,
     Img2,
@@ -31,13 +32,10 @@ export const createProperty = async (data) => {
     isVerified,
   } = data;
 
-  // Ensure features is always safe
-  // const safeFeatures = features ?? {
-  //   buildingAmenities: "",
-  //   propertyAmenities: "",
-  //   neighbourhoodPostcode: "",
-  //   nearbyPlaces: "",
-  // };
+  if (!landlordId) throw new Error("missing LandlordId")
+
+  const landlord = await Landlord.findById(landlordId);
+  if (!landlord) throw new Error("Landlord not found");
 
   // Validate required fields
   if (!previewPic) throw new Error("Please upload a preview picture");
@@ -68,8 +66,7 @@ export const createProperty = async (data) => {
 
   try {
     const newProperty = await Property.create({
-      // user,
-      landlordId,
+      landlord: landlord._Id,
       previewPic,
       Img1,
       Img2,
@@ -98,7 +95,11 @@ export const createProperty = async (data) => {
       isVerified: isVerified ?? true,
     });
 
+      landlord.properties.push(newProperty._id);
+      await landlord.save();  
+
     return newProperty;
+    
   } catch (dbError) {
     console.error("DB error:", dbError);
     throw new Error("Failed to create property");

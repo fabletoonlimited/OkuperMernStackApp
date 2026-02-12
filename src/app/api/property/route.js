@@ -2,6 +2,7 @@ import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Property from "../models/propertyModel.js";
 import { createProperty } from "../controllers/property.controller.js";
+import mongoose from "mongoose";
 
 // CREATE A PROPERTY Upload
 export async function POST(req) {
@@ -12,7 +13,7 @@ export async function POST(req) {
 
     let {
       // user,
-      landlord: landlordId,
+      landlordId,
       previewPic,
       Img1,
       Img2,
@@ -44,6 +45,8 @@ export async function POST(req) {
     // if (!landlordId) {
     //   return NextResponse.json({ message: "Landlord ID is required" }, { status: 400 });
     // }
+
+    
     if (!previewPic || !Img1 || !Img2 || !Img3) {
       return NextResponse.json(
       { message: "Please upload at least 3 images and a preview pic" }, 
@@ -79,7 +82,7 @@ export async function POST(req) {
 
     const newProperty = await createProperty({
       // user,
-      landlordId,
+      landlord: landlordId,
       previewPic,
       Img1,
       Img2,
@@ -134,20 +137,30 @@ export async function GET(request) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
+
     const id = searchParams.get("id");
-    const listedBy = searchParams.get("listedBy");
+    const landlordId = searchParams.get("landlordId");
 
     if (id) {
       const property = await Property.findById(id);
-      if (!property) return NextResponse.json({ message: "Property not found" }, { status: 404 });
+      if (!property) 
+        return NextResponse.json({ message: "Property not found" }, 
+        { status: 404 });
       return NextResponse.json(property, { status: 200 });
     }
 
-    if (listedBy) {
-      const properties = await Property.find({ listedBy }).sort({ createdAt: -1 });
+    if (landlordId && mongoose.Types.ObjectId.isValid(landlordId)) {
+      const properties = await Property.find({ landlord: landlordId })
+      .sort({ createdAt: -1 
+      });
       return NextResponse.json(properties, { status: 200 });
     }
 
+    if (landlordId && !mongoose.Types.ObjectId.isValid(landlordId)) {
+      return NextResponse.json([], { status: 200 });
+    }
+
+    //fallback for all properties
     const properties = await Property.find().sort({ createdAt: -1 });
     return NextResponse.json(properties, { status: 200 });
   } catch (err) {

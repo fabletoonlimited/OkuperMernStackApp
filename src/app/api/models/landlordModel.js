@@ -32,7 +32,7 @@ const landlordSchema = new mongoose.Schema(
     landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc"},
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
     message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
-    property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     
   }, { timestamps: true }
 );

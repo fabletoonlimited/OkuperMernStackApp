@@ -86,7 +86,7 @@ const propertySchema = new mongoose.Schema(
     rating: { type: Number, min: 0, max: 5, default: 0 },
     isVerified: { type: Boolean, default: true },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord"},
+    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
   },
   { timestamps: true }
