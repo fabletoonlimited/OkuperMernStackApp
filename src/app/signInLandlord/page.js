@@ -6,195 +6,159 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 
 const Page = () => {
-  const router = useRouter();
+    const router = useRouter();
 
-  //Auth code session not signing out
-  useEffect(() => {
-    const checkAuth = async () => {
-      const res = await fetch("/api/auth/me", {
-        credentials: "include",
-      });
+    // Check auth
+    useEffect(() => {
+        const checkAuth = async () => {
+            const res = await fetch("/api/auth/me", {
+                credentials: "include",
+            });
 
-      if (res.ok) {
-        router.replace("/landlordDashboard");
-      }
-    };
-    checkAuth();
-  }, []);
-
-  // State for form and modal
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [userId, setUserId] = useState(null);
-  const [showOtpModal, setShowOtpModal] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Handler
-  const handleSignInSubmit = async (e) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (!email || !password) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    if (!email.includes("@")) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/loginLandlord", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(
-          data.message || data.error || "Login failed. Please try again.",
-        );
-        setLoading(false);
-        return;
-      }
-
-      toast.success("Login successful! 🎉");
-      setTimeout(() => {
-        router.push("/landlordDashboard");
-      }, 1000);
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Something went wrong. Please try again.");
-      setLoading(false);
-    }
-  };
-
-  return (
-    <>
-      <h1
-        className="font-bold text-4xl"
-        style={{ paddingLeft: 45, marginTop: 70 }}
-      >
-        Sign in
-      </h1>
-
-      <ToastContainer position="top-center" autoClose={3000} />
-
-      {/*SignIn Form*/}
-      <div className="signInLoandingContainer md:flex-col col mt-10 mb-50">
-        <form onSubmit={handleSignInSubmit}>
-          <div
-            className="landlordSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              maxWidth: "556px",
-              // width: '100%',
-              height: "auto",
-              maxHeight: "100%",
-              border: "1px solid #ccc",
-              padding: "20px",
-              borderRadius: "5px",
-              paddingLeft: "35px",
-              paddingRight: "50px",
-              marginTop: "20px",
-              marginLeft: "50px",
-              paddingBottom: "80px",
-            }}
-          >
-            {/*Email*/}
-            <p style={{ paddingTop: 20, marginBottom: 30 }}>Email Address</p>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-            />
-
-            {/*Password*/}
-            <p style={{ paddingTop: 20, marginBottom: 30 }}>Password</p>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-            />
-
-            <p style={{ paddingTop: 30, marginBottom: 30 }}>
-              Forgot password?
-              <Link href="/forgotPassword">
-                <span className="cursor-pointer hover:text-blue-600">
-                  {" "}
-                  Click here
-                </span>
-              </Link>
-            </p>
-          </div>
-
-          {/*SignIn Btn*/}
-          <div className="landlordSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-            <button
-              type="submit"
-              disabled={loading}
-              className="landlordSignInBtn bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
-            >
-              {loading ? "Signing In..." : "Sign In"}
-            </button>
-          </div>
-        </form>
-
-        {/*Banner Section*/}
-        <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-240 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
-          {/* RIGHT SECTION */}
-          <div
-            className={
-              "relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170"
+            if (res.ok) {
+                router.replace("/landlordDashboard");
             }
-          >
-            <div
-              className={
-                "relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor "
-              }
-            >
-              <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-center">
-                <b>Rent & Buy your Homes Directly on Okuper</b>
-              </h2>
+        };
+        checkAuth();
+    }, [router]);
+
+    // State
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleSignInSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!email || !password) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
+
+        if (!email.includes("@")) {
+            toast.error("Please enter a valid email address");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await fetch("/api/loginLandlord", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    email: email.trim().toLowerCase(),
+                    password,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                toast.error(
+                    data.message ||
+                        data.error ||
+                        "Login failed. Please try again.",
+                );
+                setLoading(false);
+                return;
+            }
+
+            toast.success("Login successful! 🎉");
+            setTimeout(() => {
+                router.push("/landlordDashboard");
+            }, 1000);
+        } catch (error) {
+            console.error("Login error:", error);
+            toast.error("Something went wrong. Please try again.");
+            setLoading(false);
+        }
+    };
+
+    return (
+        <>
+            <h1 className="font-bold text-4xl mt-16 ml-10">Sign in</h1>
+
+            <ToastContainer position="top-center" autoClose={3000} />
+
+            {/* Main Layout */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-10 px-10 mt-10 mb-20">
+                {/* LEFT SIDE - FORM */}
+                <form
+                    onSubmit={handleSignInSubmit}
+                    className="w-full md:w-1/2 max-w-lg border border-gray-300 p-8 rounded-lg">
+                    {/* Email */}
+                    <p className="mb-3 mt-4 text-lg">Email Address</p>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email address"
+                        className="border-2 border-gray-300 p-3 rounded w-full"
+                    />
+
+                    {/* Password */}
+                    <p className="mb-3 mt-8 text-lg">Password</p>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        className="border-2 border-gray-300 p-3 rounded w-full"
+                    />
+
+                    <p className="mt-6 mb-6">
+                        Forgot password?
+                        <Link href="/forgotPassword">
+                            <span className="ml-2 cursor-pointer text-blue-600 hover:underline">
+                                Click here
+                            </span>
+                        </Link>
+                    </p>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 w-full text-xl rounded">
+                        {loading ? "Signing In..." : "Sign In"}
+                    </button>
+                </form>
+
+                {/* RIGHT SIDE - BANNER */}
+                <div className="w-full md:w-1/2 relative">
+                    <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg overflow-hidden">
+                        {/* Banner Top Section */}
+                        <div className="p-10 text-center">
+                            <h2 className="text-white text-3xl md:text-5xl font-semibold leading-snug">
+                                Rent & Buy your Homes Directly on Okuper
+                            </h2>
+
+                            <p className="mt-6 text-white text-lg md:text-xl leading-relaxed">
+                                No agents. No hidden fees. Connect directly with
+                                your next home owners on Okuper. Verified people
+                                and real homes.
+                            </p>
+                        </div>
+
+                        {/* Images Section */}
+                        <div className="relative">
+                            <img
+                                src="/BannerSam.png"
+                                alt="Ad Banner Sam"
+                                className="w-full"
+                            />
+                            <img
+                                src="/bannerGirl.png"
+                                alt="Banner Girl"
+                                className="absolute -bottom-10 right-0 w-[80%] md:w-[90%] max-w-none"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <p className="absolute md:font-medium leading-[1.5] -mt-10 md:text-[20px] text-white text-center px-5 md:px-20 text-xl md:text-center">
-              No agents. No hidden fees. Connect directly with your next home
-              owners on Okuper. Verified people and real homes.
-            </p>
-
-            {/* RIGHT BANNER IMAGES */}
-            <img
-              src="/bannerGirl.png"
-              alt="bannerGirl"
-              className={
-                "bannerGirl md:h-auto h-60 md:w-110 w-50 bottom-[-275px] md:bottom-[-721px]"
-              }
-              style={{ position: "absolute", height: "auto" }}
-            />
-
-            <img
-              src="/BannerSam.png"
-              alt="Ad Banner Sam"
-              className={"rounded-b-2xl"}
-            />
-          </div>
-        </div>
-        {/*End of Banner Section*/}
-      </div>
-    </>
-  );
+        </>
+    );
 };
 
 export default Page;

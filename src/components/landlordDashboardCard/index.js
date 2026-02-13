@@ -155,7 +155,7 @@ const index = () => {
 
                   <Link href="/profile">
                       <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
+                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7 cursor-pointer hover:bg-blue-800">
                               Update Your Profile
                           </button>
                       </div>
@@ -175,9 +175,9 @@ const index = () => {
                   <div className="flex justify-center">
                       <button
                           onClick={handleUploadClick}
-                          className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
-                          Add Listing
-                      </button>
+              className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7 cursor-pointer hover:bg-blue-800 ">
+                           Add Listing
+                          </button>
                   </div>
 
                   <SubscriptionModal2
@@ -201,7 +201,7 @@ const index = () => {
 
                   <Link href="/verification">
                       <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
+                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7 cursor-pointer hover:bg-blue-800">
                               Verify Your Address
                           </button>
                       </div>
@@ -222,7 +222,7 @@ const index = () => {
 
                   <Link href="./">
                       <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
+                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7 cursor-pointer hover:bg-blue-800">
                               Add Picture
                           </button>
                       </div>
@@ -243,7 +243,7 @@ const index = () => {
 
                   <Link href="./">
                       <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7">
+                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-7 cursor-pointer hover:bg-blue-800 ">
                               Update Preferences
                           </button>
                       </div>
@@ -264,9 +264,9 @@ const index = () => {
                   </p>
 
                   <Link href="./">
-                       <div className="flex justify-center">
-                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-1">
-                              Add Account 
+                      <div className="flex justify-center">
+                          <button className="bg-blue-900 rounded-xl md:px-6 px-4 py-2 w-full text-white text-sm mt-1 cursor-pointer hover:bg-blue-800">
+                              Add Account
                           </button>
                       </div>
                   </Link>
