@@ -36,7 +36,8 @@ export default function RootLayout({ children }) {
     "/propertyListingLanding",
     "/propertyListingUploadForm", 
     "/propertyCardExpanded",
-    "/verification"
+    "/verification",
+    "/contact"
   ];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);

@@ -44,7 +44,7 @@ const page = () => {
 
   // 🔒 HARD GUARD — PREVENT BROKEN FLOW
   useEffect(() => {
-    if (!userId) 
+    if (!userId)
       return;
     
     if (!residencyStatus || !whoIsUsingPlatform) {
@@ -203,209 +203,180 @@ const page = () => {
       toast.error("OTP verification failed");
     }
   };
-  return (
-    <>
-      <h1
-        className="font-bold text-4xl pr-10"
-        style={{ paddingLeft: 45, marginTop: 70 }}
-      >
-        Signup as Landlord
-      </h1>
+        return (
+            <>
+                <ToastContainer position="top-center" autoClose={3000} />
 
-      {/*Already have account - Sign In Link*/}
-      <div className="signInLinkSection ml-12 mt-3">
-        <p className="text-lg">
-          Already have an account?{" "}
-          <Link href="/signInLandlord">
-            <span className="text-blue-600 hover:text-blue-800 underline cursor-pointer font-semibold">
-              Sign In
-            </span>
-          </Link>
-        </p>
-      </div>
+                {error && (
+                    <p className="text-red-600 text-lg text-center">{error}</p>
+                )}
 
-      <ToastContainer position="top-center" autoClose={3000} />
+                <div className="w-full min-h-screen bg-white py-16">
+                    {/* ONE FLEX CONTAINER */}
+                    <div className="max-w-7xl mx-auto px-12 flex flex-col lg:flex-row items-start gap-20">
+                        {/* ================= LEFT SIDE ================= */}
+                        <div className="w-full lg:w-1/2">
+                            <h1 className="font-bold text-4xl mb-6">
+                                Signup as Landlord
+                            </h1>
 
-      {error && <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>}
+                            <p className="text-lg mb-6">
+                                Already have an account?{" "}
+                                <Link href="/signInLandlord">
+                                    <span className="text-blue-600 hover:text-blue-800 underline font-semibold cursor-pointer">
+                                        Sign In
+                                    </span>
+                                </Link>
+                            </p>
 
-      {/*SignUp Form*/}
-      <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">
-        <div
-          className="landlordSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            maxWidth: "556px",
-            // width: '100%',
-            height: "auto",
-            maxHeight: "100%",
-            border: "1px solid #ccc",
-            padding: "20px",
-            borderRadius: "5px",
-            paddingLeft: "35px",
-            paddingRight: "50px",
-            marginTop: "20px",
-            marginLeft: "50px",
-            paddingBottom: "80px",
-          }}
-        >
-          {/*First Name*/}
-          <p style={{ paddingTop: 40, marginBottom: 30 }}>First Name</p>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleInputChange}
-            placeholder="Enter first name"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                            {/* FORM CARD */}
+                            <div className="border rounded-xl p-10 shadow-md">
+                                <label className="block mb-2 font-medium">
+                                    First Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          {/*Last Name*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Last Name</p>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleInputChange}
-            placeholder="Enter last name"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Last Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          {/*Email*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Email</p>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder="username@gmail.com"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          {/*Password Confirmation*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Password</p>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder="password"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>
-            Referral Code (Optional)
-          </p>
-          <input
-            type="text"
-            name="referralCode"
-            value={formData.referralCode}
-            onChange={handleInputChange}
-            placeholder="Enter referral code"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Referral Code (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="referralCode"
+                                    value={formData.referralCode}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>
-            How did you hear about Okuper
-          </p>
-          <input
-            type="text"
-            name="survey"
-            value={formData.survey}
-            onChange={handleInputChange}
-            placeholder="E.g., Social Media, Friend, Advertisement"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120 surveyInputField"
-          />
-        </div>
+                                <label className="block mb-2 font-medium">
+                                    How did you hear about Okuper?
+                                </label>
+                                <input
+                                    type="text"
+                                    name="survey"
+                                    value={formData.survey}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-        {/*Terms*/}
-        <div className="termsSection -mt-11 md:mt-10 md:ml-13 ml-13 mr-10 md:mr-0 flex items-center">
-          <input
-            type="checkbox"
-            // id="agreeTerms"
-            checked={termsAccepted}
-            onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="w-7 h-7 border-2 border-blue-950 rounded cursor-pointer accent-blue-700"
-          />
-          {/*Terms Text*/}
-          <span className="text-sm ml-2 md:ml-2 mr-0 md:mr-12 md:mt-0 mt-5">
-            By signing up, you agree to Okuper's{" "}
-            <a href="/termsOfService" className="text-blue-600 underline">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacyPolicy" className="text-blue-600 underline">
-              Privacy Policy
-            </a>
-            .
-          </span>
-        </div>
+                                {/* Terms */}
+                                <div className="flex items-start gap-3 mt-4">
+                                    <input
+                                        type="checkbox"
+                                        checked={termsAccepted}
+                                        onChange={(e) =>
+                                            setTermsAccepted(e.target.checked)
+                                        }
+                                        className="w-5 h-5 accent-blue-700 mt-1"
+                                    />
+                                    <span className="text-sm">
+                                        By signing up, you agree to Okuper's{" "}
+                                        <a
+                                            href="/termsOfService"
+                                            className="text-blue-600 underline">
+                                            Terms of Service
+                                        </a>{" "}
+                                        and{" "}
+                                        <a
+                                            href="/privacyPolicy"
+                                            className="text-blue-600 underline">
+                                            Privacy Policy
+                                        </a>
+                                        .
+                                    </span>
+                                </div>
 
-        {/*SignUp Btn*/}
-        <div className="landlordSignUpSection mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <button
-            onClick={handleSignUp}
-            email={formData.email}
-            className="landlordSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
-          >
-            {" "}
-            Sign Up{" "}
-          </button>
-        </div>
+                                <button
+                                    onClick={handleSignUp}
+                                    className="mt-8 w-full bg-blue-950 hover:bg-blue-800 text-white p-4 text-lg rounded-md transition">
+                                    Sign Up
+                                </button>
+                            </div>
+                        </div>
 
-        {/*Banner Section*/}
-        <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-290 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
-          {/* RIGHT SECTION */}
-          <div
-            className={
-              "relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170"
-            }
-          >
-            <div
-              className={
-                "relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor "
-              }
-            >
-              <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-center">
-                <b>Rent & Buy your Homes Directly on Okuper</b>
-              </h2>
-            </div>
+                        {/* ================= RIGHT SIDE ================= */}
+                        <div className="w-full lg:w-1/2 flex justify-end">
+                            <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg overflow-hidden">
+                                {/* Blue Header */}
+                                <div className="bg-[#003399] p-12 w-full text-white text-left">
+                                    <h2 className="text-4xl font-semibold leading-snug">
+                                        Rent & Buy your Homes Directly on Okuper
+                                    </h2>
+                                </div>
 
-            <p className="absolute md:font-medium leading-[1.5] -mt-10 md:text-[20px] text-white text-center px-5 md:px-20 text-xl md:text-center">
-              No agents. No hidden fees. Just verified people and real homes.
-            </p>
+                                {/* Middle Text */}
+                                <p className="absolute top-44 text-white text-left text-lg px-12">
+                                    No agents. No hidden fees. Just verified
+                                    people and real homes.
+                                </p>
 
-            {/* RIGHT BANNER IMAGES */}
-            <img
-              src="/bannerGirl.png"
-              alt="bannerGirl"
-              className={
-                "bannerGirl md:h-auto h-60 md:w-110 w-50 bottom-[-275px] md:bottom-[-721px]"
-              }
-              style={{ position: "absolute", height: "auto" }}
-            />
+                                {/* Images */}
+                                <img
+                                    src="/bannerGirl.png"
+                                    alt="Banner Girl"
+                                    className="absolute -bottom-10 right-0 w-[80%] md:w-[90%] max-w-none"
+                                />
 
-            <img
-              src="/BannerSam.png"
-              alt="Ad Banner Sam"
-              className={"rounded-b-2xl"}
-            />
-          </div>
-        </div>
-        {/*End of Banner Section*/}
-      </div>
+                                <img
+                                    src="/BannerSam.png"
+                                    alt="Ad Banner Sam"
+                                    className="w-full h-full"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-      {/* OTP MODAL */}
-      {showOtpLandlord && (
-        <OtpLandlord
-          isOpen={true}
-          onClose={() => setShowOtpLandlord(false)}
-          email={formData?.email ?? ""}
-          onVerify={handleOtpVerification}
-        />
-      )}
-    </>
-  );
+                {/* OTP MODAL */}
+                {showOtpLandlord && (
+                    <OtpLandlord
+                        isOpen={true}
+                        onClose={() => setShowOtpLandlord(false)}
+                        email={formData?.email ?? ""}
+                        onVerify={handleOtpVerification}
+                    />
+                )}
+            </>
+        );
+
 };
 
 export default page;
