@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
-    const { conversationId } = params;
+    const { conversationId } = await params;
     const result = await getConversationMessages(req, conversationId);
     return result;
   } catch (err) {

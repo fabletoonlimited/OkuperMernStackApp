@@ -91,6 +91,12 @@ function TenantInbox() {
         const data = await res.json();
         setMessages(data.messages || []);
         setShowProfile(false);
+
+        // Mark messages as read
+        await fetch(`/api/message/${selectedConversation._id}/read`, {
+          method: "PATCH",
+          credentials: "include",
+        });
       } catch (err) {
         console.error("Fetch messages error:", err);
         toast.error(err.message);

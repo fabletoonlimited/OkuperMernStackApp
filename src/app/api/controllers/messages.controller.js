@@ -102,7 +102,7 @@ export const getConversationMessages = async (req, conversationId) => {
 
     // Verify user is part of conversation
     const conversation = await Conversation.findById(conversationId);
-    if (!conversation || !conversation.participants.includes(userId)) {
+    if (!conversation || !conversation.participants.some(p => p.toString() === userId)) {
       return NextResponse.json(
         { error: "Conversation not found" },
         { status: 404 },
@@ -269,6 +269,41 @@ export const sendMessage = async (req) => {
     );
   } catch (err) {
     console.error("Send message error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+};
+
+// Mark messages as read in a conversation
+export const markMessagesAsRead = async (req, conversationId) => {
+  try {
+    await dbConnect();
+    const payload = await getUserFromToken();
+
+    if (!payload || !payload.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = payload.id;
+
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation || !conversation.participants.some(p => p.toString() === userId)) {
+      return NextResponse.json(
+        { error: "Conversation not found" },
+        { status: 404 },
+      );
+    }
+
+    const result = await Message.updateMany(
+      { conversationId, receiver: userId, isRead: false },
+      { isRead: true },
+    );
+
+    return NextResponse.json(
+      { success: true, modifiedCount: result.modifiedCount },
+      { status: 200 },
+    );
+  } catch (err) {
+    console.error("Mark as read error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 };
