@@ -666,7 +666,7 @@ const ProfilePage = () => {
                                     onClick={() =>
                                         setStepIndex((prev) =>
                                             Math.min(
-                                                prev + 1,
+                                                prev + 2,
                                                 steps.length - 1,
                                             ),
                                         )

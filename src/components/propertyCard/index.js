@@ -152,14 +152,14 @@ export default function PropertyCard({
                             </p>
                         )}
 
-                        <div className="flex gap-2 mt-2 justify-items-center mb-5 md:ml-2 ml-2">
-                            <span className="text-sm bg-blue-900 text-white px-2 py-1 rounded">
+                        <div className="flex mt-2 justify-around items-center mb-5 md:ml-2 ml-2">
+                            <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
                                 {numberOfBed ?? 0} Bdr
                             </span>
-                            <span className="text-sm bg-blue-900 text-white px-2 py-1 rounded">
+                            <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
                                 {propertyType || "N/A"}
                             </span>
-                            <span className="text-sm bg-blue-900 text-white px-2 py-1 rounded">
+                            <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
                                 {numberOfBath ?? 0} Bath
                             </span>
                         </div>
