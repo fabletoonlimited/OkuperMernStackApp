@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
-import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
+import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
+import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 import { CldImage } from "next-cloudinary";
 import { toast, ToastContainer } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,7 +10,7 @@ import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import ComposeModal from "../../components/composeModal";
 import Image from "next/image";
 
-function LandlordInbox() {
+function TenantMessages() {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -24,6 +24,7 @@ function LandlordInbox() {
   const [currentActorId, setCurrentActorId] = useState(null);
   const [currentActorType, setCurrentActorType] = useState(null);
 
+  // Fetch current user on mount
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -31,9 +32,7 @@ function LandlordInbox() {
           credentials: "include",
         });
 
-        if (!res.ok) {
-          return;
-        }
+        if (!res.ok) return;
 
         const data = await res.json();
         setCurrentActorId(data.actorId || null);
@@ -122,7 +121,7 @@ function LandlordInbox() {
 
       const resolvedReceiverType =
         normalizeRole(otherParticipant?.role) ||
-        (currentActorType === "Landlord" ? "Tenant" : "Tenant");
+        (currentActorType === "Tenant" ? "Landlord" : "Landlord");
 
       const res = await fetch("/api/message", {
         method: "POST",
@@ -154,7 +153,7 @@ function LandlordInbox() {
     }
   };
 
-  // Get other participant details
+  // Helpers
   const normalizeId = (value) => (value ? String(value) : "");
   const normalizeRole = (role) => {
     if (!role) return null;
@@ -183,18 +182,18 @@ function LandlordInbox() {
   const otherParticipant = profileDetails || getOtherParticipant();
   const profilePic = otherParticipant?.profilePic || otherParticipant?.avatar;
 
+  // Reset profile details when conversation changes
   useEffect(() => {
     if (!selectedConversation) {
       setProfileDetails(null);
       return;
     }
-
     setProfileDetails(null);
   }, [selectedConversation]);
 
+  // Fetch profile when Show Profile is clicked
   useEffect(() => {
-    if (!showProfile) return;
-    if (!selectedConversation) return;
+    if (!showProfile || !selectedConversation) return;
 
     const participant = getOtherParticipant();
     if (!participant?._id) return;
@@ -207,9 +206,7 @@ function LandlordInbox() {
           credentials: "include",
         });
 
-        if (!res.ok) {
-          return;
-        }
+        if (!res.ok) return;
 
         const data = await res.json();
         if (isActive) {
@@ -225,7 +222,6 @@ function LandlordInbox() {
     };
 
     fetchProfile();
-
     return () => {
       isActive = false;
     };
@@ -233,7 +229,7 @@ function LandlordInbox() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <LandlordDashboardSidebar />
+      <TenantDashboardSidebar />
       <div className="flex-1 p-6">
         <div className="bg-white shadow-md p-6 rounded-md mb-6">
           <h3 className="text-3xl font-bold text-blue-800">Inbox</h3>
@@ -286,6 +282,7 @@ function LandlordInbox() {
             </div>
 
             <div className="flex flex-1">
+              {/* Conversation list */}
               <div className="w-full md:w-1/3 bg-white border-gray-200 border-4 overflow-y-auto">
                 {loading ? (
                   <p className="p-4 text-gray-500">Loading conversations...</p>
@@ -320,9 +317,7 @@ function LandlordInbox() {
                         <div className="flex-1">
                           <p
                             className="font-light text-black"
-                            style={{
-                              fontSize: "12px",
-                            }}
+                            style={{ fontSize: "12px" }}
                           >
                             {other?.name}
                           </p>
@@ -331,9 +326,7 @@ function LandlordInbox() {
                           </p>
                           <p
                             className="font-light text-black truncate"
-                            style={{
-                              fontSize: "10px",
-                            }}
+                            style={{ fontSize: "10px" }}
                           >
                             {lastMsg?.content}
                           </p>
@@ -344,13 +337,13 @@ function LandlordInbox() {
                 )}
               </div>
 
+              {/* Message thread / Profile panel */}
               <div className="hidden md:block flex-1 p-4 bg-gray-50 overflow-y-auto">
                 {showProfile ? (
                   profileLoading && !profileDetails ? (
                     <p className="p-4 text-gray-500">Loading profile...</p>
                   ) : (
                     <div className="p-8 border-t border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-black">
-                      {/* Avatar */}
                       <h4 className="text-2xl font-bold mb-4 text-blue-950">
                         <Image
                           src={otherParticipant?.avatar || "/avatar1.jpg"}
@@ -361,7 +354,6 @@ function LandlordInbox() {
                         />
                       </h4>
 
-                      {/* Name */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Name: </strong>
                         <span className="font-light">
@@ -369,7 +361,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Email */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Email: </strong>
                         <span className="font-light">
@@ -377,7 +368,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Document Type */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Document Type: </strong>
                         <span className="font-light">
@@ -385,7 +375,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* ID Number */}
                       <p className="text-xl mb-2 text-center">
                         <strong>ID No: </strong>
                         <span className="font-light">
@@ -393,7 +382,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Document Image */}
                       {otherParticipant?.documentImage && (
                         <div className="mt-4">
                           <Image
@@ -408,7 +396,6 @@ function LandlordInbox() {
 
                       <hr className="w-full my-4 border-gray-300" />
 
-                      {/* Gender */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Gender: </strong>
                         <span className="font-light">
@@ -416,7 +403,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Age */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Age: </strong>
                         <span className="font-light">
@@ -424,7 +410,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Occupation */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Occupation: </strong>
                         <span className="font-light">
@@ -432,7 +417,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Marital Status */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Marital Status: </strong>
                         <span className="font-light">
@@ -440,7 +424,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Spouse Name & No of Children if Married */}
                       {otherParticipant?.maritalStatus === "Married" && (
                         <>
                           <p className="text-xl mb-2 text-center">
@@ -458,7 +441,6 @@ function LandlordInbox() {
                         </>
                       )}
 
-                      {/* Religion */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Religion: </strong>
                         <span className="font-light">
@@ -466,7 +448,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Company Name */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Company Name: </strong>
                         <span className="font-light">
@@ -474,7 +455,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Company Phone */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Company Phone: </strong>
                         <span className="font-light">
@@ -482,7 +462,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Company Email */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Company Email: </strong>
                         <span className="font-light">
@@ -490,7 +469,6 @@ function LandlordInbox() {
                         </span>
                       </p>
 
-                      {/* Current Address */}
                       <p className="text-xl mb-2 text-center">
                         <strong>Current Address: </strong>
                         <span className="font-light">
@@ -500,7 +478,6 @@ function LandlordInbox() {
 
                       <hr className="w-full my-4 border-gray-300" />
 
-                      {/* 2x2 Grid for City, State, Country, Zip Code */}
                       <div className="grid grid-cols-2 gap-4 text-xl mt-2 w-full max-w-sm">
                         <p className="text-center">
                           <strong>City: </strong>
@@ -600,7 +577,7 @@ function LandlordInbox() {
               </div>
             </div>
 
-            <LandlordDashboardFooter />
+            <TenantDashboardFooter />
             <ToastContainer />
             {openCompose && (
               <ComposeModal
@@ -612,7 +589,7 @@ function LandlordInbox() {
                 senderType={currentActorType}
                 receiverType={
                   normalizeRole(otherParticipant?.role) ||
-                  (currentActorType === "Landlord" ? "Tenant" : "Tenant")
+                  (currentActorType === "Tenant" ? "Landlord" : "Landlord")
                 }
                 onMessageSent={(data) => {
                   if (data?.message) {
@@ -628,4 +605,4 @@ function LandlordInbox() {
   );
 }
 
-export default LandlordInbox;
+export default TenantMessages;
