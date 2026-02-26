@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
 import { CldImage } from "next-cloudinary";
@@ -15,7 +15,9 @@ function LandlordInbox() {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showProfile, setShowProfile] = useState(false);
-  const [openCompose, setOpenCompose] = useState(false);
+  const [openCompose, setOpenCompose] = useState(false); // Restored — pending owner confirmation of purpose
+  const [inspectionLoading, setInspectionLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [loading, setLoading] = useState(true);
   const [replyLoading, setReplyLoading] = useState(false);
@@ -23,6 +25,12 @@ function LandlordInbox() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [currentActorId, setCurrentActorId] = useState(null);
   const [currentActorType, setCurrentActorType] = useState(null);
+  const messagesEndRef = useRef(null);
+
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -92,11 +100,16 @@ function LandlordInbox() {
         setMessages(data.messages || []);
         setShowProfile(false);
 
-        // Mark messages as read
+        // Mark messages as read and clear badge locally
         await fetch(`/api/message/${selectedConversation._id}/read`, {
           method: "PATCH",
           credentials: "include",
         });
+        setConversations((prev) =>
+          prev.map((c) =>
+            c._id === selectedConversation._id ? { ...c, unreadCount: 0 } : c
+          )
+        );
       } catch (err) {
         console.error("Fetch messages error:", err);
         toast.error(err.message);
@@ -105,6 +118,39 @@ function LandlordInbox() {
 
     fetchMessages();
   }, [selectedConversation]);
+
+  // SSE real-time connection — opens a persistent stream for the selected conversation
+  useEffect(() => {
+    if (!selectedConversation?._id) return;
+
+    const es = new EventSource(
+      `/api/message/stream?conversationId=${selectedConversation._id}`
+    );
+
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "newMessage") {
+          setMessages((prev) => {
+            // Deduplicate: sender already added optimistically, SSE would double it
+            const exists = prev.some((m) => m._id === data.message._id);
+            if (exists) return prev;
+            return [...prev, data.message];
+          });
+        }
+      } catch {
+        // ignore parse errors
+      }
+    };
+
+    es.onerror = () => {
+      es.close();
+    };
+
+    return () => {
+      es.close();
+    };
+  }, [selectedConversation?._id]);
 
   // Handle sending reply
   const handleSendReply = async () => {
@@ -151,6 +197,72 @@ function LandlordInbox() {
       toast.error(err.message);
     } finally {
       setReplyLoading(false);
+    }
+  };
+
+  // Proceed with tenant for inspection
+  const handleProceedWithInspection = async () => {
+    if (!selectedConversation) return;
+
+    try {
+      setInspectionLoading(true);
+      const res = await fetch(`/api/message/${selectedConversation._id}/inspection`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to proceed with inspection");
+        return;
+      }
+
+      // Update conversation status locally
+      setSelectedConversation((prev) => ({ ...prev, status: "inspection" }));
+      setConversations((prev) =>
+        prev.map((c) =>
+          c._id === selectedConversation._id ? { ...c, status: "inspection" } : c
+        )
+      );
+      if (data.message) {
+        setMessages((prev) => [...prev, data.message]);
+      }
+      toast.success("Tenant notified for inspection!");
+    } catch (err) {
+      console.error("Proceed with inspection error:", err);
+      toast.error(err.message);
+    } finally {
+      setInspectionLoading(false);
+    }
+  };
+
+  // Generic status action handler
+  const handleStatusAction = async (endpoint, successMsg) => {
+    if (!selectedConversation) return;
+    try {
+      setActionLoading(true);
+      const res = await fetch(`/api/message/${selectedConversation._id}/${endpoint}`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Action failed");
+        return;
+      }
+      setSelectedConversation((prev) => ({ ...prev, status: data.conversation.status }));
+      setConversations((prev) =>
+        prev.map((c) =>
+          c._id === selectedConversation._id ? { ...c, status: data.conversation.status } : c
+        )
+      );
+      if (data.message) setMessages((prev) => [...prev, data.message]);
+      toast.success(successMsg);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -250,10 +362,10 @@ function LandlordInbox() {
                   My messages
                 </h5>
 
+                {/* Compose button — pending owner confirmation of purpose (see Figma) */}
                 <button
                   onClick={() => setOpenCompose(true)}
-                  className="text-blue-800 hover:underline mt-14"
-                  style={{ fontSize: "12px" }}
+                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 rounded"
                 >
                   Compose
                 </button>
@@ -318,22 +430,39 @@ function LandlordInbox() {
                         </div>
 
                         <div className="flex-1">
-                          <p
-                            className="font-light text-black"
-                            style={{
-                              fontSize: "12px",
-                            }}
-                          >
-                            {other?.name}
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <p
+                              className="font-light text-black"
+                              style={{ fontSize: "12px" }}
+                            >
+                              {other?.name}
+                            </p>
+                            {conv.unreadCount > 0 && (
+                              <span className="bg-blue-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                {conv.unreadCount > 9 ? "9+" : conv.unreadCount}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs font-semibold text-black">
                             {conv.property?.title}
                           </p>
+                          {conv.status && conv.status !== "active" && (
+                            <span
+                              className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-white capitalize ${
+                                conv.status === "inspection" ? "bg-amber-500" :
+                                conv.status === "accepted"   ? "bg-blue-600"  :
+                                conv.status === "completed"  ? "bg-green-600" :
+                                conv.status === "rejected"   ? "bg-red-500"   :
+                                                               "bg-gray-400"
+                              }`}
+                              style={{ fontSize: "9px" }}
+                            >
+                              {conv.status}
+                            </span>
+                          )}
                           <p
                             className="font-light text-black truncate"
-                            style={{
-                              fontSize: "10px",
-                            }}
+                            style={{ fontSize: "10px" }}
                           >
                             {lastMsg?.content}
                           </p>
@@ -531,9 +660,70 @@ function LandlordInbox() {
                   )
                 ) : selectedConversation && messages.length > 0 ? (
                   <div className="p-4 bg-white h-full flex flex-col">
-                    <p className="text-blue-950 font-bold text-2xl mb-4">
-                      {selectedConversation.property?.title}
-                    </p>
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                      <p className="text-blue-950 font-bold text-2xl">
+                        {selectedConversation.property?.title}
+                      </p>
+
+                      {/* Status action buttons — change based on conversation stage */}
+                      <div className="flex gap-2 flex-wrap">
+                        {selectedConversation.status === "active" && (
+                          <button
+                            onClick={handleProceedWithInspection}
+                            disabled={inspectionLoading}
+                            className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-green-700 hover:bg-green-600 disabled:bg-gray-400 transition duration-200"
+                          >
+                            {inspectionLoading ? "Processing..." : "Proceed with Inspection"}
+                          </button>
+                        )}
+
+                        {selectedConversation.status === "inspection" && (
+                          <>
+                            <button
+                              onClick={() => handleStatusAction("accept", "Tenant accepted!")}
+                              disabled={actionLoading}
+                              className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-blue-700 hover:bg-blue-600 disabled:bg-gray-400 transition duration-200"
+                            >
+                              Accept Tenant
+                            </button>
+                            <button
+                              onClick={() => handleStatusAction("reject", "Tenant rejected after inspection.")}
+                              disabled={actionLoading}
+                              className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-red-600 hover:bg-red-500 disabled:bg-gray-400 transition duration-200"
+                            >
+                              Reject After Inspection
+                            </button>
+                            <button
+                              onClick={() => handleStatusAction("cancel", "Inspection cancelled.")}
+                              disabled={actionLoading}
+                              className="px-4 py-2 text-sm font-semibold text-gray-700 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 transition duration-200"
+                            >
+                              Cancel Inspection
+                            </button>
+                          </>
+                        )}
+
+                        {selectedConversation.status === "accepted" && (
+                          <button
+                            onClick={() => handleStatusAction("complete", "Rental marked as completed!")}
+                            disabled={actionLoading}
+                            className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-purple-700 hover:bg-purple-600 disabled:bg-gray-400 transition duration-200"
+                          >
+                            {actionLoading ? "Processing..." : "Mark as Completed"}
+                          </button>
+                        )}
+
+                        {["completed", "rejected", "cancelled"].includes(selectedConversation.status) && (
+                          <span className={`px-4 py-2 text-sm font-semibold rounded-lg capitalize ${
+                            selectedConversation.status === "completed" ? "bg-green-100 text-green-800" :
+                            selectedConversation.status === "rejected" ? "bg-red-100 text-red-800" :
+                            "bg-gray-100 text-gray-600"
+                          }`}>
+                            {selectedConversation.status}
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
                     <div className="flex-1 overflow-y-auto mb-4 space-y-4">
                       {messages.map((msg, idx) => {
@@ -564,28 +754,35 @@ function LandlordInbox() {
                           </div>
                         );
                       })}
+                      <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter" && !replyLoading) {
-                            handleSendReply();
-                          }
-                        }}
-                        placeholder="Type a message..."
-                        className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                      />
-                      <button
-                        onClick={handleSendReply}
-                        disabled={replyLoading}
-                        className="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-                      >
-                        {replyLoading ? "Sending..." : "Send"}
-                      </button>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter" && !replyLoading) {
+                              handleSendReply();
+                            }
+                          }}
+                          placeholder="Type a message..."
+                          maxLength={1000}
+                          className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                        />
+                        <button
+                          onClick={handleSendReply}
+                          disabled={replyLoading || replyText.length > 1000}
+                          className="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                        >
+                          {replyLoading ? "Sending..." : "Send"}
+                        </button>
+                      </div>
+                      <p className={`text-xs text-right ${replyText.length >= 1000 ? "text-red-500" : "text-gray-400"}`}>
+                        {replyText.length}/1000
+                      </p>
                     </div>
                   </div>
                 ) : selectedConversation ? (
@@ -602,23 +799,10 @@ function LandlordInbox() {
 
             <LandlordDashboardFooter />
             <ToastContainer />
+            {/* ComposeModal — restored for owner review, not yet wired to send */}
             {openCompose && (
               <ComposeModal
-                isOpen={openCompose}
                 onClose={() => setOpenCompose(false)}
-                senderId={currentActorId}
-                receiverId={otherParticipant?._id}
-                propertyId={selectedConversation?.property?._id}
-                senderType={currentActorType}
-                receiverType={
-                  normalizeRole(otherParticipant?.role) ||
-                  (currentActorType === "Landlord" ? "Tenant" : "Tenant")
-                }
-                onMessageSent={(data) => {
-                  if (data?.message) {
-                    setMessages((prev) => [...prev, data.message]);
-                  }
-                }}
               />
             )}
           </div>

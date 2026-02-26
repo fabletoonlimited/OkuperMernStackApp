@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PropExpandedNav from "../../components/propExpandedNav";
 import { faBed, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FaBed } from "@fortawesome/free-solid-svg-icons";
@@ -8,22 +8,27 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import propertyData from "../../data/property";
+// import propertyData from "../../data/property"; // replaced by real API fetch
 import TrendingRentIndexCarousel from "../../components/trendingRentIndexCarousel";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import Footer from "../../components/footer";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import StarRating from "@/components/starRating/starRating";
-import property from "../../data/property";
+// import property from "../../data/property"; // replaced by real API fetch
 import { toast, ToastContainer } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 const Index = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const propertyId = searchParams.get("id");
 
     const [hoverLeft, setHoverLeft] = useState(false);
     const [hoverRight, setHoverRight] = useState(false);
+    const [property, setProperty] = useState(null);
+    const [propertyLoading, setPropertyLoading] = useState(true);
+    const [sendingMessage, setSendingMessage] = useState(false);
 
     // Separate refs for each carousel
     const trendingRef = useRef(null);
@@ -38,116 +43,104 @@ const Index = () => {
         if (ref.current) {
             ref.current.scrollBy({ left: 400, behavior: "smooth" });
         }
-    }; 
+    };
 
-    // Filter property items
-    const propertyItems = propertyData.filter(
-        (item) =>
-        item.img &&
-        Array.isArray(item.img) &&
-        item.img.length > 0 &&
-        item._id,
-    );
-
-    // Mix ad banners
-    const mixedItems = [];
-    let counter = 0;
-    for (let i = 0; i < propertyItems.length; i++) {
-        mixedItems.push(propertyItems[i]);
-        counter++;
-        if (counter === 6) {
-            mixedItems.push({
-                _id: "ad-banner",
-                isAd: true,
-                topic: "Ad Banner",
-                desc: "This is an Ad",
-                btn: "url",
-            });
-            counter = 0;
+    // Fetch real property from API
+    useEffect(() => {
+        if (!propertyId) {
+            setPropertyLoading(false);
+            return;
         }
-    }
+        const fetchProperty = async () => {
+            try {
+                const res = await fetch(`/api/property?id=${propertyId}`);
+                if (!res.ok) {
+                    toast.error("Failed to load property");
+                    return;
+                }
+                const data = await res.json();
+                setProperty(data);
+            } catch (err) {
+                console.error("Fetch property error:", err);
+                toast.error("Failed to load property");
+            } finally {
+                setPropertyLoading(false);
+            }
+        };
+        fetchProperty();
+    }, [propertyId]);
+
+    // Build image list from real property data
+    const images = property
+        ? [property.previewPic, property.Img1, property.Img2, property.Img3, property.Img4, property.Img5, property.Img6].filter(Boolean)
+        : ["/property-image.jpg"];
 
     const [selectedImage, setSelectedImage] = useState(null);
-
-    const images = [
-        "/property-image.jpg",
-        "/property-image.jpg",
-        "/property-image.jpg",
-        "/property-image.jpg",
-        "/property-image.jpg",
-    ];
 
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
         phone: "",
         message: "",
-});
-
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prev) => ({ ...prev, [name]: value }));
-};
-
-const requireLogin = () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    toast.error("Please login to send a request");
-    router.push("/signInTenant");
-    return false;
-  }
-  return true;
-};
-
-const handlePropertyRequestForm = async (e) => {
-  e.preventDefault();
-
-  if (!requireLogin()) return;
-
-  if (
-    !formData.firstName ||
-    !formData.lastName ||
-    // !formData.phone ||
-    !formData.message
-  ) {
-    toast.error("Please fill all required fields");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("/api/propertyRequestForm", {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-    },
-        body: JSON.stringify({
-            ...formData,
-            userId: "userId",
-            propertyId: "propertyId",
-            tenantId: "tenantId",
-        }),
     });
 
-    const data = await res.json();
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-    if (!res.ok) {
-      toast.error(data.message || "Failed to send request");
-      return;
-    }
+    // Sends the first message from tenant to landlord via /api/message
+    const handlePropertyRequestForm = async (e) => {
+        e.preventDefault();
 
-    toast.success("Property interest sent to landlord successfully");
+        if (!formData.message.trim()) {
+            toast.error("Please write a message");
+            return;
+        }
 
-    setTimeout(() => {
-      router.push("/message");
-    }, 1500);
-  } catch (error) {
-    console.error("Property interest sending error:", error);
-    toast.error("Server error");
-  }
-};
+        if (!property?.landlord) {
+            toast.error("Property landlord not found");
+            return;
+        }
+
+        try {
+            setSendingMessage(true);
+            const res = await fetch("/api/message", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    receiverId: property.landlord,
+                    receiverType: "Landlord",
+                    propertyId: property._id,
+                    content: formData.message,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) {
+                    toast.error("Please login as a tenant to send a message");
+                    router.push("/signInTenant");
+                    return;
+                }
+                toast.error(data.error || "Failed to send message");
+                return;
+            }
+
+            toast.success("Message sent to landlord successfully!");
+            setFormData({ firstName: "", lastName: "", phone: "", message: "" });
+            setTimeout(() => {
+                router.push("/tenantDashboardInbox");
+            }, 1500);
+        } catch (error) {
+            console.error("Send message error:", error);
+            toast.error("Server error");
+        } finally {
+            setSendingMessage(false);
+        }
+    };
 
 
     return (
@@ -177,6 +170,7 @@ const handlePropertyRequestForm = async (e) => {
                 </div>
             )}
 
+            <ToastContainer />
             <PropExpandedNav />
             <div>
                 <div>
@@ -268,13 +262,13 @@ const handlePropertyRequestForm = async (e) => {
                 <div className="flex flex-col md:flex-row justify-between mt-4 gap-6 items-center ">
                     <div className="w-full md:flex-1 p-4 rounded-lg ml-2 md:ml-0">
                         <h2 className="font-bold text-2xl md:text-4xl mb-1">
-                            4 Bedroom Flat with BQ
+                            {propertyLoading ? "Loading..." : (property?.title || "Property")}
                         </h2>
                         <h4 className="text-blue-950 text-2xl md:text-2xl md:mb-2 mb-5">
-                            Adelabu, Surulere, Lagos.
+                            {property?.address || ""}{property?.state ? `, ${property.state}` : ""}
                         </h4>
                         <span className="text-5xl md:text-5xl md:font-bold font-black">
-                            ₦5,500,000
+                            {property?.price ? `₦${Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
                         </span>
                         <p className="text-lg md:mt-1 mt-2 text-blue-900">
                             Price is base rent and doesn't require fees.
@@ -285,13 +279,13 @@ const handlePropertyRequestForm = async (e) => {
                                 <div>
                                     <FontAwesomeIcon icon={faHouse} />
                                 </div>
-                                <div> Bungalow building</div>
+                                <div>{property?.propertyType || ""}</div>
                             </div>
                             <div className="md:px-16 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-20.5 py-4 border-blue- flex  justify-between gap-3 ">
                                 <div>
                                     <FontAwesomeIcon icon={faBed} />
                                 </div>
-                                <div> 3 Bed | 2 Toilet</div>
+                                <div>{property?.bed || ""} | {property?.bath || ""}</div>
                             </div>
                         </div>
                     </div>
@@ -337,7 +331,7 @@ const handlePropertyRequestForm = async (e) => {
 
                             <div>
                                 <h3 className="text-2xl md:text-2xl">
-                                    Username
+                                    {property?.listedBy || "Landlord"}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <span className="text-green-600 font-light md:text-base">
@@ -486,7 +480,7 @@ const handlePropertyRequestForm = async (e) => {
                                 type="tel"
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                name="Phone"
+                                name="phone"
                                 placeholder="Phone number"
                                 className="w-full border px-3 py-2"
                             />
@@ -508,9 +502,10 @@ const handlePropertyRequestForm = async (e) => {
 
                         <button
                             type="submit"
-                            className="mt-4 w-full md:w-full px-6 py-3 text-2xl font-medium text-white bg-blue-950 rounded-lg shadow-md 
-                                hover:bg-blue-700 transition duration-300 ease-in-out">
-                            Send request to apply
+                            disabled={sendingMessage}
+                            className="mt-4 w-full md:w-full px-6 py-3 text-2xl font-medium text-white bg-blue-950 rounded-lg shadow-md
+                                hover:bg-blue-700 transition duration-300 ease-in-out disabled:bg-gray-400">
+                            {sendingMessage ? "Sending..." : "Send request to apply"}
                         </button>
 
                         <div className="mb-8 mt-8 font-medium text-3xl">
@@ -523,7 +518,7 @@ const handlePropertyRequestForm = async (e) => {
                             />
                             <div>
                                 <h3 className="text-2xl text-black md:text-2xl">
-                                    Username
+                                    {property?.listedBy || "Landlord"}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <span className="text-green-600 font-light">
@@ -615,7 +610,8 @@ const handlePropertyRequestForm = async (e) => {
                             scrollbar-hide
                     ">
                     <div className="flex gap-4 md:flex-nowrap">
-                            <TrendingRentIndexCarousel rent={mixedItems} />
+                            {/* mixedItems was built from static data — passing empty for now */}
+                            <TrendingRentIndexCarousel rent={[]} />
                         </div>
                     </div>
                 </section>

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null); // "landlord" | "tenant" | null
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -20,17 +21,24 @@ function Nav() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch("/api/user/me", {
           credentials: "include",
         });
 
-        setIsAuthenticated(res.ok);
+        if (res.ok) {
+          const data = await res.json();
+          setIsAuthenticated(true);
+          setUserRole(data.role || null); // "landlord" or "tenant"
+        } else {
+          setIsAuthenticated(false);
+          setUserRole(null);
+        }
       } catch {
         setIsAuthenticated(false);
+        setUserRole(null);
       } finally {
         setLoading(false);
       }
-
     };
 
     checkAuth();
@@ -113,12 +121,16 @@ function Nav() {
                             <li
                                 className={styles.navbar__item}
                                 onClick={() => {
-                                setIsMenuOpen(false);
-                                    router.push("/landlordDashboard");
+                                    setIsMenuOpen(false);
+                                    // Route to the correct dashboard based on role
+                                    if (userRole === "tenant") {
+                                        router.push("/tenantDashboard");
+                                    } else {
+                                        router.push("/landlordDashboard");
+                                    }
                                 }}
                                 style={{ cursor: "pointer" }}>
-                                <FontAwesomeIcon icon={faUserCircle} size="lg" 
-                            />
+                                <FontAwesomeIcon icon={faUserCircle} size="lg" />
                             </li>
                         )}
                     </>

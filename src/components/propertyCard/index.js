@@ -13,27 +13,35 @@ import "react-toastify/dist/ReactToastify.css";
 //Cloudinary config
 
 export default function PropertyCard({
+    _id,
     previewPic,
     unitsAvailable,
     price,
     savedHomes,
+    title,
     desc,
+    address,
     location,
     category,
     rating,
+    bed,
     numberOfBed,
-    propertyType,
+    bath,
     numberOfBath,
+    propertyType,
 }) {
-    const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
-    const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
-    const firstImage =
-        Array.isArray(previewPic) && previewPic[0]?.publicId
-            ? img[0].publicId
-            : "placeholder-image.jpg";
+    // previewPic from the API is already a full Cloudinary URL string
+    const imageSrc = previewPic || "/property-image.jpg";
 
-    const CLOUDINARY_URL = `${BASE_URL}/${firstImage}`;
-    const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
+    // old image construction — was crashing with undefined `img` and `fallbackImage`
+    // const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
+    // const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+    // const firstImage =
+    //     Array.isArray(previewPic) && previewPic[0]?.publicId
+    //         ? img[0].publicId
+    //         : "placeholder-image.jpg";
+    // const CLOUDINARY_URL = `${BASE_URL}/${firstImage}`;
+    // const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
 
     const handleInputChange = (e) => {
         setFormData((prev) => ({
@@ -77,7 +85,7 @@ export default function PropertyCard({
 
     return (
         <>
-            <Link href={"/propertyCardExpanded"}>
+            <Link href={`/propertyCardExpanded?id=${_id}`}>
                 <div
                     className="rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300 
         w-[310px] md:min-w-[310px] md:min-h-[520px] min-h-[520px] md:mt-13 mt-0 col-span-full hover:scale-105"
@@ -90,12 +98,10 @@ export default function PropertyCard({
                     }}>
                     <div className="relative h-72 w-[310px] md:h-72">
                         <Image
-                            src={CLOUDINARY_URL}
-                            blurDataURL={BLUR_URL}
-                            alt={`Property: ${desc || "No description"}`}
+                            src={imageSrc}
+                            alt={`Property: ${title || desc || "Property"}`}
                             width={310}
                             height={250}
-                            placeholder="blur"
                             draggable={false}
                             unoptimized={true}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -124,15 +130,15 @@ export default function PropertyCard({
 
                     <div className="p-4 text-center -mt-30 md:-mt-30">
                         <h3 className="text-lg font-semibold mt-10 mb-2">
-                            ₦{price ? price.toLocaleString() : "N/A"} / yr
+                            ₦{price ? Number(String(price).replace(/[^0-9.]/g, "")).toLocaleString() : "N/A"} / yr
                         </h3>
 
                         <p className="text-sm text-gray-800 mt-2">
-                            {desc || "No description provided mb-4"}
+                            {title || desc || "No description provided"}
                         </p>
 
                         <p className="text-sm font-medium text-blue-700 mt-1 mb-4">
-                            {location || "Unknown location"}
+                            {address || location || "Unknown location"}
                         </p>
 
                         <p className="text-md font-bold text-blue-950">
@@ -154,13 +160,13 @@ export default function PropertyCard({
 
                         <div className="flex mt-2 justify-around items-center mb-5 md:ml-2 ml-2">
                             <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
-                                {numberOfBed ?? 0} Bdr
+                                {bed || numberOfBed || "N/A"}
                             </span>
                             <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
                                 {propertyType || "N/A"}
                             </span>
                             <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
-                                {numberOfBath ?? 0} Bath
+                                {bath || numberOfBath || "N/A"}
                             </span>
                         </div>
                     </div>

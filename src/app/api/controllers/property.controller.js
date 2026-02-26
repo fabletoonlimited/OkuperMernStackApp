@@ -66,7 +66,7 @@ export const createProperty = async (data) => {
 
   try {
     const newProperty = await Property.create({
-      landlord: landlord._Id,
+      landlord: landlord._id, // was landlord._Id — JS is case-sensitive, correct key is _id
       previewPic,
       Img1,
       Img2,
@@ -102,7 +102,8 @@ export const createProperty = async (data) => {
     
   } catch (dbError) {
     console.error("DB error:", dbError);
-    throw new Error("Failed to create property");
+    // re-throw the real error so we can see what Mongoose is actually rejecting
+    throw new Error(dbError.message || "Failed to create property");
   }
 };
 
