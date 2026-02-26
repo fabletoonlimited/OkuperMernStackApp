@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 import { Message, Conversation } from "../models/messageModel.js";
 import Tenant from "../models/tenantModel.js";
 import Landlord from "../models/landlordModel.js";
-import "../models/propertyModel.js"; // register Property schema for .populate()
+import Property from "../models/propertyModel.js";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import dbConnect from "@/app/lib/mongoose";
-import { emitToConversation } from "@/app/lib/sseStore.js";
+import { emitToConversation, emitReadReceipt, emitTyping } from "@/app/lib/sseStore.js";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -202,22 +202,23 @@ export const sendMessage = async (req) => {
     }
 
     const body = await req.json();
-    const { receiverId, receiverType, propertyId, content } = body;
+    const { receiverId, receiverType, propertyId, content, fileUrl, fileType } = body;
 
-    if (!content || !content.trim()) {
-      return NextResponse.json({ error: "Message content is required" }, { status: 400 });
+    if (!content?.trim() && !fileUrl) {
+      return NextResponse.json({ error: "Message must have content or a file" }, { status: 400 });
     }
-    if (content.trim().length > 1000) {
+    if (content && content.trim().length > 1000) {
       return NextResponse.json({ error: "Message cannot exceed 1000 characters" }, { status: 400 });
     }
 
     const senderId = payload.id;
 
-    // Run all lookups in parallel — sender detection, receiver validation, conversation check
-    const [isTenant, isLandlord, receiver, existingConversation] = await Promise.all([
+    // Run all lookups in parallel — sender detection, receiver validation, property check, conversation check
+    const [isTenant, isLandlord, receiver, property, existingConversation] = await Promise.all([
       Tenant.findById(senderId),
       Landlord.findById(senderId),
       receiverType === "Tenant" ? Tenant.findById(receiverId) : Landlord.findById(receiverId),
+      Property.findById(propertyId).lean(),
       Conversation.findOne({
         participants: { $all: [senderId, receiverId] },
         property: propertyId,
@@ -241,6 +242,16 @@ export const sendMessage = async (req) => {
       return NextResponse.json({ error: "Invalid receiver" }, { status: 400 });
     }
 
+    if (!property) {
+      return NextResponse.json({ error: "Property not found" }, { status: 404 });
+    }
+
+    // Verify the landlord participant actually owns the property
+    const landlordParticipantId = receiverType === "Landlord" ? receiverId : senderId;
+    if (property.landlord.toString() !== landlordParticipantId) {
+      return NextResponse.json({ error: "Receiver is not the property owner" }, { status: 403 });
+    }
+
     // enforce tenant ↔ landlord only
     if (senderType === receiverType) {
       return NextResponse.json(
@@ -249,13 +260,11 @@ export const sendMessage = async (req) => {
       );
     }
 
-    // Atomic upsert — prevents duplicate conversations under concurrent requests.
-    // $setOnInsert only applies when a new document is created, never overwrites existing.
-    const conversation = existingConversation ?? await Conversation.findOneAndUpdate(
-      { participants: { $all: [senderId, receiverId] }, property: propertyId },
-      { $setOnInsert: { participants: [senderId, receiverId], property: propertyId, status: "active" } },
-      { upsert: true, new: true },
-    );
+    const conversation = existingConversation ?? await Conversation.create({
+      participants: [senderId, receiverId],
+      property: propertyId,
+      status: "active",
+    });
 
 
     // create message
@@ -266,7 +275,9 @@ export const sendMessage = async (req) => {
       receiverType,
       property: propertyId,
       conversationId: conversation._id,
-      content,
+      content: content?.trim() || "",
+      ...(fileUrl && { fileUrl }),
+      ...(fileType && { fileType }),
     });
 
     // update conversation with last message
@@ -539,6 +550,35 @@ export const completeRental = async (req, conversationId) => {
   }
 };
 
+// Broadcast a typing indicator to the other participant via SSE (no DB write)
+export const sendTypingIndicator = async (req, conversationId) => {
+  try {
+    await dbConnect();
+    const payload = await getUserFromToken();
+    if (!payload?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = payload.id;
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation || !conversation.participants.some(p => p.toString() === userId)) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+
+    const actor = await Tenant.findById(userId).lean() || await Landlord.findById(userId).lean();
+    const senderName = actor
+      ? `${actor.firstName || ""} ${actor.lastName || ""}`.trim()
+      : "Someone";
+
+    emitTyping(conversationId, senderName);
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (err) {
+    console.error("Typing indicator error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+};
+
 // Mark messages as read in a conversation
 export const markMessagesAsRead = async (req, conversationId) => {
   try {
@@ -563,6 +603,11 @@ export const markMessagesAsRead = async (req, conversationId) => {
       { conversationId, receiver: userId, isRead: false },
       { isRead: true },
     );
+
+    // Notify the sender that their messages have been read
+    if (result.modifiedCount > 0) {
+      emitReadReceipt(conversationId, userId);
+    }
 
     return NextResponse.json(
       { success: true, modifiedCount: result.modifiedCount },

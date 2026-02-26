@@ -7,6 +7,7 @@ import { Conversation } from "../../models/messageModel.js";
 import {
   registerConnection,
   removeConnection,
+  sendPing,
 } from "@/app/lib/sseStore.js";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -65,10 +66,7 @@ export async function GET(req) {
     start(c) {
       controller = c;
       registerConnection(conversationId, controller);
-
-      // Send an initial keep-alive comment so the browser confirms connection
-      const encoder = new TextEncoder();
-      controller.enqueue(encoder.encode(": connected\n\n"));
+      sendPing(controller);
     },
     cancel() {
       removeConnection(conversationId, controller);

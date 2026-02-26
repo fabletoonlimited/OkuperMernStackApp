@@ -44,6 +44,55 @@ export const removeConnection = (conversationId, controller) => {
 };
 
 /**
+ * Emit a read receipt event to all clients in a conversation
+ */
+export const emitReadReceipt = (conversationId, readerId) => {
+  const key = conversationId.toString();
+  const connections = sseConnections.get(key);
+  if (!connections || connections.size === 0) return;
+
+  const payload = encoder.encode(
+    `data: ${JSON.stringify({ type: "messagesRead", readerId })}\n\n`
+  );
+
+  for (const controller of connections) {
+    try {
+      controller.enqueue(payload);
+    } catch {
+      connections.delete(controller);
+    }
+  }
+};
+
+/**
+ * Emit a typing indicator event to all clients in a conversation
+ */
+export const emitTyping = (conversationId, senderName) => {
+  const key = conversationId.toString();
+  const connections = sseConnections.get(key);
+  if (!connections || connections.size === 0) return;
+
+  const payload = encoder.encode(
+    `data: ${JSON.stringify({ type: "typing", senderName })}\n\n`
+  );
+
+  for (const controller of connections) {
+    try {
+      controller.enqueue(payload);
+    } catch {
+      connections.delete(controller);
+    }
+  }
+};
+
+/**
+ * Send the initial keep-alive ping to a newly connected client
+ */
+export const sendPing = (controller) => {
+  controller.enqueue(encoder.encode(": connected\n\n"));
+};
+
+/**
  * Emit a new message event to all clients connected to a conversation
  */
 export const emitToConversation = (conversationId, message) => {

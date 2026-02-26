@@ -64,7 +64,8 @@ const messageSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
       trim: true,
       maxlength: [1000, "Message cannot exceed 1000 characters"],
     },
@@ -75,6 +76,14 @@ const messageSchema = new mongoose.Schema(
     isRead: {
       type: Boolean,
       default: false,
+    },
+    fileUrl: {
+      type: String,
+      default: null,
+    },
+    fileType: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true },
