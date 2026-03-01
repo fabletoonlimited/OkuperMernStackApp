@@ -15,7 +15,23 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
   const [landlordId, setLandlordId] = useState(null);
-  
+
+  // Fetch the logged-in landlord's ID from the JWT cookie on mount
+  useEffect(() => {
+    const fetchLandlordId = async () => {
+      try {
+        const res = await fetch("/api/user/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setLandlordId(data.actorId || null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch landlord ID:", err);
+      }
+    };
+    fetchLandlordId();
+  }, []);
+
   const [formData, setFormData] = useState({
     landlord: landlordId || "",
     previewPic: "",
@@ -264,7 +280,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          landlord: landlordId,
+          landlordId, // was sent as "landlord" before — route expects "landlordId"
           propertyType,
           bed,
           bath,
@@ -547,7 +563,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  placeholder="N10,000,000"
+                  placeholder="e.g. 500000 (numbers only)"
                   className="border border-[#233670] md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
                 />
               </span>

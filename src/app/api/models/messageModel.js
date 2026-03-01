@@ -17,9 +17,18 @@ const conversationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
     },
+    status: {
+      type: String,
+      enum: ["active", "inspection", "accepted", "rejected", "cancelled", "completed"],
+      default: "active",
+    },
   },
   { timestamps: true },
 );
+
+// Conversation indexes
+conversationSchema.index({ participants: 1, updatedAt: -1 }); // inbox list query + sort
+conversationSchema.index({ participants: 1, property: 1 });   // duplicate conversation check in sendMessage
 
 export const Conversation =
   mongoose.models.Conversation ||
@@ -55,8 +64,10 @@ const messageSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
       trim: true,
+      maxlength: [1000, "Message cannot exceed 1000 characters"],
     },
     conversationId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -66,9 +77,21 @@ const messageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    fileUrl: {
+      type: String,
+      default: null,
+    },
+    fileType: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true },
 );
+
+// Message indexes
+messageSchema.index({ conversationId: 1, createdAt: 1 });          // fetch messages in order
+messageSchema.index({ conversationId: 1, receiver: 1, isRead: 1 }); // markMessagesAsRead query
 
 export const Message =
   mongoose.models.Message || mongoose.model("Message", messageSchema);

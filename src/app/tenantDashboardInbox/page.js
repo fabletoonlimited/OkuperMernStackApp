@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 import { CldImage } from "next-cloudinary";
@@ -15,14 +15,53 @@ function TenantInbox() {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showProfile, setShowProfile] = useState(false);
-  const [openCompose, setOpenCompose] = useState(false);
+  const [openCompose, setOpenCompose] = useState(false); // Restored — pending owner confirmation of purpose
   const [replyText, setReplyText] = useState("");
   const [loading, setLoading] = useState(true);
   const [replyLoading, setReplyLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [readByOther, setReadByOther] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState("disconnected");
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
+  const typingDebounceRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const messagesContainerRef = useRef(null);
+  const [convSearch, setConvSearch] = useState("");
+  const [msgSearch, setMsgSearch] = useState("");
+  const [showMsgSearch, setShowMsgSearch] = useState(false);
   const [profileDetails, setProfileDetails] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [currentActorId, setCurrentActorId] = useState(null);
   const [currentActorType, setCurrentActorType] = useState(null);
+  const messagesEndRef = useRef(null);
+
+  // Request browser notification permission on mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Seed readByOther from loaded messages — handles the case where the other
+  // party already read messages before this session started
+  useEffect(() => {
+    if (!messages.length || !currentActorId) return;
+    const alreadySeen = messages.some((msg) => {
+      const sid = msg?.sender && typeof msg.sender === "object"
+        ? String(msg.sender._id || msg.sender.id || "")
+        : String(msg.sender || "");
+      return sid === String(currentActorId) && msg.isRead === true;
+    });
+    if (alreadySeen) setReadByOther(true);
+  }, [messages, currentActorId]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -92,11 +131,16 @@ function TenantInbox() {
         setMessages(data.messages || []);
         setShowProfile(false);
 
-        // Mark messages as read
+        // Mark messages as read and clear badge locally
         await fetch(`/api/message/${selectedConversation._id}/read`, {
           method: "PATCH",
           credentials: "include",
         });
+        setConversations((prev) =>
+          prev.map((c) =>
+            c._id === selectedConversation._id ? { ...c, unreadCount: 0 } : c
+          )
+        );
       } catch (err) {
         console.error("Fetch messages error:", err);
         toast.error(err.message);
@@ -106,12 +150,116 @@ function TenantInbox() {
     fetchMessages();
   }, [selectedConversation]);
 
-  // Handle sending reply
-  const handleSendReply = async () => {
-    if (!replyText.trim() || !selectedConversation) {
-      toast.error("Please enter a message");
+  // SSE real-time connection — auto-reconnects with exponential backoff
+  useEffect(() => {
+    if (!selectedConversation?._id) return;
+
+    let es;
+    let retryCount = 0;
+    let retryTimeout;
+
+    const connect = () => {
+      es = new EventSource(
+        `/api/message/stream?conversationId=${selectedConversation._id}`
+      );
+
+      es.onopen = () => {
+        retryCount = 0;
+        setConnectionStatus("connected");
+      };
+
+      es.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "newMessage") {
+            setMessages((prev) => {
+              const exists = prev.some((m) => m._id === data.message._id);
+              if (exists) return prev;
+              return [...prev, data.message];
+            });
+            // Push notification when tab is hidden and message is from the other party
+            if (
+              typeof document !== "undefined" &&
+              document.hidden &&
+              typeof Notification !== "undefined" &&
+              Notification.permission === "granted" &&
+              normalizeId(data.message.sender?._id) !== normalizeId(currentActorId)
+            ) {
+              new Notification(data.message.sender?.name || "New message", {
+                body: data.message.fileUrl
+                  ? data.message.fileType?.startsWith("image/") ? "📷 Image" : "📄 Document"
+                  : data.message.content?.slice(0, 80),
+                icon: data.message.sender?.avatar || "/favicon.ico",
+              });
+            }
+          } else if (data.type === "messagesRead") {
+            setReadByOther(true);
+          } else if (data.type === "typing") {
+            setIsOtherTyping(true);
+            clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => setIsOtherTyping(false), 3000);
+          }
+        } catch {
+          // ignore parse errors
+        }
+      };
+
+      es.onerror = () => {
+        es.close();
+        setConnectionStatus("reconnecting");
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+        retryCount++;
+        retryTimeout = setTimeout(connect, delay);
+      };
+    };
+
+    connect();
+
+    return () => {
+      clearTimeout(retryTimeout);
+      es?.close();
+      setConnectionStatus("disconnected");
+    };
+  }, [selectedConversation?._id]);
+
+  // Throttled typing indicator — fires immediately on first keystroke, then at most
+  // once every 2s while typing continues. Receiver resets a 3s timer on each event,
+  // so the indicator stays up the whole time and clears ~3s after typing stops.
+  const handleTyping = useCallback(() => {
+    if (!selectedConversation?._id) return;
+    if (typingDebounceRef.current) return; // throttle: skip if fired recently
+    fetch(`/api/message/${selectedConversation._id}/typing`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
+    typingDebounceRef.current = setTimeout(() => {
+      typingDebounceRef.current = null; // allow next fire after 2s
+    }, 2000);
+  }, [selectedConversation?._id]);
+
+  // Handle file selection
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Only images (JPEG, PNG, WebP) and PDFs are allowed");
       return;
     }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File must be 10MB or smaller");
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  // Handle sending reply
+  const handleSendReply = async () => {
+    if (!replyText.trim() && !selectedFile) {
+      toast.error("Please enter a message or attach a file");
+      return;
+    }
+    if (!selectedConversation) return;
 
     try {
       setReplyLoading(true);
@@ -122,7 +270,28 @@ function TenantInbox() {
 
       const resolvedReceiverType =
         normalizeRole(otherParticipant?.role) ||
-        (currentActorType === "Tenant" ? "Landlord" : "Landlord");
+        (currentActorType === "Tenant" ? "Landlord" : "Tenant");
+
+      // Upload file first if one is selected
+      let fileUrl = null;
+      let fileType = null;
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        const uploadRes = await fetch(`/api/message/${selectedConversation._id}/upload`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json();
+          toast.error(err.error || "File upload failed");
+          return;
+        }
+        const uploadData = await uploadRes.json();
+        fileUrl = uploadData.fileUrl;
+        fileType = uploadData.fileType;
+      }
 
       const res = await fetch("/api/message", {
         method: "POST",
@@ -133,6 +302,7 @@ function TenantInbox() {
           receiverType: resolvedReceiverType,
           propertyId: selectedConversation.property?._id,
           content: replyText,
+          ...(fileUrl && { fileUrl, fileType }),
         }),
       });
 
@@ -145,12 +315,44 @@ function TenantInbox() {
       const data = await res.json();
       setMessages([...messages, data.message]);
       setReplyText("");
+      setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setReadByOther(false);
       toast.success("Message sent!");
     } catch (err) {
       console.error("Send message error:", err);
       toast.error(err.message);
     } finally {
       setReplyLoading(false);
+    }
+  };
+
+  // Generic status action handler (tenant-side)
+  const handleStatusAction = async (endpoint, successMsg) => {
+    if (!selectedConversation) return;
+    try {
+      setActionLoading(true);
+      const res = await fetch(`/api/message/${selectedConversation._id}/${endpoint}`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Action failed");
+        return;
+      }
+      setSelectedConversation((prev) => ({ ...prev, status: data.conversation.status }));
+      setConversations((prev) =>
+        prev.map((c) =>
+          c._id === selectedConversation._id ? { ...c, status: data.conversation.status } : c
+        )
+      );
+      if (data.message) setMessages((prev) => [...prev, data.message]);
+      toast.success(successMsg);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -190,6 +392,10 @@ function TenantInbox() {
     }
 
     setProfileDetails(null);
+    setReadByOther(false);
+    setIsOtherTyping(false);
+    setShowMsgSearch(false);
+    setMsgSearch("");
   }, [selectedConversation]);
 
   useEffect(() => {
@@ -250,10 +456,10 @@ function TenantInbox() {
                   My messages
                 </h5>
 
+                {/* Compose button — pending owner confirmation of purpose (see Figma) */}
                 <button
                   onClick={() => setOpenCompose(true)}
-                  className="text-blue-800 hover:underline mt-14"
-                  style={{ fontSize: "12px" }}
+                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 rounded"
                 >
                   Compose
                 </button>
@@ -287,12 +493,31 @@ function TenantInbox() {
 
             <div className="flex flex-1">
               <div className="w-full md:w-1/3 bg-white border-gray-200 border-4 overflow-y-auto">
+                <div className="p-2 border-b border-gray-100">
+                  <input
+                    type="text"
+                    value={convSearch}
+                    onChange={(e) => setConvSearch(e.target.value)}
+                    placeholder="Search conversations..."
+                    className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+                  />
+                </div>
                 {loading ? (
                   <p className="p-4 text-gray-500">Loading conversations...</p>
                 ) : conversations.length === 0 ? (
                   <p className="p-4 text-gray-500">No conversations</p>
                 ) : (
-                  conversations.map((conv) => {
+                  conversations
+                    .filter((conv) => {
+                      if (!convSearch.trim()) return true;
+                      const q = convSearch.toLowerCase();
+                      const other = getOtherParticipantForConversation(conv);
+                      return (
+                        other?.name?.toLowerCase().includes(q) ||
+                        conv.property?.title?.toLowerCase().includes(q)
+                      );
+                    })
+                    .map((conv) => {
                     const lastMsg = conv.lastMessage;
                     const other = getOtherParticipantForConversation(conv);
                     return (
@@ -318,22 +543,39 @@ function TenantInbox() {
                         </div>
 
                         <div className="flex-1">
-                          <p
-                            className="font-light text-black"
-                            style={{
-                              fontSize: "12px",
-                            }}
-                          >
-                            {other?.name}
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <p
+                              className="font-light text-black"
+                              style={{ fontSize: "12px" }}
+                            >
+                              {other?.name}
+                            </p>
+                            {conv.unreadCount > 0 && (
+                              <span className="bg-blue-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                {conv.unreadCount > 9 ? "9+" : conv.unreadCount}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs font-semibold text-black">
                             {conv.property?.title}
                           </p>
+                          {conv.status && conv.status !== "active" && (
+                            <span
+                              className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-white capitalize ${
+                                conv.status === "inspection" ? "bg-amber-500" :
+                                conv.status === "accepted"   ? "bg-blue-600"  :
+                                conv.status === "completed"  ? "bg-green-600" :
+                                conv.status === "rejected"   ? "bg-red-500"   :
+                                                               "bg-gray-400"
+                              }`}
+                              style={{ fontSize: "9px" }}
+                            >
+                              {conv.status}
+                            </span>
+                          )}
                           <p
                             className="font-light text-black truncate"
-                            style={{
-                              fontSize: "10px",
-                            }}
+                            style={{ fontSize: "10px" }}
                           >
                             {lastMsg?.content}
                           </p>
@@ -531,61 +773,211 @@ function TenantInbox() {
                   )
                 ) : selectedConversation && messages.length > 0 ? (
                   <div className="p-4 bg-white h-full flex flex-col">
-                    <p className="text-blue-950 font-bold text-2xl mb-4">
-                      {selectedConversation.property?.title}
-                    </p>
+                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                      <div className="flex items-center gap-3">
+                        <p className="text-blue-950 font-bold text-2xl">
+                          {selectedConversation.property?.title}
+                        </p>
+                        <button
+                          onClick={() => { setShowMsgSearch((v) => !v); setMsgSearch(""); }}
+                          className="text-sm text-blue-700 hover:text-blue-900 font-medium"
+                        >
+                          {showMsgSearch ? "Close search" : "Search messages"}
+                        </button>
+                      </div>
 
-                    <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-                      {messages.map((msg, idx) => {
-                        const senderId =
-                          msg?.sender && typeof msg.sender === "object"
-                            ? msg.sender._id || msg.sender.id
-                            : msg.sender;
-                        const fromOther =
-                          normalizeId(senderId) ===
-                          normalizeId(otherParticipant?._id);
+                      {/* Tenant-side status actions */}
+                      <div className="flex gap-2 flex-wrap">
+                        {selectedConversation.status === "inspection" && (
+                          <>
+                            <button
+                              onClick={() => handleStatusAction("cancel", "Inspection cancelled.")}
+                              disabled={actionLoading}
+                              className="px-4 py-2 text-sm font-semibold text-gray-700 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 transition duration-200"
+                            >
+                              Cancel Inspection
+                            </button>
+                            <button
+                              onClick={() => handleStatusAction("reject", "Property rejected after inspection.")}
+                              disabled={actionLoading}
+                              className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-red-600 hover:bg-red-500 disabled:bg-gray-400 transition duration-200"
+                            >
+                              Reject Property
+                            </button>
+                          </>
+                        )}
 
-                        return (
-                          <div
-                            key={idx}
-                            className={`p-3 rounded-lg ${
-                              fromOther
-                                ? "bg-gray-200 text-left"
-                                : "bg-blue-200 text-right ml-auto"
-                            } max-w-xs`}
-                          >
-                            <p className="font-semibold text-sm">
-                              {fromOther ? otherParticipant?.name : "You"}
-                            </p>
-                            <p className="text-sm">{msg.content}</p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {new Date(msg.createdAt).toLocaleTimeString()}
-                            </p>
-                          </div>
-                        );
-                      })}
+                        {selectedConversation.status !== "active" && selectedConversation.status !== "inspection" && (
+                          <span className={`px-4 py-2 text-sm font-semibold rounded-lg capitalize ${
+                            selectedConversation.status === "completed" ? "bg-green-100 text-green-800" :
+                            selectedConversation.status === "accepted" ? "bg-blue-100 text-blue-800" :
+                            selectedConversation.status === "rejected" ? "bg-red-100 text-red-800" :
+                            "bg-gray-100 text-gray-600"
+                          }`}>
+                            {selectedConversation.status}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter" && !replyLoading) {
-                            handleSendReply();
+                    {showMsgSearch && (
+                      <div className="mb-2">
+                        <input
+                          type="text"
+                          value={msgSearch}
+                          onChange={(e) => setMsgSearch(e.target.value)}
+                          placeholder="Search messages..."
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+                          autoFocus
+                        />
+                      </div>
+                    )}
+
+                    <div className="relative flex-1 min-h-0">
+                    <div
+                      ref={messagesContainerRef}
+                      className="h-full overflow-y-auto mb-4 space-y-4"
+                      onScroll={(e) => {
+                        const el = e.currentTarget;
+                        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+                        setIsScrolledUp(distanceFromBottom > 100);
+                      }}
+                    >
+                      {(() => {
+                        // Track the _id of the last self-sent message (works with filtered lists too)
+                        let lastSelfId = null;
+                        messages.forEach((msg) => {
+                          const sid = msg?.sender && typeof msg.sender === "object"
+                            ? msg.sender._id || msg.sender.id
+                            : msg.sender;
+                          if (normalizeId(sid) !== normalizeId(otherParticipant?._id)) {
+                            lastSelfId = msg._id;
                           }
-                        }}
-                        placeholder="Type a message..."
-                        className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                      />
+                        });
+
+                        const displayMessages = msgSearch.trim()
+                          ? messages.filter((m) => m.content?.toLowerCase().includes(msgSearch.toLowerCase()))
+                          : messages;
+
+                        return displayMessages.map((msg) => {
+                          const senderId =
+                            msg?.sender && typeof msg.sender === "object"
+                              ? msg.sender._id || msg.sender.id
+                              : msg.sender;
+                          const fromOther =
+                            normalizeId(senderId) ===
+                            normalizeId(otherParticipant?._id);
+
+                          return (
+                            <div key={msg._id}>
+                              <div
+                                className={`p-3 rounded-lg ${
+                                  fromOther
+                                    ? "bg-gray-200 text-left"
+                                    : "bg-blue-200 text-right ml-auto"
+                                } max-w-xs`}
+                              >
+                                <p className="font-semibold text-sm">
+                                  {fromOther ? otherParticipant?.name : "You"}
+                                </p>
+                                {msg.fileUrl && msg.fileType?.startsWith("image/") && (
+                                  <Image
+                                    src={msg.fileUrl}
+                                    alt="attachment"
+                                    width={200}
+                                    height={150}
+                                    className="rounded mt-1 mb-1 object-cover"
+                                  />
+                                )}
+                                {msg.fileUrl && msg.fileType === "application/pdf" && (
+                                  <a
+                                    href={msg.fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-blue-700 underline text-xs mt-1 mb-1"
+                                  >
+                                    📄 View Document
+                                  </a>
+                                )}
+                                {msg.content && <p className="text-sm">{msg.content}</p>}
+                                <p className="text-xs text-gray-600 mt-1">
+                                  {new Date(msg.createdAt).toLocaleTimeString()}
+                                </p>
+                              </div>
+                              {!fromOther && readByOther && msg._id === lastSelfId && (
+                                <p className="text-xs text-right text-gray-400 mr-1 mt-0.5">Seen ✓</p>
+                              )}
+                            </div>
+                          );
+                        });
+                      })()}
+                      <div ref={messagesEndRef} />
+                    </div>
+
+                    {isScrolledUp && (
                       <button
-                        onClick={handleSendReply}
-                        disabled={replyLoading}
-                        className="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                        onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })}
+                        className="absolute bottom-2 right-3 bg-blue-700 text-white rounded-full w-9 h-9 flex items-center justify-center shadow-md hover:bg-blue-600 transition"
+                        title="Jump to latest message"
                       >
-                        {replyLoading ? "Sending..." : "Send"}
+                        ↓
                       </button>
+                    )}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      {connectionStatus === "reconnecting" && (
+                        <p className="text-xs text-center text-amber-600 bg-amber-50 rounded px-2 py-1">Reconnecting...</p>
+                      )}
+                      {isOtherTyping && (
+                        <p className="text-xs text-gray-500 italic px-1">Typing...</p>
+                      )}
+                      {selectedFile && (
+                        <div className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs text-gray-600">
+                          <span>📎 {selectedFile.name}</span>
+                          <button onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-red-500 hover:text-red-700 font-bold">✕</button>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
+                          className="hidden"
+                          onChange={handleFileSelect}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 text-gray-500 text-sm"
+                          title="Attach file"
+                        >
+                          📎
+                        </button>
+                        <input
+                          type="text"
+                          value={replyText}
+                          onChange={(e) => { setReplyText(e.target.value); handleTyping(); }}
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter" && !replyLoading) {
+                              handleSendReply();
+                            }
+                          }}
+                          placeholder="Type a message..."
+                          maxLength={1000}
+                          className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                        />
+                        <button
+                          onClick={handleSendReply}
+                          disabled={replyLoading || replyText.length > 1000}
+                          className="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                        >
+                          {replyLoading ? "Sending..." : "Send"}
+                        </button>
+                      </div>
+                      <p className={`text-xs text-right ${replyText.length >= 1000 ? "text-red-500" : "text-gray-400"}`}>
+                        {replyText.length}/1000
+                      </p>
                     </div>
                   </div>
                 ) : selectedConversation ? (
@@ -602,23 +994,10 @@ function TenantInbox() {
 
             <TenantDashboardFooter />
             <ToastContainer />
+            {/* ComposeModal — restored for owner review, not yet wired to send */}
             {openCompose && (
               <ComposeModal
-                isOpen={openCompose}
                 onClose={() => setOpenCompose(false)}
-                senderId={currentActorId}
-                receiverId={otherParticipant?._id}
-                propertyId={selectedConversation?.property?._id}
-                senderType={currentActorType}
-                receiverType={
-                  normalizeRole(otherParticipant?.role) ||
-                  (currentActorType === "Tenant" ? "Landlord" : "Landlord")
-                }
-                onMessageSent={(data) => {
-                  if (data?.message) {
-                    setMessages((prev) => [...prev, data.message]);
-                  }
-                }}
               />
             )}
           </div>

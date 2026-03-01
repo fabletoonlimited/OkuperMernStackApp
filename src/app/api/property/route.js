@@ -82,7 +82,7 @@ export async function POST(req) {
 
     const newProperty = await createProperty({
       // user,
-      landlord: landlordId,
+      landlordId, // was "landlord: landlordId" — controller expects key "landlordId" not "landlord"
       previewPic,
       Img1,
       Img2,
