@@ -2,11 +2,13 @@
 import { ChevronDown, Trash2, Menu } from "lucide-react";
 import PropertyCard from "@/components/propertyCard";
 import { useState } from "react";
+import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 
 export default function SavedHomes() {
     return (
         <>
-            <div>
+            <div >
+                <LandlordDashboardSidebar />
                 <div className="bg-[#123d8d] text-white flex items-center justify-around px-10 py-6">
                     {/* Left Section */}
                     <div className="flex items-center gap-8">

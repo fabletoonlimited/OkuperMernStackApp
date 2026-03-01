@@ -18,6 +18,9 @@ import property from "../../data/property";
 import { toast, ToastContainer } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
+import { FaExclamationCircle, FaStar } from "react-icons/fa";
+import PropertyCard from "@/components/propertyCard";
 
 const Index = () => {
     const router = useRouter();
