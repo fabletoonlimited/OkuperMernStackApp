@@ -243,8 +243,8 @@ const ProfilePage = () => {
 
             toast.success("Profile updated successfully");
 
-            // 🔑 Correct way to navigate in App Router
-            router.push("/landlordDashboard");
+            router.push("/landlordDashboardComplete");
+
         } catch (err) {
             console.error("Profile update error:", err);
             toast.error("Failed to update profile");

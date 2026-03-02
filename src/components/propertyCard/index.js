@@ -1,16 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import property from "../../data/property";
 import StarRating from "../starRating/starRating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
-import PropertyExpandedNav from "../propExpandedNav/index.js";
 import Link from "next/link";
-import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-//Cloudinary config
 
 export default function PropertyCard({
     _id,
@@ -30,148 +23,94 @@ export default function PropertyCard({
     numberOfBath,
     propertyType,
 }) {
-    // previewPic from the API is already a full Cloudinary URL string
     const imageSrc = previewPic || "/property-image.jpg";
 
-    // old image construction — was crashing with undefined `img` and `fallbackImage`
-    // const NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dfdzbuk0c";
-    // const BASE_URL = `https://res.cloudinary.com/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
-    // const firstImage =
-    //     Array.isArray(previewPic) && previewPic[0]?.publicId
-    //         ? img[0].publicId
-    //         : "placeholder-image.jpg";
-    // const CLOUDINARY_URL = `${BASE_URL}/${firstImage}`;
-    // const BLUR_URL = `${BASE_URL}/${firstImage || fallbackImage}`;
-
-    const handleInputChange = (e) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-
-    const fetchProperties = async () => {
-        try {
-            const propertyCardRes = await fetch("/api/property", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    _id,
-                    previewPix: formData.previewPic,
-                    unitsAvailable: formData.unitsAvailable,
-                    price: formData.price,
-                    title: formData.title,
-                    address: formData.address,
-                    location: formData.location,
-                    category: formData.categories,
-                    rating: formData.rating,
-                    numberOfBed: formData.numberOfBed,
-                    propertyType: formData.propertyType,
-                    numberOfBath: formData.numberOfBath,
-                }),
-            });
-
-            if (
-                    !propertyCardRes.ok
-                ) {
-                  toast.error("error fetching properties");
-                  return;
-                }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     return (
-        <>
-            <Link href={`/propertyCardExpanded?id=${_id}`}>
-                <div
-                    className="rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300 
-        w-[310px] md:min-w-[310px] md:min-h-[520px] min-h-[520px] md:mt-13 mt-0 col-span-full hover:scale-105"
-                    style={{
-                        maxWidth: "310px",
-                        minHeight: "520px",
-                        maxHeight: "520px",
-                        minWidth: "310px",
-                        cursor: "pointer",
-                    }}>
-                    <div className="relative h-72 w-[310px] md:h-72">
-                        <Image
-                            src={imageSrc}
-                            alt={`Property: ${title || desc || "Property"}`}
-                            width={310}
-                            height={250}
-                            draggable={false}
-                            unoptimized={true}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            quality={100}
-                            priority={true}
-                            className="rounded-t-xl object-cover"
-                        />
+        <Link href={`/propertyCardExpanded?id=${_id}`}>
+            <div
+                className="w-full rounded-xl overflow-hidden shadow-md 
+                bg-white hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
+                {/* IMAGE */}
+                <div className="relative w-full h-64">
+                    <Image
+                        src={imageSrc}
+                        alt={`Property: ${title || desc || "Property"}`}
+                        fill
+                        className="object-cover rounded-t-xl"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={true}
+                        draggable={false}
+                    />
 
-                        {savedHomes && (
-                            <div className="2 md:right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white">
-                                <FontAwesomeIcon
-                                    icon={faCircleCheck}
-                                    className="text-blue-800/75 text-2xl md:text-4xl"
-                                />
-                            </div>
-                        )}
-
-                        {typeof unitsAvailable === "number" && (
-                            <div className="absolute top-2 left-2 bg-blue-600/75 text-white text-xs px-2 py-1 rounded-xl">
-                                {unitsAvailable > 0
-                                    ? `${unitsAvailable} unit${unitsAvailable > 1 ? "s" : ""} available`
-                                    : "No units available"}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="p-4 text-center -mt-30 md:-mt-30">
-                        <h3 className="text-lg font-semibold mt-10 mb-2">
-                            ₦{price ? Number(String(price).replace(/[^0-9.]/g, "")).toLocaleString() : "N/A"} / yr
-                        </h3>
-
-                        <p className="text-sm text-gray-800 mt-2">
-                            {title || desc || "No description provided"}
-                        </p>
-
-                        <p className="text-sm font-medium text-blue-700 mt-1 mb-4">
-                            {address || location || "Unknown location"}
-                        </p>
-
-                        <p className="text-md font-bold text-blue-950">
-                            For {category || "Unspecified"}
-                        </p>
-
-                        <div className="ratings mt-3 mb-4 justify-items-center">
-                            <StarRating rating={rating || 0} />
+                    {savedHomes && (
+                        <div className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
+                            <FontAwesomeIcon
+                                icon={faCircleCheck}
+                                className="text-white text-2xl md:text-4xl"
+                            />
                         </div>
+                    )}
 
-                        {rating && (
-                            <p className="text-sm text-gray-500 mb-4">
+                    {typeof unitsAvailable === "number" && (
+                        <div className="absolute top-2 left-2 bg-blue-600/75 text-white text-xs px-2 py-1 rounded-xl">
+                            {unitsAvailable > 0
+                                ? `${unitsAvailable} unit${unitsAvailable > 1 ? "s" : ""} available`
+                                : "No units available"}
+                        </div>
+                    )}
+                </div>
+
+                {/* INFO */}
+                <div className="p-4 text-center">
+                    <h3 className="text-lg font-semibold mt-2 mb-2">
+                        ₦
+                        {price
+                            ? Number(
+                                  String(price).replace(/[^0-9.]/g, ""),
+                              ).toLocaleString()
+                            : "N/A"}{" "}
+                        / yr
+                    </h3>
+
+                    <p className="text-sm text-gray-800 mt-2">
+                        {title || desc || "No description provided"}
+                    </p>
+
+                    <p className="text-sm font-medium text-blue-700 mt-1 mb-2">
+                        {address || location || "Unknown location"}
+                    </p>
+
+                    <p className="text-md font-bold text-blue-950">
+                        For {category || "Unspecified"}
+                    </p>
+
+                    {rating && (
+                        <>
+                            <div className="ratings mt-3 mb-2 justify-items-center">
+                                <StarRating rating={rating} />
+                            </div>
+                            <p className="text-sm text-gray-500 mb-2">
                                 {rating}{" "}
                                 <span className="text-blue-700">
                                     ({category})
                                 </span>
                             </p>
-                        )}
+                        </>
+                    )}
 
-                        <div className="flex mt-2 justify-around items-center mb-5 md:ml-2 ml-2">
-                            <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
-                                {bed || numberOfBed || "N/A"}
-                            </span>
-                            <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
-                                {propertyType || "N/A"}
-                            </span>
-                            <span className="text-sm bg-blue-950 text-white px-5 py-3 rounded">
-                                {bath || numberOfBath || "N/A"}
-                            </span>
-                        </div>
+                    <div className="flex flex-wrap justify-around items-center mt-2 mb-4 gap-2">
+                        <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
+                            {bed || numberOfBed || "N/A"}
+                        </span>
+                        <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
+                            {propertyType || "N/A"}
+                        </span>
+                        <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
+                            {bath || numberOfBath || "N/A"}
+                        </span>
                     </div>
                 </div>
-            </Link>
-        </>
+            </div>
+        </Link>
     );
 }

@@ -70,7 +70,7 @@ const index = () => {
             onClick={toggleSidebar}
             className="fixed inset-0 bg-black/40 z-40 md:hidden">
           </div> 
-          <div className="flex bg-transparent w-70"></div>
+          <div className="flex bg-transparent w-72"></div>
         </>
       )}
       {/* Sidebar */}
