@@ -145,7 +145,7 @@ const index = () => {
 
     return (
         <>
-            {profilePercent === 100 && (
+            {profilePercent === 87 && (
                 <div className=" bg-gray-100 p-6">
                     {/* Header */}
                     <div className="flex justify-between items-center mb-6">

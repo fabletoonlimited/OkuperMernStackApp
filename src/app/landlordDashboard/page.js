@@ -14,6 +14,7 @@ function landlordDashboard() {
               <LandlordDashboardSidebar />
               <div className="flex-1">
                   {/* Top Nav Section*/}
+                  
                   <div className="landlordDashboardWelcomeMessage mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
                       <h1 className="font-bold md:text-5xl text-2xl pl-7">
                           Welcome, Landlord!
