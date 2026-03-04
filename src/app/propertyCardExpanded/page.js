@@ -48,7 +48,8 @@ const Index = () => {
         }
     };
 
-    // Fetch real property from API
+    
+   // Fetch real property from API
     useEffect(() => {
         if (!propertyId) {
             setPropertyLoading(false);
@@ -227,39 +228,43 @@ const Index = () => {
                     </div>
 
                     {/* DESKTOP GRID */}
-                    <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-6">
-                        {/* Main Image */}
-                        <div className="relative col-span-2 row-span-2 aspect-[5/3] overflow-hidden rounded-lg cursor-pointer border-2 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                            <img
-                                src={images[0]}
-                                alt="property"
-                                className="w-full h-full object-cover"
-                                onClick={() => setSelectedImage(images[0])}
-                            />
+                  <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-4">
 
-                            <div className="absolute top-2 left-2 z-10">
-                                <FontAwesomeIcon
-                                    icon={faCheckCircle}
-                                    className="text-3xl text-blue-300/95 rounded-full p-1"
-                                />
-                            </div>
-                        </div>
+  {/* MAIN LARGE IMAGE */}
+  <div className="relative col-span-2 row-span-2 rounded-lg border shadow-lg overflow-hidden aspect-[5/3] cursor-pointer">
+    <img
+      src={images[0]}
+      alt="property-main"
+      className="w-full h-full object-cover"
+      onClick={() => setSelectedImage(images[0])}
+    />
+    <div className="absolute top-3 left-3">
+      <FontAwesomeIcon
+        icon={faCheckCircle}
+        className="text-3xl text-blue-400 bg-white rounded-full"
+      />
+    </div>
+  </div>
 
-                        {/* Other Images */}
-                        {images.slice(1).map((img, i) => (
-                            <div
-                                key={i}
-                                className="aspect-[5/3] overflow-hidden rounded-lg cursor-pointer border-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                                <img
-                                    src={img}
-                                    alt="property"
-                                    className="w-full h-full object-cover"
-                                    onClick={() => setSelectedImage(img)}
-                                />
-                            </div>
-                        ))}
+  {/* FOUR SMALL IMAGES */}
+  {Array.from({ length: 4 }).map((_, i) => {
+    const img = images[i + 1] || images[0]; // fallback to avoid undefined
+    return (
+      <div
+        key={i}
+        className="rounded-lg border shadow-md overflow-hidden cursor-pointer aspect-[5/3]"
+        onClick={() => setSelectedImage(img)}
+      >
+        <img
+          src={img}
+          alt={`property-${i}`}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  })}
+</div>
                     </div>
-                </div>
 
                 {/* PROPERTY DETAILS */}
                 <div className="flex flex-col md:flex-row justify-between mt-4 gap-6 items-center ">
