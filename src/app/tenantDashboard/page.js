@@ -1,9 +1,11 @@
-import React from "react";
+"use client"
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
+import React, { useState, useEffect } from "react";
+import TenantDashboardCompleted from "../TenantDashboardCompleted/page.js";
 
-function TenantDashboard() {
+function tenantDashboard() {
    const [profilePercent, setProfilePercent] = useState(null);
   
     useEffect(() => {
@@ -30,7 +32,9 @@ function TenantDashboard() {
     }, []);
   return (
     <>
-      
+      {profilePercent === 15 && (
+       <TenantDashboardCompleted />
+       ) }
       {profilePercent === 100 && (
       <div className="tenantDashboardContainer flex">
         {/* Sidebar */}
@@ -73,4 +77,4 @@ function TenantDashboard() {
   );
 }
 
-export default TenantDashboard;
+export default tenantDashboard;
