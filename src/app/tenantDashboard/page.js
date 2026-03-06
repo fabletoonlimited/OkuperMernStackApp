@@ -4,8 +4,34 @@ import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 
 function TenantDashboard() {
+   const [profilePercent, setProfilePercent] = useState(null);
+  
+    useEffect(() => {
+      const fetchCompletion = async () => {
+        try {
+          const res = await fetch("/api/profile/completion", {
+            credentials: "include",
+          });
+  
+          if (!res.ok) {
+            setProfilePercent(null);
+            return;
+          }
+  
+          const data = await res.json();
+          setProfilePercent(Number.isFinite(data.percent) ? data.percent : 0);
+        } catch (err) {
+          console.error("Profile completion error:", err);
+          setProfilePercent(null);
+        }
+      };
+  
+      fetchCompletion();
+    }, []);
   return (
     <>
+      
+      {profilePercent === 100 && (
       <div className="tenantDashboardContainer flex">
         {/* Sidebar */}
         <TenantDashboardSidebar />
@@ -41,7 +67,7 @@ function TenantDashboard() {
           </div>
         </div>
       </div>
-
+) }
       <TenantDashboardFooter />
     </>
   );
