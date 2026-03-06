@@ -35,17 +35,12 @@ const page = () => {
 
     return (
         <>
-            {profilePercent === 87 && (
-                <div className="flex min-h-screen bg-gray-100">
-                    
+                <div className="flex min-h-screen w-full bg-gray-100">
                     {/* Sidebar (fixed width) */}
-                    <div className="w-64 fixed left-0 top-0 h-full bg-white shadow-md z-40">
-                        <LandlordDashboardSidebar />
-                    </div>
+                    <LandlordDashboardSidebar/>
 
                     {/* Main Content */}
-                    <div className="ml-64 flex-1 p-6">
-
+                    <div className=" flex-1 p-6">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">
                             <div>
@@ -69,7 +64,6 @@ const page = () => {
 
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                            
                             <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4">
                                 <div className="bg-green-100 p-3 rounded-full text-green-600">
                                     <FaHome />
@@ -134,8 +128,7 @@ const page = () => {
                             {[1, 2, 3, 4].map((item) => (
                                 <div
                                     key={item}
-                                    className="bg-white p-4 rounded-lg shadow flex items-center justify-between"
-                                >
+                                    className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
                                     <div>
                                         <p className="text-xs text-gray-400">
                                             OkTenCom - 1234
@@ -151,9 +144,7 @@ const page = () => {
                                             className="w-8 h-8 rounded-full"
                                             alt="resident"
                                         />
-                                        <p className="text-sm">
-                                            April Naomie
-                                        </p>
+                                        <p className="text-sm">April Naomie</p>
                                     </div>
 
                                     <div className="text-yellow-500 text-lg">
@@ -175,10 +166,8 @@ const page = () => {
                                 <PropertyCard />
                             </div>
                         </div>
-
                     </div>
                 </div>
-            )}
         </>
     );
 };

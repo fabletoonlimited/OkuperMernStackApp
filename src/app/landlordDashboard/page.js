@@ -150,10 +150,13 @@ function landlordDashboard() {
     
     return (
         <>
+            <div className="flex bg-gray-100">
+                {profilePercent === 100 && (
             <LandlordDashboardComplete />
-        
-            {profilePercent === 100 && (
-                <div className="landlordDashboardContainer flex">
+                )}
+
+            {profilePercent === 87 && (
+                <div className="flex min-h-screen bg-gray-100">
                     <LandlordDashboardSidebar />
                     <div className="flex-1">
                         {/* Top Nav Section*/}
@@ -163,8 +166,8 @@ function landlordDashboard() {
                                 Welcome, Landlord!
                             </h1>
                             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-                                We are thrilled that you have chosen to list your
-                                property with Okuper.
+                                We are thrilled that you have chosen to list
+                                your property with Okuper.
                             </p>
                         </div>
 
@@ -174,18 +177,19 @@ function landlordDashboard() {
                                 Your next steps
                             </h3>
                             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-                                In other to complete your profile and listing, there
-                                are a few things left to do.
+                                In other to complete your profile and listing,
+                                there are a few things left to do.
                             </p>
                         </div>
-                            
+
                         <div className="md:px-16 px-0">
                             <LandlordDashboardCard />
                         </div>
                     </div>
                 </div>
             )}
-            <LandlordDashboardFooter />
+                
+            </div>
         </>
     );
 }
