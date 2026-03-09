@@ -17,11 +17,11 @@ const tenantKycSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
-    },
+    // status: {
+    //   type: String,
+    //   enum: ["pending", "approved", "rejected"],
+    //   default: "pending",
+    // },
     gender: {
       type: String,
       enum: ["Male", "Female"],

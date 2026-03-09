@@ -78,6 +78,11 @@ const propertySchema = new mongoose.Schema(
       nearbyPlaces: { type: String, default: "" },
     // },
 
+    status: {type: String,
+      enum: ["rented", "vacant, Sold"],
+      default: "vacant"
+    },
+
     listedBy: { type: String, required: true },
 
 

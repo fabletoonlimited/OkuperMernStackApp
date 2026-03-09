@@ -10,6 +10,7 @@ import Link from "next/link";
 import React from "react";
 import { useState, useEffect } from "react";
 
+
 function Banner() {
 
 const [isAuthenticated, setIsAuthenticated] = useState(false);
