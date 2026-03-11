@@ -29,31 +29,25 @@ const tenantSchema = new mongoose.Schema(
         default: false
     },
 
-    isSubscribed: {
-      type: Boolean,
-      default: false
-    },
-
     role: {
         type: String, 
-        default: "tenant"
+        default: "admin"
     },
 
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
-    tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc"},
-    tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
+    adminDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "AdminDashboard"},
     message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
-    homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
     property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
+    tenant: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}],
+    landlord: [{ type: mongoose.Schema.Types.ObjectId, ref: "Landlord"}]
 
 }, {timestamps: true});
 
 // Password hashing
-tenantSchema.pre("save", async function(next) {
+adminSchema.pre("save", async function(next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-export default mongoose.models.Tenant || mongoose.model("Tenant", tenantSchema);
+export default mongoose.models.Admin || mongoose.model("Admin", adminSchema);

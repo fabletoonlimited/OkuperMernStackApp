@@ -10,6 +10,7 @@ import Link from "next/link";
 import React from "react";
 import { useState, useEffect } from "react";
 
+
 function Banner() {
 
 const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,7 +18,8 @@ const router = useRouter();
 useEffect(() => {
     const checkAuth = async () => {
         try {
-            const res = await fetch("/api/auth/me", { credentials: "include" });
+            const res = await fetch("/api/auth/me", 
+                { credentials: "include" });
             setIsAuthenticated(res.ok);
         } catch {
             setIsAuthenticated(false);
@@ -89,15 +91,16 @@ useEffect(() => {
                     </h3>
 
                     {/* Buttons */}
-                    <div className="mt-15 md:mt-6 flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
-                        <button
-                            className="bg-blue-950 flex text-white px-22 md:px-8 gap-2 pt-3 md:py-3
-rounded-md text-md md:text-base hover:bg-blue-300 hover:text-[#0E1D48] transition"
+                    <div className="mt-15 md:mt-6 flex flex-col md:flex-row gap-5 md:gap-5 w-full md:w-auto">
+                        
+                        <button className="bg-blue-950 flex text-white hover:rounded-full px-22 md:px-8 gap-2 pt-3 md:py-3text-md md:text-base hover:bg-blue-300 hover:text-[#0E1D48] transition"
                             onClick={
                                 isAuthenticated === true
                                     ? goTopropertyListing
                                     : goToSignUp
-                            }>
+                            }
+                            style={{ cursor: "pointer" }}
+                        >
                             <Image
                                 className="self-start mb-2 md:mb-0"
                                 src={homeIcon}
@@ -108,18 +111,28 @@ rounded-md text-md md:text-base hover:bg-blue-300 hover:text-[#0E1D48] transitio
                             Got a vacant home?
                         </button>
 
-                        <Link href="/rent">
-                            <button className="bg-white text-blue-950 flex gap-3 md:px-8 px-22 pt-3 md:py-3 rounded-md text-md md:text-base hover:bg-amber-200 transition">
-                                <Image
-                                    className="self-start mb-2 md:mb-0"
-                                    src={userIcon}
-                                    alt="houseIcon"
-                                    width={22}
-                                    height={24}
-                                />
-                                Looking for a home?
-                            </button>
-                        </Link>
+                      
+                        <button className="bg-white text-blue-950 hover:rounded-full flex gap-3 md:px-8 px-22 pt-3 md:py-3  text-md md:text-base hover:bg-amber-200 transition"
+                            onClick={
+                                isAuthenticated === true
+                                    ? goTopropertyListing
+                                    : goToSignUp
+                            }
+                            style={{ cursor: "pointer" }}
+                        >
+                                
+                            <Image
+                                className="self-start mb-2 md:mb-0"
+                                src={userIcon}
+                                alt="houseIcon"
+                                width={22}
+                                height={24}
+                            />
+                            
+                            Looking for a home?
+
+                        </button>
+                        
                     </div>
                 </div>
             </div>

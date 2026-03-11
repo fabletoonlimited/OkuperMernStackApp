@@ -5,8 +5,10 @@ import Instagram from '../../../public/instagram-logo.png'
 import Facebook from '../../../public/Facebook.png' // Update to correct logo
 import X from '../../../public/X_icon_black.svg'
 import Youtube from '../../../public/free-youtube-logo-icon-2431-thumb.png'
+import Link from 'next/link'
 
 function Footer() {
+
   return (
     <div className="bg-gray-700 w-full text-white pt-3">
       <div className="max-w-5xl mx-auto text-center px-6 md:px-0">
@@ -25,11 +27,34 @@ function Footer() {
           homes to your attention, so you don't miss out.
         </p>
 
-        <div className="flex justify-center gap-8 mt-10">
-          <Image src={Instagram} alt="Instagram" width={40} height={40} />
-          <Image src={Facebook} alt="Facebook" width={40} height={30} />
-          <Image src={X} alt="X (formerly Twitter)" width={40} height={40} />
-          <Image src={Youtube} alt="YouTube" width={40} height={30} />
+        <div className="flex justify-center gap-10 mt-10">
+         
+          <Link href="https://www.instagram.com/okuper_/" target="_blank">
+            <Image 
+              className='hover:scale-150'
+              src={Instagram} alt="Instagram" width={50} height={50} 
+            />
+          </Link>
+          <Link href="https://web.facebook.com/profile.php?id=61568283636863" target='_blank'>
+            <Image 
+              className='hover:scale-120'
+              src={Facebook} alt="Facebook" width={50} height={30} 
+            />
+          </Link>
+          <Link href="https://www.x.com/@okuper_" target='_blank'>
+            <Image 
+            className='hover:scale-150'
+            src={X} alt="X (formerly Twitter)" width={40} height={40} 
+          />
+          </Link>
+        
+
+          <Link href="https://www.youtube.com/@Okuper" target='_blank'>
+            <Image 
+              className='hover:scale-150'
+              src={Youtube} alt="YouTube" width={50} height={30} 
+            />
+          </Link>
         </div>
       </div>
 
