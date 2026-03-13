@@ -22,6 +22,7 @@ export const createProperty = async (data) => {
     bed,
     bath,
     rating,
+    status,
     listedBy,
     savedHomes,
     // features,
@@ -48,8 +49,9 @@ export const createProperty = async (data) => {
   if (!unitsAvailable) throw new Error("Property units available missing");
   if (!bed) throw new Error("At least one number of bed is required");
   if (!bath) throw new Error("At least one number of bath is required");
+  if (!status) throw new Error("At least one status is required");
   if (!listedBy) throw new Error("Property listed by is required");
-
+  
   // Format address safely
   // const formattedAddress = `${address?.line1 || ""} ${address?.line2 || ""}`.trim();
 
@@ -85,6 +87,7 @@ export const createProperty = async (data) => {
       bed,
       bath,
       // features: safeFeatures,
+      status,
       listedBy,
       buildingAmenities,
       propertyAmenities,

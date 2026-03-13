@@ -16,21 +16,15 @@ function Rent() {
         const fetchProperties = async () => {
             try {
                 const res = await fetch("/api/property", 
-                    { method: "GET" });
-                    
+                { method: "GET" });
+                
                 const data = await res.json();
 
-                // The original filter checked for item.img but the property schema
-                // uses previewPic, Img1, Img2... not item.img — so this was returning
-                // an empty array and showing 0 properties. Commented out for reference.
-                // const filtered = data.filter(
-                //     (item) =>
-                //         item.img &&
-                //         Array.isArray(item.img) &&
-                //         item.img.length > 0 &&
-                //         item._id,
-                // );
-                const filtered = data.filter((item) => item._id);
+                const filtered = data.filter(
+                    (property) => property.category === "Rent",
+                );
+
+                setPropertyItems(filtered);
 
             if (!res.ok) {
             console.error(data.message || "Failed to fetch properties");
@@ -48,13 +42,6 @@ function Rent() {
         };
         fetchProperties();
     }, []);
-
-//     const fetchProperties = async() => {
-//         try {
-//             res = await fetch("./api/property")
-            
-//       }
-//   }
       
     return (
         <>

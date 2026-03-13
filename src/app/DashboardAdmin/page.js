@@ -6,6 +6,8 @@ import PropertyCard from "@/components/propertyCard";
 import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
 import Allproperties from "@/app/DashboardAdminAllProperties/page.js"
 
+
+
 const disputes = [
     {
         id: "DKDen - 1234",

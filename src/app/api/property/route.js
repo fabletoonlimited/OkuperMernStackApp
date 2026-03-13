@@ -29,7 +29,7 @@ export async function POST(req) {
       propertyType,
       bed,
       bath,
-      features,
+      status,
       listedBy,
       buildingAmenities,
       propertyAmenities,
@@ -40,23 +40,18 @@ export async function POST(req) {
       rating,
       isVerified,
     } = body;
-
-    // Validation
-    // if (!landlordId) {
-    //   return NextResponse.json({ message: "Landlord ID is required" }, { status: 400 });
-    // }
-
     
     if (!previewPic || !Img1 || !Img2 || !Img3) {
       return NextResponse.json(
       { message: "Please upload at least 3 images and a preview pic" }, 
       { status: 400 });
     }
-    if (!title || !address || !state || !price || !category || !unitsAvailable || !bed || !bath || !listedBy || !buildingAmenities || !propertyAmenities || !neighbourhoodPostcode || !nearbyPlaces) {
+    if (!title || !address || !state || !price || !category || !unitsAvailable || !bed || !bath || !listedBy || !buildingAmenities || !propertyAmenities || !neighbourhoodPostcode || !nearbyPlaces || !status) {
       return NextResponse.json(
         { message: "Missing required fields" }, 
         { status: 400 });
     }
+    
 
     // Extract **just the URLs** if frontend sent objects
     const getUrl = (img) => (Array.isArray(img) ? img[0]?.url || img[0] : img);
@@ -69,15 +64,6 @@ export async function POST(req) {
     Img5 = getUrl(Img5);
     Img6 = getUrl(Img6);
 
-    // Format features
-    // const featuresPayload = {
-    //   buildingAmenities: features?.buildingAmenities || [],
-    //   propertyAmenities: features?.propertyAmenities || [],
-    //   neighbourhoodPostcode: features?.neighbourhoodPostcode || "00000",
-    //   nearbyPlaces: features?.nearbyPlaces || [],
-    // };
-
-    // const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();
     const validPropertyType = propertyType === "Appartment" ? "Apartment" : propertyType;
 
     const newProperty = await createProperty({
@@ -100,8 +86,7 @@ export async function POST(req) {
       bed,
       bath,
       rating,
-
-      // features: featuresPayload,
+      status,
       listedBy,
       buildingAmenities,
       propertyAmenities,

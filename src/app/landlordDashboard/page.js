@@ -151,11 +151,11 @@ function landlordDashboard() {
     return (
         <>
             <div className="flex bg-gray-100">
-                {profilePercent === 100 && (
+                {profilePercent == 15 && (
             <LandlordDashboardComplete />
                 )}
 
-            {profilePercent === 87 && (
+            {profilePercent === 100 && (
                 <div className="flex min-h-screen bg-gray-100">
                     <LandlordDashboardSidebar />
                     <div className="flex-1">

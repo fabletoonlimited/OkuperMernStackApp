@@ -38,13 +38,16 @@ export default function RootLayout({ children }) {
     "/propertyCardExpanded",
     "/verification",
     "/contact",
-    "/savedHomes"
+    "/savedHomes",
+    "/landlordDashboardComplete"
   ];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {!shouldHideLayout && <Nav />}
         {children}
 
