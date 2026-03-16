@@ -118,7 +118,7 @@ useEffect(() => {
                       
                         <button className="bg-white text-blue-950 hover:rounded-full flex gap-3 md:px-8 px-22 pt-3 md:py-3  text-md md:text-base hover:bg-amber-200 transition"
                             onClick={
-                                isAuthenticated === true
+                                isAuthenticated || !isAuthenticated === true
                                     ? goToRent
                                     : goToRent
                             }

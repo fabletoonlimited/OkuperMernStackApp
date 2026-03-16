@@ -9,8 +9,37 @@ import RatingStar from "../../components/ratingStar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const page = ({ currentUserId }) => { // assume you pass landlord id as prop
-  const router = useRouter();
+const page = ({ currentUserId }) => { 
+
+ const [isAuthenticated, setIsAuthenticated] = useState(false);
+ const router = useRouter();
+ 
+ useEffect(() => {
+     const checkAuth = async () => {
+         try {
+             const res = await fetch("/api/auth/me", 
+                 { credentials: "include" });
+             setIsAuthenticated(res.ok);
+         } catch {
+             setIsAuthenticated(false);
+         }
+     };
+     checkAuth();
+ }, []);
+     
+     const goToContact = () => {
+         router.push("/contact");
+     };
+      const goToRent = () => {
+         router.push("/rent");
+     };
+ 
+     const goToSignUp = () => {
+         router.push("/signUpLanding");
+     };
+     const goTopropertyListing = () => {
+         router.push("/propertyListingLanding");
+     };
 
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 

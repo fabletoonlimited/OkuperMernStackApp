@@ -21,9 +21,47 @@ import Link from "next/link";
 import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
 import { FaExclamationCircle, FaStar } from "react-icons/fa";
 import PropertyCard from "@/components/propertyCard";
+import tenantDashboard from "../tenantDashboard/page";
 
 const Index = () => {
+    
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("/api/auth/me", 
+                    { credentials: "include" });
+                setIsAuthenticated(res.ok);
+            } catch {
+                setIsAuthenticated(false);
+            }
+        };
+        checkAuth();
+    }, []);
+    
+        const goToSignUp = () => {
+            router.push("/signUpLanding");
+        };
+        const goToInbox= () => {
+            router.push("/tenantDashboardInbox");
+        };
+
+        const [isVerified, setIsVerified] = useState(false);
+        
+        useEffect(() => {
+            const checkVerification = async () => {
+                try {
+                    const res = await fetch ("/api/landlord",
+                        {credentials: "include"})
+                    setIsVerified(res.ok);
+                } catch {
+                    setIsVerified(false);
+                }
+            };
+                checkVerification();
+        }, []);
+
     const searchParams = useSearchParams();
     const propertyId = searchParams.get("id");
 
@@ -67,7 +105,7 @@ const Index = () => {
             } catch (err) {
                 console.error("Fetch property error:", err);
                 toast.error("Failed to load property");
-            } finally { 
+            } finally {
                 setPropertyLoading(false);
             }
         };
@@ -125,8 +163,13 @@ const Index = () => {
 
             if (!res.ok) {
                 if (res.status === 401 || res.status === 403) {
+
+                    //storing redirect path
+                    localStorage.setItem("redirectAfterLogin", "/tenantDashboardInbox");
+
                     toast.error("Please login as a tenant to send a message");
                     router.push("/signInTenant");
+
                     return;
                 }
                 toast.error(data.error || "Failed to send message");
@@ -134,10 +177,13 @@ const Index = () => {
             }
 
             toast.success("Message sent to landlord successfully!");
+
             setFormData({ firstName: "", lastName: "", phone: "", message: "" });
+
             setTimeout(() => {
                 router.push("/tenantDashboardInbox");
             }, 1500);
+            
         } catch (error) {
             console.error("Send message error:", error);
             toast.error("Server error");
@@ -508,7 +554,9 @@ const Index = () => {
                             />
                         </div>
 
-                        <button
+                        <button 
+                            style={{ cursor: "pointer" }}
+
                             type="submit"
                             disabled={sendingMessage}
                             className="mt-4 w-full md:w-full px-6 py-3 text-2xl font-medium text-white bg-blue-950 rounded-lg shadow-md
@@ -520,29 +568,54 @@ const Index = () => {
                             <p className="text-black ">will be sent to</p>
                         </div>
                         <div className="flex items-center gap-4">
-                            <FontAwesomeIcon
+                        
+                               <FontAwesomeIcon
                                 icon={faUser}
                                 className="text-[28px] bg-gray-200 p-3 rounded-full"
                             />
+                           
+                         
                             <div>
                                 <h3 className="text-2xl text-black md:text-2xl">
                                     {property?.listedBy || "Landlord"}
                                 </h3>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-green-600 font-light">
-                                        Verified
-                                    </span>
-                                    <FontAwesomeIcon
-                                        icon={faCircleInfo}
-                                        style={{
-                                            fontSize: "10px",
-                                            background: "white",
-                                            borderRadius: "50%",
-                                            padding: "2px",
-                                            color: "lightgreen",
-                                        }}
-                                    />
-                                </div>
+                                    {
+                                        isVerified ? (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-green-600 font-light">
+                                                    Verified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "lightgreen",
+                                                    }}
+                                                />
+                                            </div>
+                                        ) : (
+
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-red-600 font-light">
+                                                    Unverified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "red",
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    }               
+                                
                             </div>
                         </div>
                     </form>
