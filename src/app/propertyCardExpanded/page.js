@@ -132,6 +132,11 @@ const Index = () => {
                 toast.error(data.error || "Failed to send message");
                 return;
             }
+            if (res.ok) {
+                if (res.status === 200 || res.status === 201)
+                    router.push("/tenantDashboardInbox")
+                return
+            }
 
             toast.success("Message sent to landlord successfully!");
             setFormData({ firstName: "", lastName: "", phone: "", message: "" });

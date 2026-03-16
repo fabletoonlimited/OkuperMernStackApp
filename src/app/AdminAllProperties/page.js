@@ -38,57 +38,74 @@ export default function AdminAllPropertyPage() {
                 <h1 className="text-2xl font-semibold mb-6">All Properties</h1>
 
                 {/* Header */}
-                <div className="grid grid-cols-6 text-gray-500 text-sm mb-3 px-4">
-                    <span>ID</span>
-                    <span>STATUS</span>
-                    <span>LISTED</span>
-                    <span>SOLD/RENTED</span>
-                    <span>AMOUNT</span>
-                    <span>PROPERTY</span>
+                <div className="grid grid-cols-6 items-center text-gray-400 text-xs mb-3 px-6 py-2 uppercase tracking-wide">
+                    <div className="flex items-center">ID</div>
+                    <div className="flex items-center">STATUS</div>
+                    <div className="flex items-center">LISTED</div>
+                    <div className="flex items-center">SOLD / RENTED</div>
+                    <div className="flex items-center">AMOUNT</div>
+                    <div className="flex justify-center">PROPERTY</div>
                 </div>
 
                 {properties.map((property) => (
                     <Link
                         key={property._id}
                         href={`/propertyDetail/${property._id}`}>
-                        <div className="grid grid-cols-6 items-center bg-white rounded-lg shadow-sm px-4 py-3 mb-3">
-                            {/* Property ID */}
-                            <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 flex items-center justify-center bg-gray-100 rounded-full text-sm"></div>
-                                <span className="font-semibold text-gray-500">
-                                    {property._id}
-                                </span>
+                        <div className="grid grid-cols-6 items-center bg-gray-100 rounded-md px-5 py-3 mb-2 text-sm">
+                            {/* Name + Avatar */}
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-green-200 text-green-800 font-semibold text-xs">
+                                    <img
+                                        src={property.previewPic}
+                                        alt="property"
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-gray-700">
+                                        {property.title || "Property"}
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Status */}
                             <div>
-                                <span className="px-3 py-1 rounded-full text-xs font-semibold">
+                                <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-200 text-green-800">
                                     {property.status}
                                 </span>
                             </div>
 
-                            {/* Listed */}
-                            <div className="text-gray-500 text-sm font-semibold">
-                                {property.createdAt}
+                            {/* Listed Date */}
+                            <div className="text-gray-600 text-sm">
+                                {new Date(
+                                    property.createdAt,
+                                ).toLocaleDateString()}
                             </div>
 
-                            {/* Sold/Rent Date */}
-                            <div className="text-gray-500 text-xs font-semibold">
-                                {property.updatedAt}
+                            {/* Sold/Rented Date */}
+                            <div className="text-gray-600 text-sm">
+                                {new Date(
+                                    property.updatedAt,
+                                ).toLocaleDateString()}
                             </div>
 
-                            {/* Amount */}
-                            <div className="text-gray-500 font-semibold">
+                            {/* Price */}
+                            <div className="text-gray-700 font-medium">
                                 ₦{property.price}
                             </div>
 
                             {/* Property Image */}
-                            <div className="flex items-center gap-2">
+                            <div className="flex justify-center gap-3">
                                 <img
                                     src={property.previewPic}
                                     alt="property"
-                                    className="w-10 h-10 rounded object-cover"
+                                    className="w-8 h-8 rounded-full object-cover"
                                 />
+
+                                <span className="text-gray-400 text-xs mt-2">
+                                    {property._id.slice(-3)}
+                                </span>
                             </div>
                         </div>
                     </Link>

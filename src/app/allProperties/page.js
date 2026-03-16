@@ -50,7 +50,7 @@ function AllProperties() {
             <FilterNavbarIndex />
             <main className="bg-gray-100 min-h-screen py-3 px-6 md:px-12">
                 <h1 className="text-3xl font-bold text-blue-800 mb-2 text-start">
-                    All Properties
+                    New Properties
                 </h1>
                 <p className="text-md text-blue-800 mb-6 text-start">
                     {propertyItems.filter((item) => !item.isAd).length} homes

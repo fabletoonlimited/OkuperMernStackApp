@@ -11,7 +11,9 @@ const index = () => {
         <div>
             <div className="exp-prop-nav bg-white flex items-center justify-between px-4 py-3">
                 <div className="flex items-center back-to-listing gap-3 cursor-pointer">
-                    <FaAngleLeft className="text-blue-800" />
+                      <Link href="/rent">
+                        <FaAngleLeft className="text-blue-800" />
+                    </Link>
                     <Link href="/rent">
                         <h3 className="font-regular text-blue-800">
                             Back to Listing
