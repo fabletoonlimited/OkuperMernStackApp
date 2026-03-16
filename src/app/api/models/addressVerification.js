@@ -74,5 +74,6 @@ addressVerificationSchema.pre('save', async function(next) {
         next();
     }
 });
-const AddressVerification = mongoose.model('AddressVerification', addressVerificationSchema);
-export default AddressVerification; 
+
+export default mongoose.models. AddressVerification || mongoose.model( "AddressVerification",  addressVerificationSchema);
+

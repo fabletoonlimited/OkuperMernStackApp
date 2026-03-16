@@ -1,99 +1,161 @@
 "use client";
 
-import React from "react";
-import { FaMoneyBillWave } from "react-icons/fa";
-import AdminDashboardSidebar from "../../components/adminDashboardSidebar/index"
-const Page = () => {
-    const properties = [
-        {
-            id: "SLR-102",
-            status: "Rented",
-            listed: "13 Jan 2024",
-            sold: "13 Jun 2024",
-            price: "₦1,000,000",
-            property: "Greenwood 1",
-            image: "/property1.jpg",
-        },
-        {
-            id: "SLR-103",
-            status: "Sold",
-            listed: "20 Feb 2024",
-            sold: "10 Jul 2024",
-            price: "₦2,500,000",
-            property: "Palm View Estate",
-            image: "/property2.jpg",
-        },
-        {
-            id: "SLR-104",
-            status: "Vacant",
-            listed: "5 Mar 2024",
-            sold: "12 jul 2025",
-            price: "₦850,000",
-            property: "Sunrise Apartments",
-            image: "/property3.jpg",
-        },
-    ];
+import React, { useEffect, useState } from "react";
+import AdminDashboardSidebar from "../../components/adminDashboardSidebar";
+import Link from "next/link";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-    // Function to get text color only
-    const getStatusTextColor = (status) => {
-        if (status === "Rented" || status === "Sold") return "text-green-700";
-        if (status === "Vacant") return "text-red-700";
-        return "text-gray-700";
-    };
+export default function AdminAllPropertyPage() {
+    const [properties, setProperties] = useState([]);
+    const [landlord, setLandlord] = useState([])
+
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const res = await fetch("/api/property");
+
+                if (!res.ok) {
+                    toast.error("Failed to fetch property details");
+                    return;
+                }
+
+                const data = await res.json();
+                setProperties(data);
+            } catch (error) {
+                console.error(error);
+                toast.error("Failed to load property");
+            }
+        };
+
+        fetchProperty();
+
+        
+    }, []);
+
+     useEffect(() => {
+         const fetchLandlord = async () => {
+             try {
+                 const res = await fetch("/api/landlord");
+
+                 if (!res.ok) {
+                     toast.error("Failed to fetch landlord details");
+                     return;
+                 }
+
+                 const data = await res.json();
+                 setLandlord(data);
+             } catch (error) {
+                 console.error(error);
+                 toast.error("Failed to load landlord");
+             }
+         };
+
+         fetchLandlord();
+     }, []);
+
+    
+
+    // Helper to get status badge classes with refined colors
+    function getStatusClass(status) {
+        switch (status) {
+            case "Vacant":
+                return "bg-red-100 text-red-700"; // light red background + bold red text
+            case "Rented":
+            case "Sold":
+                return "bg-green-100 text-green-700"; // light green background + green text
+            default:
+                return "bg-gray-100 text-gray-600";
+        }
+    }
 
     return (
-        <><AdminDashboardSidebar/>
-        <div className="mt-6 p-6 bg-auto">
-            <h2 className="font-semibold mb-4 text-2xl">All Properties</h2>
+        <div className="flex">
+            <AdminDashboardSidebar />
 
-            {/* Header */}
-            <div className="grid grid-cols-6  font-medium text-gray-500 p-3">
-                <span>ID</span>
-                <span>Status</span>
-                <span>Listed</span>
-                <span>Sold / Rented</span>
-                <span>Price</span>
-                <span>Property</span>
-            </div>
+            <div className="bg-gray-50 min-h-screen p-8 w-full">
+                <h1 className="text-2xl font-semibold mb-6">All Properties</h1>
 
-            {/* Rows */}
-            <div className="rounded-lg p-3">
-                {properties.map((p, i) => (
-                    <div
-                        key={i}
-                        className="grid grid-cols-6 items-center text-sm py-3 px-3 mb-3 bg-white rounded-lg shadow-sm">
-                        <span>{p.id}</span>
+                {/* Header */}
+                <div className="grid grid-cols-7 items-center gap-4 text-gray-400 text-xs mb-3 px-6 py-3 uppercase tracking-wider border-b">
+                    <div>ID</div>
+                    <div>Status</div>
+                    <div>Listed</div>
+                    <div>Sold / Rented</div>
+                    <div>Amount</div>
+                    <div>Property Name</div>
+                    <div className="text-right">Property</div>
+                </div>
 
-                        {/* Status Badge with gray background and colored text */}
-                        <span
-                            className={`text-xs px-3 py-1 rounded-full w-fit font-medium bg-gray-200 ${getStatusTextColor(
-                                p.status,
-                            )}`}>
-                            {p.status}
-                        </span>
+                {properties.map((property) => (
+                    <Link
+                        key={property._id}
+                        href={`/propertyDetail/${property._id}`}
+                        className="no-underline">
+                        <div className="grid grid-cols-7 items-center bg-gray-100 rounded-md px-5 py-3 mb-2 text-sm hover:bg-gray-200 transition cursor-pointer">
+                            {/* ID */}
+                            <div className="flex gap-3">
+                            <div className="text-gray-700 font-medium">
+                                {landlord.previewPic || "img"}
+                            </div>
+                            <div className="text-gray-700 font-medium">
+                                {landlord.firstName || "name"}
+                                </div>
+                            </div>
 
-                        <span>{p.listed}</span>
-                        <span>{p.sold}</span>
+                            {/* Status */}
+                            <div>
+                                <span
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold 
+                                        ${getStatusClass(
+                                        property.status,
+                                    )}`}>
+                                    {property.status}
+                                </span>
+                            </div>
 
-                        {/* Price */}
-                        <span className="flex items-center gap-1 font-medium">
-                            <FaMoneyBillWave /> {p.price}
-                        </span>
+                            {/* Listed Date */}
+                            <div className="text-gray-600 text-sm">
+                                {new Date(
+                                    property.createdAt,
+                                ).toLocaleDateString()}
+                            </div>
 
-                        {/* Property with round image */}
-                        <span className="flex items-center gap-2">
-                            <img
-                                src={p.image}
-                                alt={p.property}
-                                className="w-8 h-8 rounded-full object-cover"
-                            />
-                            {p.property}
-                        </span>
-                    </div>
+                            {/* Sold/Rented Date */}
+                            <div className="text-gray-600 text-sm">
+                                {new Date(
+                                    property.updatedAt,
+                                ).toLocaleDateString()}
+                            </div>
+
+                            {/* Amount */}
+                            <div className="text-gray-700 font-medium">
+                                ₦{property.price}
+                            </div>
+
+                            {/* Property Name */}
+                            <div className="text-gray-700 font-semibold">
+                                {property.title || "Property Name"}
+                            </div>
+
+                            {/* Property Image */}
+                            <div className="flex justify-end items-center gap-2">
+                                <img
+                                    src={
+                                        property.previewPic ||
+                                        "/placeholder.png"
+                                    }
+                                    alt="property"
+                                    className="w-8 h-8 rounded-full object-cover"
+                                />
+                                <span className="text-gray-400 text-xs mt-1">
+                                    {property._id?.slice(-3)}
+                                </span>
+                            </div>
+                        </div>
+                    </Link>
                 ))}
             </div>
-        </div></>
+        </div>
     );
-};
-
-export default Page;
+}

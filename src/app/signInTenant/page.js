@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
-import route from "../api/landlordAddressVerfication/route";
 
 const page = () => {
   const router = useRouter();
@@ -158,7 +157,7 @@ const page = () => {
         </form>
 
         {/*Banner Section*/}
-        <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-240 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
+        <div className="bannerSection md:flex md:justify-right md:items-right mt-10 md:-mt-186 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
           {/* RIGHT SECTION */}
           <div
             className={

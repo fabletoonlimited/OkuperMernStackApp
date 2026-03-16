@@ -1,4 +1,5 @@
-import AddressVerification from "../models/addressVerification.js";
+"use client";
+import AddressVerification from "../models/addressVerification";
 import { streamUpload } from "../../lib/streamUpload.js";
 
 // Create a new address with utility bill
