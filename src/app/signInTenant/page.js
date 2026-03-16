@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import route from "../api/landlordAddressVerfication/route";
 
 const page = () => {
   const router = useRouter();
@@ -63,10 +64,18 @@ const page = () => {
       }
 
       toast.success("Login successful! 🎉");
-      setTimeout(() => {
-        router.push("/tenantDashboard");
-      }, 1000);
-    } catch (error) {
+
+        const redirect = localStorage.getItem("redirectAfterLogin");
+
+          if (redirect) {
+            localStorage.removeItem("redirectAfterLogin");
+            router.push(redirect);
+          } else {
+            setTimeout(() => {
+              router.push("/tenantDashboard");
+            }, 1000);
+          }
+      } catch (error) {
       console.error("Login error:", error);
       toast.error("Something went wrong. Please try again.");
       setLoading(false);
