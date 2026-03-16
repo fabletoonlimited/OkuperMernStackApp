@@ -67,7 +67,7 @@ const Index = () => {
             } catch (err) {
                 console.error("Fetch property error:", err);
                 toast.error("Failed to load property");
-            } finally {
+            } finally { 
                 setPropertyLoading(false);
             }
         };

@@ -64,6 +64,8 @@ export async function POST(req) {
     Img5 = getUrl(Img5);
     Img6 = getUrl(Img6);
 
+
+    // const formattedAddress = `${address.line1 || ""} ${address.line2 || ""}`.trim();
     const validPropertyType = propertyType === "Appartment" ? "Apartment" : propertyType;
 
     const newProperty = await createProperty({

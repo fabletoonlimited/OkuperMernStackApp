@@ -20,7 +20,8 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
   useEffect(() => {
     const fetchLandlordId = async () => {
       try {
-        const res = await fetch("/api/user/me", { credentials: "include" });
+        const res = await fetch("/api/user/me", 
+          { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
           setLandlordId(data.actorId || null);
@@ -53,6 +54,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
     propertyAmenities: "",
     neighbourhoodPostcode: "",
     nearbyPlaces: "",
+    status: "",
     status: "",
     listedBy: "",
   });
@@ -179,12 +181,11 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
     const bed = formData.bed;
     const bath = formData.bath;
 
-    const statusMap = {
-      Rented: "Rented",
-      Vacant: "Vacant",
-      Sold:"Sold",
+    const status = {
+      rented: "rented",
+      vacant: "vacant",
+      sold: "sold"
     }
-    const status = statusMap[formData.status] || "Vacant";
 
     const stateMap = {
       Abia: "Abia", 
@@ -247,6 +248,7 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
       !bed ||
       !bath ||
       !status ||
+      !status ||
       !formData.listedBy ||
       !formData.buildingAmenities ||
       !formData.propertyAmenities ||
@@ -263,11 +265,11 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          landlordId,
+          landlordId, 
           propertyType,
           bed,
           bath,
-          status,
+          status
         }),
       });
 
@@ -704,40 +706,40 @@ const page = ({ currentUserId }) => { // assume you pass landlord id as prop
                           </span>
                       </li>
 
-                      <li className="flex">
-                          <h5 className="md:m-0  mt-1">Rating:</h5>
-                          <span className="md:ml-8 ml-2">
-                              <RatingStar rating={3} />
-                          </span>
-                      </li>
-                      <li className="md:flex">
-                          <h5 className="mt-4">Status:</h5>
-                          <span className="space-x-2 space-y-4 text-white md:ml-6">
-                              {["Vacant", "Rented", "Sold"].map(
-                                  (feature) => (
-                                      <button
-                                          key={feature}
-                                          type="button"
-                                          onClick={() =>
-                                              setFormData((prev) => ({
-                                                  ...prev,
-                                                  status: feature,
-                                              }))
-                                          }
-                                          className={`w-32 h-15 rounded cursor-pointer transition
+            <li className="flex">
+              <h5 className="md:m-0  mt-1">Rating:</h5>
+              <span className="md:ml-8 ml-2">
+                <RatingStar rating={3} />
+              </span>
+            </li>
+            
+
+            <li className="md:flex">
+              <h5 className="mt-4">Status:</h5>
+              <span className="space-x-2 space-y-4 text-white md:ml-6">
+                {["Vacant", "Rented", "Sold"].map((feature) => (
+                  <button
+                    key={feature}
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: feature,
+                      }))
+                    }
+                    className={`w-32 h-15 rounded cursor-pointer transition
                       ${
-                          formData.status === feature
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-900 text-white"
+                        formData.category === feature
+                          ? "bg-blue-700 text-white"
+                          : "bg-blue-900 text-white"
                       }
-                    `}>
-                                          {feature}
-                                      </button>
-                                  ),
-                              )}
-                          </span>
-                      </li>
-                     
+                    `}
+                  >
+                    {feature}
+                  </button>
+                ))}
+              </span>
+            </li>
 
                       <li className="md:flex">
                           <h5 className="mt-4">Listed By:</h5>

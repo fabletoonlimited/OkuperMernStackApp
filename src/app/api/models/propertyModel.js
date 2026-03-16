@@ -24,11 +24,11 @@ const propertySchema = new mongoose.Schema(
     title: { type: String, required: true },
     address: { type: String, required: true },
     state: { type: String, 
-    enum: ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta",
+    enum: ["Abia", "Abuja", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta",
       "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara",
       "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
     ],
-    // lowercase: true,
+    lowercase: true,
     required: true 
     },
 
@@ -80,9 +80,8 @@ const propertySchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Vacant", "Rented","Sold"],
-      default: "Vacant",
-      required: true
+      enum: ["rented", "vacant, sold"],
+      default: "vacant"
     },
 
     listedBy: { type: String, required: true },

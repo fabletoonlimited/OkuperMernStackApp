@@ -51,7 +51,8 @@ export const createProperty = async (data) => {
   if (!bath) throw new Error("At least one number of bath is required");
   if (!status) throw new Error("At least one status is required");
   if (!listedBy) throw new Error("Property listed by is required");
-  
+ 
+
   // Format address safely
   // const formattedAddress = `${address?.line1 || ""} ${address?.line2 || ""}`.trim();
 
