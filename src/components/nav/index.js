@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState(null); // "landlord" | "tenant" | null
+  const [userRole, setUserRole] = useState(null); // "landlord" | "tenant" | "admin" | null
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

@@ -31,6 +31,10 @@ useEffect(() => {
     const goToContact = () => {
         router.push("/contact");
     };
+     const goToRent = () => {
+        router.push("/rent");
+    };
+
     const goToSignUp = () => {
         router.push("/signUpLanding");
     };
@@ -115,8 +119,8 @@ useEffect(() => {
                         <button className="bg-white text-blue-950 hover:rounded-full flex gap-3 md:px-8 px-22 pt-3 md:py-3  text-md md:text-base hover:bg-amber-200 transition"
                             onClick={
                                 isAuthenticated === true
-                                    ? goTopropertyListing
-                                    : goToSignUp
+                                    ? goToRent
+                                    : goToRent
                             }
                             style={{ cursor: "pointer" }}
                         >
