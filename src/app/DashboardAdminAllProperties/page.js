@@ -73,7 +73,7 @@ export default function AdminAllPropertyPage() {
         <div className="flex">
             <AdminDashboardSidebar />
 
-            <div className="bg-gray-50 min-h-screen p-8 w-full">
+            <div className=" min-h-screen p-8 w-full">
                 <h1 className="text-2xl font-semibold mb-6">All Properties</h1>
 
                 {/* Header */}
@@ -92,7 +92,7 @@ export default function AdminAllPropertyPage() {
                         key={property._id}
                         href={`/propertyDetail/${property._id}`}
                         className="no-underline">
-                        <div className="grid grid-cols-7 items-center bg-gray-100 rounded-md px-5 py-3 mb-2 text-sm hover:bg-gray-200 transition cursor-pointer">
+                        <div className="grid grid-cols-7 items-center bg-white rounded-md px-5 py-3 mb-2 text-sm hover:bg-gray-200 transition cursor-pointer">
                             {/* ID */}
                             <div className="flex gap-3">
                             <div className="text-gray-700 font-medium">

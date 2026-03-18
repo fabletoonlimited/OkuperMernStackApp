@@ -6,7 +6,6 @@ import FilterNavbarIndex from "../../components/filterNavbarHome";
 import "../../style/globals.css";
 import { insertAdBanners } from "../../utils/insertAdBanners";
 
-
 function AllProperties() {
     const [propertyItems, setPropertyItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,10 +14,14 @@ function AllProperties() {
     useEffect(() => {
         const fetchProperties = async () => {
             try {
-                const res = await fetch("/api/property", 
-                    { method: "GET" });
-                    
+                const res = await fetch("/api/property", { method: "GET" });
                 const data = await res.json();
+
+                if (!res.ok) {
+                    console.error(data.message || "Failed to fetch properties");
+                    setError(data.message || "Failed to fetch properties");
+                    return;
+                }
 
                 const filtered = data.filter(
                     (item) =>
@@ -28,12 +31,7 @@ function AllProperties() {
                         item._id,
                 );
 
-            if (!res.ok) {
-            console.error(data.message || "Failed to fetch properties");
-            return;
-            }
-
-            const mixed = insertAdBanners(filtered);
+                const mixed = insertAdBanners(filtered);
                 setPropertyItems(mixed);
             } catch (err) {
                 console.error("Error loading properties:", err);
@@ -81,19 +79,17 @@ function AllProperties() {
                     </div>
                 )}
 
-                {/*buton Banner */}
+                {/* Button Banner */}
                 <div className="flex flex-col items-center justify-center mt-14 bg-blue-950 p-6 md:p-4 max-w-full md:max-w-6xl mx-8 md:mx-8">
-                    <p className="text-2xl  text-white text-center mt-6">
+                    <p className="text-2xl text-white text-center mt-6">
                         WorkmanHQ!
                     </p>
-                    <p className=" text-white text-center mt-1 font-extralight">
-                        Dont let pests control you. Contact us for more details.
+                    <p className="text-white text-center mt-1 font-extralight">
+                        Don't let pests control you. Contact us for more
+                        details.
                     </p>
-                    <button
-                        className="px-4 py-3 border-1 rounded-lg mt-4 mb-2 hover:bg-blue-900 hover:scale-95 transition duration-300 ease-in-out
-                        text-white text-sm   font-semibold md:text-lg">
-                            {" "}
-                            Get Started
+                    <button className="px-4 py-3 border-1 rounded-lg mt-4 mb-2 hover:bg-blue-900 hover:scale-95 transition duration-300 ease-in-out text-white text-sm font-semibold md:text-lg">
+                        Get Started
                     </button>
                 </div>
             </main>
@@ -101,4 +97,4 @@ function AllProperties() {
     );
 }
 
-export default Rent;
+export default AllProperties;

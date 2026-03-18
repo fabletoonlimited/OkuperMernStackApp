@@ -274,55 +274,14 @@ const page = () => {
                                     onChange={handleInputChange}
                                     className="border-2 border-gray-300 p-3 rounded w-full mb-6"
                                 />
-
-                                <label className="block mb-2 font-medium">
-                                    Referral Code (Optional)
-                                </label>
-                                <input
-                                    type="text"
-                                    name="referralCode"
-                                    value={formData.referralCode}
-                                    onChange={handleInputChange}
-                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
-                                />
-
-                                <label className="block mb-2 font-medium">
-                                    How did you hear about Okuper?
-                                </label>
-                                <input
-                                    type="text"
-                                    name="survey"
-                                    value={formData.survey}
-                                    onChange={handleInputChange}
-                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
-                                />
-
-                                {/* Terms */}
-                                <div className="flex items-start gap-3 mt-4">
-                                    <input
-                                        type="checkbox"
-                                        checked={termsAccepted}
-                                        onChange={(e) =>
-                                            setTermsAccepted(e.target.checked)
-                                        }
-                                        className="w-5 h-5 accent-blue-700 mt-1"
-                                    />
-                                    <span className="text-sm">
-                                        By signing up, you agree to Okuper's{" "}
-                                        <a
-                                            href="/termsOfService"
-                                            className="text-blue-600 underline">
-                                            Terms of Service
-                                        </a>{" "}
-                                        and{" "}
-                                        <a
-                                            href="/privacyPolicy"
-                                            className="text-blue-600 underline">
-                                            Privacy Policy
-                                        </a>
-                                        .
-                                    </span>
-                                </div>
+                                <p className="mt-6 mb-6">
+                                    Forgot password?
+                                    <Link href="/forgotPassword">
+                                        <span className="ml-2 cursor-pointer text-blue-600 hover:underline">
+                                            Click here
+                                        </span>
+                                    </Link>
+                                </p>
 
                                 <button
                                     onClick={handleSignUp}
@@ -343,7 +302,7 @@ const page = () => {
                                 </div>
 
                                 {/* Middle Text */}
-                                <p className="absolute top-44 text-white text-left text-lg px-12">
+                                <p className="absolute top-44 text-white text-left mt-5 text-lg px-12">
                                     No agents. No hidden fees. Just verified
                                     people and real homes.
                                 </p>
