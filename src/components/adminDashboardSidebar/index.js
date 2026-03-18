@@ -131,7 +131,7 @@ const Sidebar = () => {
                         </li>
                     </Link>
 
-                    <Link href="/homeInterest">
+                    <Link href="/TenantDisputeForm">
                         <li className="px-4 py-2 rounded hover:bg-blue-800 text-white">
                             Disputes
                         </li>

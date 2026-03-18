@@ -11,7 +11,7 @@ const index = () => {
         <div>
             <div className="exp-prop-nav bg-white flex items-center justify-between px-4 py-3">
                 <div className="flex items-center back-to-listing gap-3 cursor-pointer">
-                      <Link href="/rent">
+                    <Link href="/rent">
                         <FaAngleLeft className="text-blue-800" />
                     </Link>
                     <Link href="/rent">
@@ -51,15 +51,16 @@ const index = () => {
                         </button>
                     </Link>
 
-                    <Link href="/Contact">
-                        <button className="w-14 h-14">
-                            <img
-                                src="/Report_Icon.png"
-                                alt="Report Icon"
-                                className="w-full h-full object-contain"
-                            />
-                        </button>
-                    </Link>
+                    {/* Use router for report */}
+                    <button
+                        className="w-14 h-14 cursor-pointer"
+                        onClick={() => router.push("/TenantDisputeForm")}>
+                        <img
+                            src="/Report_Icon.png"
+                            alt="Report Icon"
+                            className="w-full h-full object-contain"
+                        />
+                    </button>
                 </div>
             </div>
         </div>
