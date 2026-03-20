@@ -46,6 +46,8 @@ const tenantSchema = new mongoose.Schema(
     message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
     property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
+    payment: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]
 
 }, {timestamps: true});
 

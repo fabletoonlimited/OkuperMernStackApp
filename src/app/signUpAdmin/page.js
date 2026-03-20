@@ -19,9 +19,7 @@ const page = () => {
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
-    survey: "",
-    referralCode: "",
+    password: ""
   });
 
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -36,7 +34,7 @@ const page = () => {
       });
 
       if (res.ok) {
-        router.replace("/landlordDashboard");
+        router.replace("/adminDashboard");
       }
     };
     checkAuth();
@@ -88,32 +86,29 @@ const page = () => {
     //   return;
     // }
 
-    if (!termsAccepted) {
-      toast.error("Please accept the terms and conditions");
-      return;
-    }
+    // if (!termsAccepted) {
+    //   toast.error("Please accept the terms and conditions");
+    //   return;
+    // }
 
     try {
-      // Create landlord
-      const landlordRes = await fetch("/api/landlord", {
+      // Create SuperAdmin
+      const superAdminRes = await fetch("/api/superAdmin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId,
+          // userId,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
-          survey: formData.survey,
-          referralCode: formData.referralCode,
-          terms: termsAccepted,
         }),
       });
 
-      const landlord = await landlordRes.json();
+      const superAdmin = await superAdminRes.json();
 
-      if (!landlordRes.ok) {
-        toast.error(landlord.message || "Failed to create landlord");
+      if (!superAdminRes.ok) {
+        toast.error(superAdmin.message || "Failed to create superAdmin");
         return;
       }
     
@@ -125,7 +120,7 @@ const page = () => {
           action: "generate",
           email: formData.email,
           purpose: "verifyAccount",
-          userType: "landlord",
+          userType: "superAdmin",
         }),
       });
 
@@ -159,7 +154,7 @@ const page = () => {
           email: formData.email,
           code: otpCode,
           purpose: "verifyAccount",
-          userType: "landlord",
+          userType: "superAdmin",
         }),
       });
 
@@ -171,8 +166,8 @@ const page = () => {
         throw new Error(data.message || "Invalid OTP");
       }
 
-      // Update landlord to verified
-      const updateRes = await fetch("/api/landlord", {
+      // Update superAdmin to verified
+      const updateRes = await fetch("/api/superAdmin", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -188,7 +183,7 @@ const page = () => {
         toast.error("Verification successful but failed to update account");
         return;
       } else {
-        console.log("✅ Landlord updated to verified");
+        console.log("✅ SuperAdmin updated to verified");
         toast.success("Account verified successfully! 🎉");
         setShowOtpLandlord(false);
       }
@@ -196,7 +191,7 @@ const page = () => {
       // Redirect to landlord signin page
       setTimeout(() => {
         toast.success("🚀 Redirecting to sign in page...");
-        router.push("/signInLandlord");
+        router.push("/signInAdmin");
       }, 2000);
     } catch (err) {
       console.error(err);

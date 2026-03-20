@@ -47,6 +47,7 @@ const Index = () => {
             router.push("/tenantDashboardInbox");
         };
 
+        //Check if Landlord is verified
         const [isVerified, setIsVerified] = useState(false);
         
         useEffect(() => {
@@ -60,7 +61,7 @@ const Index = () => {
                 }
             };
                 checkVerification();
-        }, []);
+        },  []);
 
     const searchParams = useSearchParams();
     const propertyId = searchParams.get("id");
@@ -169,7 +170,6 @@ const Index = () => {
 
                     toast.error("Please login as a tenant to send a message");
                     router.push("/signInTenant");
-
                     return;
                 }
                 toast.error(data.error || "Failed to send message");
@@ -196,7 +196,6 @@ const Index = () => {
             setSendingMessage(false);
         }
     };
-
 
     return (
         <div className="w-auto">
@@ -278,8 +277,8 @@ const Index = () => {
                         ))}
                     </div>
 
-                    {/* DESKTOP GRID */}
-                  <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-4">
+                {/* DESKTOP GRID */}
+                <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-4">
 
   {/* MAIN LARGE IMAGE */}
   <div className="relative col-span-2 row-span-2 rounded-lg border shadow-lg overflow-hidden aspect-[5/3] cursor-pointer">
@@ -393,19 +392,43 @@ const Index = () => {
                                     {property?.listedBy || "Landlord"}
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-green-600 font-light md:text-base">
-                                        Verified
-                                    </span>
-                                    <FontAwesomeIcon
-                                        icon={faCircleInfo}
-                                        style={{
-                                            fontSize: "10px",
-                                            background: "white",
-                                            borderRadius: "50%",
-                                            padding: "2px",
-                                            color: "lightgreen",
-                                        }}
-                                    />
+                                     {
+                                        isVerified ? (
+                                            <div className="flex items-center gap-2">
+                                             <span className="text-red-600 font-light">
+                                                    Unverified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "red",
+                                                    }}
+                                                />
+                                            </div>
+                                        ) : (
+
+                                            <div className="flex items-center gap-2">
+                                                 <span className="text-green-600 font-light">
+                                                    Verified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "lightgreen",
+                                                    }}
+                                                />
+                                               
+                                            </div>
+                                        )
+                                    }               
                                 </div>
                             </div>
                             <hr className="mt-4 md:mt-6 text-gray-300" />
@@ -587,24 +610,7 @@ const Index = () => {
                                     {
                                         isVerified ? (
                                             <div className="flex items-center gap-2">
-                                                <span className="text-green-600 font-light">
-                                                    Verified
-                                                </span>
-                                                <FontAwesomeIcon
-                                                    icon={faCircleInfo}
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        background: "white",
-                                                        borderRadius: "50%",
-                                                        padding: "2px",
-                                                        color: "lightgreen",
-                                                    }}
-                                                />
-                                            </div>
-                                        ) : (
-
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-red-600 font-light">
+                                             <span className="text-red-600 font-light">
                                                     Unverified
                                                 </span>
                                                 <FontAwesomeIcon
@@ -617,6 +623,24 @@ const Index = () => {
                                                         color: "red",
                                                     }}
                                                 />
+                                            </div>
+                                        ) : (
+
+                                            <div className="flex items-center gap-2">
+                                                 <span className="text-green-600 font-light">
+                                                    Verified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%", 
+                                                        padding: "2px",
+                                                        color: "lightgreen",
+                                                    }}
+                                                />
+                                               
                                             </div>
                                         )
                                     }               

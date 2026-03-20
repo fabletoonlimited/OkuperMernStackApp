@@ -31,8 +31,11 @@ const landlordSchema = new mongoose.Schema(
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
     landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc"},
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
-    message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
+    messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
+    payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    subscription: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}],
+    disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]
     
   }, { timestamps: true }
 );

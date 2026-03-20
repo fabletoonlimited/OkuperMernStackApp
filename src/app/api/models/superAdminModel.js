@@ -1,7 +1,7 @@
 import {mongoose} from "@/app/lib/mongoose.js"
 import bcrypt from "bcryptjs"
 
-const adminSchema = new mongoose.Schema(
+const superAdminSchema = new mongoose.Schema(
   {
     firstName: { 
         type: String, 
@@ -19,8 +19,6 @@ const adminSchema = new mongoose.Schema(
         trim: true
     },
     password: {type: String, required: true},
-    survey: {type: String},
-    terms: {type: Boolean, required: true},
     forgotPasswordToken: {type: String},
     forgotPasswordTokenExpiry: {type: Date},
 
@@ -29,9 +27,9 @@ const adminSchema = new mongoose.Schema(
         default: false
     },
 
-    isAdmin: {
+    isSuperAdmin: {
         type: Boolean,
-        default: false
+        default: true
     },
 
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
@@ -48,15 +46,15 @@ const adminSchema = new mongoose.Schema(
 }, {timestamps: true});
 
 // Password hashing
-adminSchema.pre("save", async function(next) {
+superAdminSchema.pre("save", async function(next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-adminSchema.index(
-  { isAdmin: 1 },
-  { unique: true, partialFilterExpression: { isAdmin: true } }
-);
+superAdminSchema.index(
+    {isSuperAdmin: 1 },
+    {unique: true, partialFilterExpression: { isSuperAdmin: true }}
+)
 
-export default mongoose.models.Admin || mongoose.model("Admin", adminSchema);
+export default mongoose.models.SuperAdmin || mongoose.model("SuperAdmin", superAdminSchema);
