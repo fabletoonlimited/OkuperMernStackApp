@@ -3,7 +3,7 @@ import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 import React, { useState, useEffect } from "react";
-import TenantDashboardCompleted from "../TenantDashboardCompleted/page.js";
+import TenantDashboardCompleted from "../tenantDashboardCompleted/page.js";
 
 function tenantDashboard() {
    const [profilePercent, setProfilePercent] = useState(null);

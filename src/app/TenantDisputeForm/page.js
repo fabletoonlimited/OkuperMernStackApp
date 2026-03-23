@@ -2,13 +2,10 @@ import React from "react";
 import AdminDashboardSidebar from "../../components/adminDashboardSidebar";
 
 const Page = () => {
-    
     return (
-        <div className="flex min-h-screen bg-gray-100">
-            {/* Sidebar */}
+        <div className="flex min-h-screen">
             <AdminDashboardSidebar />
 
-            {/* Main Content */}
             <div className="flex-1 flex justify-center py-8">
                 <div className="w-full max-w-5xl px-4">
                     <h1 className="text-2xl font-semibold text-gray-800 mb-10">
@@ -27,7 +24,7 @@ const Page = () => {
                             <input
                                 type="text"
                                 placeholder="FULLNAME"
-                                className="flex-1 border border-gray-600 rounded px-4 py-2 text-sm outline-none"
+                                className="flex-1 border border-gray-600 rounded px-4 py-2 text-sm"
                             />
                         </div>
 
@@ -38,7 +35,7 @@ const Page = () => {
                             <textarea
                                 rows={6}
                                 placeholder="Message"
-                                className="flex-1 border border-gray-600 rounded px-4 py-3 text-sm outline-none resize-none"
+                                className="flex-1 border border-gray-600 rounded px-4 py-3 text-sm resize-none"
                             />
                         </div>
 
@@ -54,7 +51,7 @@ const Page = () => {
                                 PROPERTY:
                             </label>
                             <div className="flex items-center gap-2 text-sm text-gray-700">
-                                <img src="" alt="yoo" />
+                                <img src="" alt="" />
                                 <span>SLR-102</span>
                             </div>
                         </div>

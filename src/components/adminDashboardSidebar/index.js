@@ -74,6 +74,7 @@ const Sidebar = () => {
                 className={`landlordDashboardSidebar px-6 text-white bg-blue-950 h-screen w-[272px] fixed top-0 left-0 z-50 transform transition-transform duration-300 ${
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 }`}>
+                    
                 <Link href="/">
                     <img
                         className="w-45 px-4 h-auto mt-4"
