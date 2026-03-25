@@ -84,19 +84,19 @@ const Sidebar = () => {
                 </Link>
 
                 <ul className="flex flex-col mt-8 space-y-2">
-                    <Link href="/DashboardAdmin">
+                    <Link href="/dashboardAdmin">
                         <li className="px-4 py-2 rounded hover:bg-blue-800 text-white">
                             Dashboard
                         </li>
                     </Link>
 
-                    <Link href="/AdminDisputePage">
+                    <Link href="/adminDisputePage">
                         <li className="px-4 py-2 rounded hover:bg-blue-800 text-white">
                             Complaints / Rating
                         </li>
                     </Link>
 
-                    <Link href="/DashboardAdminAllProperties">
+                    <Link href="/dashboardAdminAllProperties">
                         <li className="px-4 py-2 rounded hover:bg-blue-800 text-white">
                             Properties
                         </li>
