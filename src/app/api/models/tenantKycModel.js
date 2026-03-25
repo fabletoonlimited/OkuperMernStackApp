@@ -17,11 +17,11 @@ const tenantKycSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // status: {
-    //   type: String,
-    //   enum: ["pending", "approved", "rejected"],
-    //   default: "pending",
-    // },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
     gender: {
       type: String,
       enum: ["Male", "Female"],
@@ -117,10 +117,12 @@ const tenantKycSchema = new mongoose.Schema(
       ref: "AddressVerification",
       required: false,
     },
-  },
-  { timestamps: true },
+
+    
+    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord" },
+    
+  },{ timestamps: true },
 );
 
-const TenantKyc =
-  mongoose.models.TenantKyc || mongoose.model("TenantKyc", tenantKycSchema);
-export default TenantKyc;
+export default mongoose.models.TenantKyc || mongoose.model("TenantKyc", tenantKycSchema);
+
