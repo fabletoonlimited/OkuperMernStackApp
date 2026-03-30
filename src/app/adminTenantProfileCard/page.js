@@ -29,7 +29,7 @@ const Page = () => {
     
     return (
       <div className="mt-12 mb-12">
-      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+      <div className="flex items-center justify-center min-h-screen ">
           {/* Card */}
           <div className="w-[320px] bg-white rounded-2xl shadow-md p-5 relative text-center">
               {/* Close */}

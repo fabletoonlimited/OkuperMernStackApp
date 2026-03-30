@@ -1,16 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import AdminDashboardSidebar from "../../components/adminDashboardSidebar/index.js";
-
-
+import { useSearchParams } from "next/navigation";
 
 
 const Page = () => {
+    const searchParams = useSearchParams();
+    const propertyId = searchParams.get("id");
     const [subscribers, setSubscribers] = useState([]);
     const [tenants, setTenants] = useState([]);
     const [tenantKyc, setTenantKyc] = useState([]);
     const [landlord, setLandlord] = useState([]);
-     const [landlordKyc, setLandlordKyc] = useState([]);
+    const [landlordKyc, setLandlordKyc] = useState([]);
+    const [property, setProperty] = useState([]);
 
 useEffect(() => {
         const fetchSubscribers = async () => {
@@ -79,6 +81,24 @@ useEffect(() => {
         };
         fetchLandlordKyc();
     }, []);
+     useEffect(() => {
+           
+            const fetchProperty = async () => {
+                try {
+                    const res = await fetch(`/api/property`);
+                    if (!res.ok) {
+                        toast.error("Failed to load property");
+                        return;
+                    }
+                    const data = await res.json();
+                    setProperty(data);
+                } catch (err) {
+                    console.error("Fetch property error:", err);
+                    toast.error("Failed to load property");
+                } 
+            };
+            fetchProperty();
+        }, [propertyId]);
     return (
         <div className="">
             <AdminDashboardSidebar />
@@ -86,26 +106,35 @@ useEffect(() => {
                 {/* SUBSCRIBERS */}
                 <select className="bg-white text-gray-700 rounded px-3 py-2">
                     <option value="">Status</option>
-                    {subscribers.map((d, i) => (
-                        <option key={i}>
-                            {d.disputeNo || `DKDen - ${1000 + i}`}
-                        </option>
-                    ))}
+                
                 </select>
 
                 {/* FILTERS */}
                 <select className="bg-white text-gray-700 rounded px-3 py-2">
                     <option value="">Type</option>
+                    {property.map((u) => (
+                        <option key={u.id}>{u.propertyType}</option>
+                    ))}
                 </select>
 
                 <select className="bg-white text-gray-700 rounded px-5 py-2">
                     <option value="">Amount</option>
+                    {property.map((u) => (
+                        <option key={u.id}>{u.price}</option>
+                    ))}
+                </select>
+
+                <select className="bg-white text-gray-700 rounded px-5 py-2">
+                    <option value="">Date</option>
+                    {tenants.map((u) => (
+                        <option key={u.id}>{u.timestamps}</option>
+                    ))}
                 </select>
 
                 <select className="bg-white text-gray-700 rounded px-3 py-2">
                     <option value="">Role</option>
-                    {landlordKyc.map((u) => (
-                        <option key={u.id}>{u.email}</option>
+                    {tenants.map((u) => (
+                        <option key={u.id}>{u.role}</option>
                     ))}
                 </select>
             </div>
@@ -125,36 +154,33 @@ useEffect(() => {
             {/* DATA */}
             {tenants.map((user) => (
                 <div
-                    key={tenants.id}
+                    key={tenants?.id || 1}
                     className="grid grid-cols-7 items-center bg-white px-5 py-3 mb-2 text-sm">
                     <div className="flex items-center gap-3">
                         <img
-                            src={tenants.previewPic}
+                            src={tenants?.previewPic }
                             className="w-8 h-8 rounded-full"
                         />
                         <span>
-                            {tenants.firstName}
-                            {tenants.lastName}
+                            {tenants?.firstName
+                                || Akpan
+                            }
+                            {tenants?.lastName || Victor}
                         </span>
                     </div>
 
-                    <div
-                        className={`font-medium ${
-                            tenants.isSubscribed
-                                ? "text-green-600 bg-gray-300 px-9 w-26 rounded-3xl"
-                                : "text-red-600 bg-gray-300 px-9 w-26 rounded-3xl"
-                        }`}>
-                        {tenants.isSubscribed ? "True" : "False"}
+                    <div>
+                        STATUS
                     </div>
-                    <div className="capitalize">{tenants.type}</div>
-                    <div>{tenants.date}</div>
+                    <div className="capitalize">{tenants?.type || "Bungalow"}</div>
+                    <div>{tenants?.date ||  11/29/20}</div>
                     <div className="">{tenants.Amount}</div>
-                    <div>{tenants.Amount}</div>
+                    <div>{tenants?.Amount || 20000 }</div>
                     <div className="flex gap-4">
-                        <img src={tenants.previewPic} alt="yoo" />
-                        <span>{tenants.id}</span>
+                        <img src={landlord.previewPic || img} alt="yoo" />
+                        <span>{landlord?.id || 1234}</span>
                     </div>
-                    <div className="text-right mr-16">{tenants.role}</div>
+                    <div className="text-right mr-16">{tenants?.role || "tenant"}</div>
                 </div>
             ))}
         </div>
