@@ -22,10 +22,13 @@ export default function PropertyCard({
     bath,
     numberOfBath,
     propertyType,
-}) {
+}) 
+
+{
     const imageSrc = previewPic || "/property-image.jpg";
 
     return (
+        
         <Link href={`/propertyCardExpanded?id=${_id}`}>
             <div
                 className="w-full rounded-xl overflow-hidden shadow-md 

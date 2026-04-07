@@ -33,7 +33,7 @@ const Contact = () => {
                     <div className="w-full lg:w-7/12 flex justify-center">
                         <div className="rounded-2xl overflow-hidden shadow-xl w-full max-w-2xl">
                             {/* Top Blue Banner */}
-                            <div className="bg-[rgba(0,51,153,1)] text-white p-12">
+                            {/* <div className="bg-[rgba(0,51,153,1)] text-white p-12">
                                 <h2 className="text-5xl font-semibold leading-snug mb-8">
                                     Thank you for <br /> contacting Okuper
                                 </h2>
@@ -43,11 +43,11 @@ const Contact = () => {
                                     is available to treat your complaint in a
                                     timely manner.
                                 </p>
-                            </div>
+                            </div> */}
 
                             {/* Banner Image */}
                             <img
-                                src="/BannerSam.png"
+                                src="/ContactBanner_Section_Banner.png"
                                 alt="Ad Banner Sam"
                                 className="w-full object-cover"
                             />

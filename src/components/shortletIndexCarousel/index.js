@@ -4,7 +4,7 @@ import PropertyCard from "../propertyCard/index";
 import AdBanner from "../listingAdCard/index";
 import { insertAdBanners } from "../../utils/insertAdBanners";
 
-const TrendingRentIndexCarousel = () => {
+const ShortletIndexCarousel = () => {
     const [propertyItems, setPropertyItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,10 +22,30 @@ const TrendingRentIndexCarousel = () => {
 
                 const list = Array.isArray(data) ? data : data.properties;
 
-                // ✅ Filter only rent
+                      console.log("RAW DATA:", data);
+      console.log("LIST:", list);
+      console.log(
+      "CATEGORIES:",
+      list.map((p) => p.category)
+    );
+
+
+
+                // ✅ Filter only shortlets
                 const filtered = list.filter(
-                    (property) => property.category === "Rent"
+                  (property) => 
+                  property.category &&
+                  property.category.toLowerCase().trim() === "shortlet"
                 );
+
+
+console.log("FILTERED:", filtered);
+
+                if (filtered.length === 0) {
+                    console.error("No shortlet properties found");
+                    setError("No shortlet properties available.");
+                    return;
+                }
 
                 // OPTIONAL: insert ads
                 const mixed = insertAdBanners(filtered);
@@ -76,4 +96,4 @@ const TrendingRentIndexCarousel = () => {
     );
 };
 
-export default TrendingRentIndexCarousel;
+export default ShortletIndexCarousel;

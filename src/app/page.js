@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import Banner from "../components/bannerIndex";
 import StorySection from "../components/storySection";
 import TrendingRentIndexCarousel from "../components/trendingRentIndexCarousel";
+import ShortletIndexCarousel from "../components/shortletIndexCarousel";
 import propertyData from "../data/property";
 import HomesCategory from "../components/homesCategory";
 import XStories from "../components/xStories";
@@ -127,7 +128,7 @@ function Homepage() {
           </div>
         </div>
         <div ref={shortletsRef} className="flex -ml-28 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide">
-          <TrendingRentIndexCarousel rent={mixedItems} />
+          <ShortletIndexCarousel shortlet={mixedItems}/>
         </div>
       </section>
     </>

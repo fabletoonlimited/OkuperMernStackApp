@@ -46,7 +46,7 @@ function FilterNavbarIndex() {
     useEffect(() => {
         const fetchFilterNav = async () => {
         try {
-            const res = await fetch("./api/property",
+            const res = await fetch("/api/property",
                 { method: "GET" });
             const data = await res.json();
 

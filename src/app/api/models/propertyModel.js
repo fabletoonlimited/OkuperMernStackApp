@@ -80,7 +80,7 @@ const propertySchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["rented", "vacant, sold"],
+      enum: ["rented", "vacant", "sold"],
       default: "vacant"
     },
 
