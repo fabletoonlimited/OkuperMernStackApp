@@ -1,6 +1,7 @@
 import Landlord from "../models/landlordModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server.js";
 
 //Signup Landlord
 export const signupLandlord = async (data) => {
@@ -132,9 +133,8 @@ export const loginLandlord = async (data) => {
       { expiresIn: "1d" }, //1day
     );
 
-    return {
-      status: 200,
-      token,
+    const response = NextResponse.json (
+    {
       success: true,
       landlord: {
         id: landlord._id,
@@ -142,7 +142,19 @@ export const loginLandlord = async (data) => {
         email: landlord.email,
       },
       message: "Login successful",
-    };
+    },
+    {status: 200},
+  );
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 1day
+    });
+
+    return response;
   } catch (err) {
     console.error("Login Error:", err.message);
     return { status: 500, message: "Server error" };

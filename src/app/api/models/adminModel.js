@@ -1,7 +1,7 @@
 import {mongoose} from "@/app/lib/mongoose.js"
 import bcrypt from "bcryptjs"
 
-const adminSchema = new mongoose.Schema(
+const superAdminSchema = new mongoose.Schema(
   {
     firstName: { 
         type: String, 
@@ -19,8 +19,6 @@ const adminSchema = new mongoose.Schema(
         trim: true
     },
     password: {type: String, required: true},
-    survey: {type: String},
-    terms: {type: Boolean, required: true},
     forgotPasswordToken: {type: String},
     forgotPasswordTokenExpiry: {type: Date},
 
@@ -29,13 +27,14 @@ const adminSchema = new mongoose.Schema(
         default: false
     },
 
-    isAdmin: {
-        type: Boolean,
-        default: false
+    role: {
+        type: String,
+        enum: ["superAdmin", "admin", "support", "moderator"],
+        default: "admin",
     },
 
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
-    adminDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "AdminDashboard"},
+    DashboardSuperAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "AdminDashboard"},
     message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     tenant: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}],
@@ -48,15 +47,19 @@ const adminSchema = new mongoose.Schema(
 }, {timestamps: true});
 
 // Password hashing
-adminSchema.pre("save", async function(next) {
+superAdminSchema.pre("save", async function(next) {
     if (!this.isModified("password")) return next();
+
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
-adminSchema.index(
-  { isAdmin: 1 },
-  { unique: true, partialFilterExpression: { isAdmin: true } }
-);
+superAdminSchema.index(
+    {role: 1},
+    {
+        unique: true, 
+        partialFilterExpression: 
+        { role: "superAdmin" }}
+)
 
-export default mongoose.models.Admin || mongoose.model("Admin", adminSchema);
+export default mongoose.models.SuperAdmin || mongoose.model("SuperAdmin", superAdminSchema);

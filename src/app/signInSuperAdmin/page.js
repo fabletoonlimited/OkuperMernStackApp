@@ -16,7 +16,7 @@ const Page = () => {
             });
 
             if (res.ok) {
-                router.replace("/landlordDashboard");
+                router.replace("/dashboardSuperAdmin");
             }
         };
         checkAuth();
@@ -43,7 +43,7 @@ const Page = () => {
         setLoading(true);
 
         try {
-            const response = await fetch("/api/loginLandlord", {
+            const response = await fetch("/api/loginSuperAdmin", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -55,20 +55,20 @@ const Page = () => {
 
             const data = await response.json();
 
+            toast.success("Login successful! 🎉");
+                setTimeout(() => {
+                    router.push("/dashboardSuperAdmin");
+            }, 1000);
+
             if (!response.ok) {
                 toast.error(
-                    data.message ||
-                        data.error ||
-                        "Login failed. Please try again.",
+                    data.message || data.error || "Login failed. Please try again.",
                 );
                 setLoading(false);
                 return;
             }
 
-            toast.success("Login successful! 🎉");
-            setTimeout(() => {
-                router.push("/landlordDashboard");
-            }, 1000);
+        
         } catch (error) {
             console.error("Login error:", error);
             toast.error("Something went wrong. Please try again.");
@@ -78,7 +78,7 @@ const Page = () => {
 
     return (
         <>
-            <h1 className="font-bold text-4xl mt-16 ml-10">Sign in</h1>
+            <h1 className="font-bold text-4xl mt-16 ml-10">Sign in Admin</h1>
 
             <ToastContainer position="top-center" autoClose={3000} />
 

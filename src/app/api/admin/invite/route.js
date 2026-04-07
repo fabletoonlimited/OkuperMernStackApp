@@ -20,7 +20,7 @@ export async function POST(req) {
     const result = await signupAdmin(body);
     return NextResponse.json(result, { status: result.status || 201 });
   } catch (error) {
-    console.error("Landlord creation error:", error);
+    console.error("Admin creation error:", error);
     return NextResponse.json(
       { message: error.message || "Server error, something went wrong" },
       { status: 500 },

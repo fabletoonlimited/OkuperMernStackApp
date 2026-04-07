@@ -27,69 +27,8 @@ const disputes = [
 ];
 
 const page = () => {
-    const [properties, setProperties] = useState([]);
     
-        useEffect(() => {
-            const fetchProperty = async () => {
-                try {
-                    const res = await fetch("/api/models/tenantModels");
-                    const data = await res.json();
-                    if (!res.ok) return;
-                    setProperties(data);
-                } catch (error) {
-                    console.error(error);
-                }
-            };
-            fetchProperty();
-        }, []);
 
-     const [property, setProperty] = useState([]);
-        const [landlord, setLandlord] = useState([])
-    
-        useEffect(() => {
-            const fetchProperty = async () => {
-                try {
-                    const res = await fetch("/api/property");
-    
-                    if (!res.ok) {
-                        toast.error("Failed to fetch property details");
-                        return;
-                    }
-    
-                    const data = await res.json();
-                    setProperty(data);
-                } catch (error) {
-                    console.error(error);
-                    toast.error("Failed to load property");
-                }
-            };
-    
-            fetchProperty();
-    
-            
-        }, []);
-    
-         useEffect(() => {
-             const fetchLandlord = async () => {
-                 try {
-                     const res = await fetch("/api/landlord");
-    
-                     if (!res.ok) {
-                         toast.error("Failed to fetch landlord details");
-                         return;
-                     }
-    
-                     const data = await res.json();
-                     setLandlord(data);
-                 } catch (error) {
-                     console.error(error);
-                     toast.error("Failed to load landlord");
-                 }
-             };
-    
-             fetchLandlord();
-         }, []);
-    
     return (
         <div className="flex min-h-screen w-full bg-gray-100">
             <AdminDashboardSidebar />
@@ -124,7 +63,7 @@ const page = () => {
                                 Total Properties
                             </p>
                             <h2 className="text-xl font-bold">
-                                {property.length}
+                                {totalProperties}
                             </h2>
                         </div>
                     </div>
@@ -160,7 +99,7 @@ const page = () => {
                                 Total Complaints
                             </p>
                             <h2 className="text-xl font-bold">
-                                {property.length}
+                                {disputes.length}
                             </h2>
                         </div>
                     </div>
@@ -178,18 +117,18 @@ const page = () => {
                     </div>
 
                     <div className="rounded-lg p-3">
-                        {properties.map((tenant, i) => (
+                        {disputes.map((d, i) => (
                             <div
                                 key={i}
                                 className="grid grid-cols-4 items-center text-sm py-3 px-3 mb-3 last:mb-0 bg-white rounded-lg">
-                                <span>{tenant.id}</span>
-                                <span>{tenant.resident}</span>
+                                <span>{d.id}</span>
+                                <span>{d.resident}</span>
                                 <span className="text-gray-500">
-                                    {tenant.complaint}
+                                    {d.complaint}
                                 </span>
                                 <span className="text-yellow-500">
-                                    {"★".repeat(tenant.rating)}
-                                    {"☆".repeat(5 - tenant.rating)}
+                                    {"★".repeat(d.rating)}
+                                    {"☆".repeat(5 - d.rating)}
                                 </span>
                             </div>
                         ))}
@@ -206,7 +145,7 @@ const page = () => {
 
                 {/* Listings */}
                 <div className="p-6 sm:p-8 md:p-10 rounded-3xl w-full">
-                    <AllProperties/>
+                    <AllProperties setTotalProperties={setTotalProperties} />
                 </div>
             </div>
         </div>

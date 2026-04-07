@@ -54,15 +54,7 @@ const page = () => {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        toast.error(
-          data.message || data.error || "Login failed. Please try again.",
-        );
-        setLoading(false);
-        return;
-      }
-
-      toast.success("Login successful! 🎉");
+        toast.success("Login successful! 🎉");
 
         const redirect = localStorage.getItem("redirectAfterLogin");
 
@@ -74,6 +66,15 @@ const page = () => {
               router.push("/tenantDashboard");
             }, 1000);
           }
+
+      if (!response.ok) {
+        toast.error(
+          data.message || data.error || "Login failed. Please try again.",
+        );
+        setLoading(false);
+        return;
+      }
+
       } catch (error) {
       console.error("Login error:", error);
       toast.error("Something went wrong. Please try again.");

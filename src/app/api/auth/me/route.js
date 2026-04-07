@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // ✅ Next.js 15 requires awaiting cookies() before using its methods
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     
@@ -14,6 +13,7 @@ export async function GET() {
         { status: 401 }
       );
     }
+
 
     await jwtVerify(
       token,
@@ -26,6 +26,8 @@ export async function GET() {
     );
       
   } catch (error) {
+    console.error("Auth error", error.message);
+    
     return NextResponse.json(
       { authenticated: false, message: "Invalid or expired token" },
       { status: 401 }
