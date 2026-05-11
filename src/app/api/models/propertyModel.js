@@ -61,7 +61,16 @@ const propertySchema = new mongoose.Schema(
 
     bed: {
       type: String,
-      enum: ["1Bdr","2Bdr","3Bdr","4Bdr","5Bdr","6Bdr","7Bdr","8Bdr"],
+      enum: [
+        "1Bdr",
+        "2Bdr",
+        "3Bdr",
+        "4Bdr",
+        "5Bdr",
+        "6Bdr",
+        "7Bdr",
+        "8Bdr"
+      ],
       required: true,
     },
 
@@ -71,25 +80,22 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    // features: {
-      buildingAmenities: { type: String, default: "" },
-      propertyAmenities: { type: String, default: "" },
-      neighbourhoodPostcode: { type: String, default: "00000" },
-      nearbyPlaces: { type: String, default: "" },
-    // },
-
+    buildingAmenities: { type: [String], default: [] },
+    propertyAmenities: { type: [String], default: [] },
+    neighbourhoodPostcode: { type: String, default: "00000" },
+    nearbyPlaces: { type: [String], default: [] },
+   
     status: {
       type: String,
       enum: ["rented", "vacant", "sold"],
       default: "vacant"
     },
 
+    rating: { type: Number, min: 0, max: 5, default: 0 },
+
     listedBy: { type: String, required: true },
 
-
-
     savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
-    rating: { type: Number, min: 0, max: 5, default: 0 },
     isVerified: { type: Boolean, default: true },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},

@@ -14,27 +14,23 @@ export async function createUserController(data) {
     whoIsUsingPlatform = "someoneElse";
   }
 
-  // COMMENTED OUT: This lookup reuses the same User for different people
-  // if they have matching residencyStatus, whoIsUsingPlatform, and role.
-  // This breaks referralCode uniqueness (multiple users get the same code).
-  // Solution: Always create a fresh User per signup (every email gets unique referralCode).
-  // //Existing User
-  // const existingUser = await User.findOne({
-  //   residencyStatus,
-  //   whoIsUsingPlatform,
-  //   role,
-  // });
+  // Check for existing user with same profile (excluding referral fields)
+  const existingUser = await User.findOne({ 
+    residencyStatus,
+    whoIsUsingPlatform,
+    role,
+  });
 
-  // if (existingUser) {
-  //   return {
-  //     exists: "true",
-  //     message: "User already exists",
-  //     user: {
-  //       _id: existingUser._id,
-  //       role: existingUser.role,
-  //     },
-  //   };
-  // }
+  if (existingUser) {
+    return {
+      exists: true,
+      message: "User already exists", 
+      user: {
+        _id: existingUser._id,
+        role: existingUser.role,
+      },
+    };
+  }
 
   // Generate unique referral code with collision handling
   const referralCode = await generateUniqueReferralCode();
@@ -48,6 +44,7 @@ export async function createUserController(data) {
     referredBy: null,
     referralCount: 0,
   });
+  
   await newUser.save();
 
   return {
@@ -59,6 +56,7 @@ export async function createUserController(data) {
     },
   };
 }
+
 // Get one User
 export async function getUserController(userId) {
   if (!userId) {

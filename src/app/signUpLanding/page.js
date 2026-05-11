@@ -5,7 +5,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const page = () => {
-  const router = useRouter();
+const router = useRouter();
+
 
   /* =======================
      STATE
@@ -14,10 +15,10 @@ const page = () => {
   const [showResidencyStatus, setShowResidencyStatus] = useState(false);
   const [error, setError] = useState(null);
 
-  const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] =
-    useState(null);
+  const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
   const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
   const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
+
 
   /* =======================
      EFFECTS
@@ -46,28 +47,20 @@ const page = () => {
   // ✅ Resume signup safely (FIXED)
   useEffect(() => {
     const resumeSignup = async () => {
-      const userId = localStorage.getItem("userId");
-      const role = localStorage.getItem("role");
+    const res = await fetch("/api/user/me", {
+      credentials: "include",
+      });
 
-      if (!userId || !role) return;
-
-      try {
-        const res = await fetch(`/api/user?id=${userId}`);
-
-        if (!res.ok) {
-          localStorage.removeItem("userId");
-          localStorage.removeItem("role");
-          return;
-        }
+      if (res.ok) {
+        const user = await res.json();
 
         router.replace(
-          role === "tenant"
-            ? `/signUpTenant?userId=${userId}`
-            : `/signUpLandlord?userId=${userId}`,
-        );
-      } catch {
-        // silent fail
-      }
+          user.role === "Tenant"
+            ? "/tenantDashboard"
+            : "/landlordDashboard"
+        );               
+        return;
+      } 
     };
 
     resumeSignup();
@@ -143,7 +136,7 @@ const page = () => {
       };
 
       // Capitalize role to match schema enum
-      // const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
+      const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
       const response = await fetch("/api/user", {
         method: "POST",
@@ -151,17 +144,24 @@ const page = () => {
         body: JSON.stringify({
           residencyStatus: residencyMap[selectResidencyStatus],
           whoIsUsingPlatform: selectWhoIsUsingPlatform,
-          role,
+          role: capitalizedRole,
         }),
       });
 
       const data = await response.json();
+
+      console.log("BUTTON ROLE:", role);
+      console.log("CAPITALIZED ROLE:", capitalizedRole);
+      console.log("FULL API RESPONSE:", data);
+      console.log("USER ROLE:", data.role || data.user?.role);
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
       }
 
       const userId = data._id || data.user?._id;
       const userRole = data.role || data.user?.role;
+      
 
       localStorage.setItem("userId", userId);
       localStorage.setItem("role", userRole);

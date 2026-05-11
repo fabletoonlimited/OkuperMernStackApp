@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 const page = () => {
   const router = useRouter();
@@ -52,20 +51,7 @@ const page = () => {
         }),
       });
 
-      const data = await response.json();
-
-        toast.success("Login successful! 🎉");
-
-        const redirect = localStorage.getItem("redirectAfterLogin");
-
-          if (redirect) {
-            localStorage.removeItem("redirectAfterLogin");
-            router.push(redirect);
-          } else {
-            setTimeout(() => {
-              router.push("/tenantDashboard");
-            }, 1000);
-          }
+      const data = await response.json();;
 
       if (!response.ok) {
         toast.error(
@@ -74,6 +60,19 @@ const page = () => {
         setLoading(false);
         return;
       }
+      toast.success("Login successful! 🎉")
+
+
+      const redirect = localStorage.getItem("redirectAfterLogin");
+
+        if (redirect) {
+          localStorage.removeItem("redirectAfterLogin");
+          router.push(redirect);
+        } else {
+          setTimeout(() => {
+            router.push("/tenantDashboard");
+          }, 1000);
+        }
 
       } catch (error) {
       console.error("Login error:", error);
@@ -91,7 +90,7 @@ const page = () => {
         Sign in
       </h1>
 
-      <ToastContainer position="top-center" autoClose={3000} />
+      {/* <ToastContainer position="top-center" autoClose={3000} /> */}
 
       {/*SignIn Form*/}
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">

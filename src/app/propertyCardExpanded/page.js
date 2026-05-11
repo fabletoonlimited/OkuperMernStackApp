@@ -22,6 +22,7 @@ import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
 import { FaExclamationCircle, FaStar } from "react-icons/fa";
 import PropertyCard from "@/components/propertyCard";
 import tenantDashboard from "../tenantDashboard/page";
+import { Scale } from "lucide-react";
 
 const Index = () => {
     
@@ -113,12 +114,55 @@ const Index = () => {
         fetchProperty();
     }, [propertyId]);
 
+
     // Build image list from real property data
     const images = property
         ? [property.previewPic, property.Img1, property.Img2, property.Img3, property.Img4, property.Img5, property.Img6].filter(Boolean)
         : ["/property-image.jpg"];
 
     const [selectedImage, setSelectedImage] = useState(null);
+    const [saveProperty, setSavePropertyState] = useState(false);
+
+    const toArray = (value) => {
+        if (!value) return [];
+        if (Array.isArray(value)) return value;
+
+        if (typeof value === "string") {
+            return value.split(",").map(v => v.trim()).filter(Boolean);
+        }
+
+        return [];
+    };
+
+    useEffect(() => {
+         if (saveProperty) {
+            const saveToFavorites = async () => {
+                try {
+                    const res = await fetch("/api/favorites", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({ propertyId: property._id }),
+                    });
+                    if (!res.ok) {
+                        if (res.status === 401 || res.status === 403) {
+                            toast.error("Please login as a tenant to save favorites");
+                            router.push("/signInTenant");
+                            return;
+                        }
+                        toast.error("Failed to save property");
+                    } else {
+                        toast.success("Property saved to favorites!");
+                    }
+                } catch (error) {
+                    console.error("Save favorite error:", error);
+                    toast.error("Server error");
+                }
+            };
+            saveToFavorites();
+        }
+    }, [saveProperty, property, router]);
+  
 
     const [formData, setFormData] = useState({
         firstName: "",
@@ -231,8 +275,8 @@ const Index = () => {
                     <div>
                         <input type="text" />
                     </div>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} />
-                    <div></div>
+                    {/* <FontAwesomeIcon icon={faMagnifyingGlass} /> */}
+                <div></div>
                 </div>
                 <div></div>
                 <div></div>
@@ -240,7 +284,6 @@ const Index = () => {
                 <div></div>
             </div>
             <div className="property-card-expanded px-4 md:px-12">
-                {/* IMAGE GRID */}
                 {/* IMAGE GRID */}
                 <div className="mt-14">
                     {/* MAIN IMAGE (MOBILE) */}
@@ -280,41 +323,42 @@ const Index = () => {
                 {/* DESKTOP GRID */}
                 <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-4">
 
-  {/* MAIN LARGE IMAGE */}
-  <div className="relative col-span-2 row-span-2 rounded-lg border shadow-lg overflow-hidden aspect-[5/3] cursor-pointer">
-    <img
-      src={images[0]}
-      alt="property-main"
-      className="w-full h-full object-cover"
-      onClick={() => setSelectedImage(images[0])}
-    />
-    <div className="absolute top-3 left-3">
-      <FontAwesomeIcon
-        icon={faCheckCircle}
-        className="text-3xl text-blue-400 bg-white rounded-full"
-      />
-    </div>
-  </div>
-
-  {/* FOUR SMALL IMAGES */}
-  {Array.from({ length: 4 }).map((_, i) => {
-    const img = images[i + 1] || images[0]; // fallback to avoid undefined
-    return (
-      <div
-        key={i}
-        className="rounded-lg border shadow-md overflow-hidden cursor-pointer aspect-[5/3]"
-        onClick={() => setSelectedImage(img)}
-      >
-        <img
-          src={img}
-          alt={`property-${i}`}
-          className="w-full h-full object-cover"
-        />
-      </div>
-    );
-  })}
-</div>
+                {/* MAIN LARGE IMAGE */}
+                <div className="relative col-span-2 row-span-2 rounded-lg border shadow-lg overflow-hidden aspect-[5/3] cursor-pointer">
+                    <img
+                    src={images[0]}
+                    alt="property-main"
+                    className="w-full h-full object-cover"
+                    onClick={() => setSelectedImage(images[0])}
+                    />
+                    <div className="absolute top-3 left-3">
+                        <FontAwesomeIcon
+                            icon={faCheckCircle}
+                            className="text-3xl text-blue-500/75 rounded-full hover:scale-115 transition duration-300 ease-in-out p-1 shadow-lg"
+                            onClick={() => setSavePropertyState(!saveProperty)}
+                        />
                     </div>
+                </div>
+
+                    {/* FOUR SMALL IMAGES */}
+                    {Array.from({ length: 4 }).map((_, i) => {
+                        const img = images[i + 1] || images[0]; // fallback to avoid undefined
+                        return (
+                        <div
+                            key={i}
+                            className="rounded-lg border shadow-md overflow-hidden cursor-pointer aspect-[5/3]"
+                            onClick={() => setSelectedImage(img)}
+                        >
+                            <img
+                            src={img}
+                            alt={`property-${i}`}
+                            className="w-full h-full object-cover"
+                            />
+                        </div>
+                        );
+                    })}
+                    </div>
+                </div>
 
                 {/* PROPERTY DETAILS */}
                 <div className="flex flex-col md:flex-row justify-between mt-4 gap-6 items-center ">
@@ -329,7 +373,7 @@ const Index = () => {
                             {property?.price ? `₦${Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
                         </span>
                         <p className="text-lg md:mt-1 mt-2 text-blue-900">
-                            Price is base rent and doesn't require fees.
+                            Price is base rent and doesn't require agency fees.
                         </p>
 
                         <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
@@ -337,18 +381,24 @@ const Index = () => {
                                 <div>
                                     <FontAwesomeIcon icon={faHouse} />
                                 </div>
-                                <div>{property?.propertyType || ""}</div>
+                                <div>
+                                    {property?.propertyType || ""}
+                                </div>
                             </div>
+
                             <div className="md:px-16 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-20.5 py-4 border-blue- flex  justify-between gap-3 ">
                                 <div>
                                     <FontAwesomeIcon icon={faBed} />
                                 </div>
-                                <div>{property?.bed || ""} | {property?.bath || ""}</div>
+                                <div>
+                                    {property?.bed || ""} | {property?.bath || ""}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="md:flex flex-col md:items-center border-1 border-blue-950 md:border-1 md:p-6 rounded-lg w-full md:w-96 p-11 h-70 mt-14">
+                       {/* Request Form*/}
                         <div className="items-start md:items-start">
                             <Link href="#form">
                                 <button
@@ -359,15 +409,15 @@ const Index = () => {
                                 </button>
                             </Link>
                         </div>
+
                         {/*star rating*/}
                         <div className="flex flex-col  mt-4 mb-4 gap-3 w-full">
                             <h5 className="text-3xl md:text-2xl ">Rate</h5>
-                            <div className="h-16 ">
+                            
+                            <div className="h-24 w-full flex items-center">
                                 <StarRating
-                                    style={{
-                                        transform: "scale(2)",
-                                        transformOrigin: "left",
-                                    }}
+                                    className="scale-150 "
+                                    propertyId={property?.rating}
                                 />
                             </div>
                         </div>
@@ -392,27 +442,10 @@ const Index = () => {
                                     {property?.listedBy || "Landlord"}
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                     {
+                                    {
                                         isVerified ? (
                                             <div className="flex items-center gap-2">
-                                             <span className="text-red-600 font-light">
-                                                    Unverified
-                                                </span>
-                                                <FontAwesomeIcon
-                                                    icon={faCircleInfo}
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        background: "white",
-                                                        borderRadius: "50%",
-                                                        padding: "2px",
-                                                        color: "red",
-                                                    }}
-                                                />
-                                            </div>
-                                        ) : (
-
-                                            <div className="flex items-center gap-2">
-                                                 <span className="text-green-600 font-light">
+                                             <span className="text-green-600 font-light">
                                                     Verified
                                                 </span>
                                                 <FontAwesomeIcon
@@ -425,7 +458,23 @@ const Index = () => {
                                                         color: "lightgreen",
                                                     }}
                                                 />
-                                               
+                                            </div>
+                                        ) : (
+
+                                            <div className="flex items-center gap-2">
+                                                 <span className="text-red-600 font-light">
+                                                    Unverified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "red",
+                                                    }}
+                                                />   
                                             </div>
                                         )
                                     }               
@@ -451,30 +500,41 @@ const Index = () => {
                         </button>
                     </div>
                 </div>
+
                 {/* FEATURES */}
                 <div className="mt-12">
                     <h2 className="text-5xl text-black  md:text-6xl font-medium md:font-medium mb-6 md:text-start text-start ">
                         Features
                     </h2>
 
-                    {["Building amenities", "Unit features"].map((title, i) => (
+                    {[
+                        {title: "Building amenities", data: toArray(property?.buildingAmenities)},
+                        {title: "Unit features", data: toArray(property?.propertyAmenities)},
+                    ].map((section, i) => (
                         <div key={i} className="mt-9">
                             <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 border-1 p-2 pl-10">
-                                {title}
+                                {section.title}
                             </h3>
+
                             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                                {Array.from({ length: 6 }).map((_, j) => (
-                                    <li
-                                        key={j}
-                                        className="flex items-center gap-3 bg-gray-100 p-3">
-                                        <span className="md:text-2xl text-black text-2xl">
-                                            ●
-                                        </span>
-                                        <span className="text-2xl text-black md:text-lg">
-                                            {title}
-                                        </span>
-                                    </li>
-                                ))}
+                                {section.data.length > 0 ? (
+                                    section.data?.map((item, j) => (
+                                        <li 
+                                            key={j}
+                                            className="flex items-center gap-3 bg-gray-100 p-3">
+                                            <span className="md:text-2xl text-black text-2xl">
+                                            ● 
+                                            </span>
+                                            <span className="text-2xl text-black md:text-lg">
+                                                {item}
+                                            </span>
+                                        </li>
+                                ))
+                                ) : (
+                                    <p className="text-gray-500 text-lg md:text-xl">
+                                        No {section.title.toLowerCase()} listed.
+                                    </p>
+                                )}
                             </ul>
                         </div>
                     ))}
@@ -482,6 +542,7 @@ const Index = () => {
                 <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 p-2 mt-9">
                     Neighborhood: Postcode
                 </h3>
+                   
                 {/* MAP */}
                 <div className="mt-8 w-full max-w-full md:max-w-5xl mx-auto h-[300px] md:h-[400px] rounded-sm overflow-hidden border shadow-sm">
                     <iframe
@@ -495,23 +556,35 @@ const Index = () => {
 
                 {["Nearby Places"].map((title, i) => (
                     <div key={i} className="mt-9">
-                        <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 p-2">
-                            {title}
-                        </h3>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            {Array.from({ length: 4 }).map((_, j) => (
-                                <li
-                                    key={j}
-                                    className="flex items-center gap-3 bg-gray-100 p-3">
-                                    <span className="md:text-2xl text-black text-2xl">
-                                        ●
-                                    </span>
-                                    <span className="text-2xl text-black md:text-lg">
-                                        {title}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
+                        {[
+                        {title: "Nearby Places", data: toArray(property?.nearbyPlaces)}
+                    ].map((section, i) => (
+                        <div key={i} className="mt-9">
+                            <h3 className="text-3xl md:text-3xl text-blue-950 mb-4 p-2">
+                                {section.title}
+                            </h3>
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                {section.data.length > 0 ? (
+                                    section.data?.map((item, j) => (
+                                        <li 
+                                            key={j}
+                                            className="flex items-center gap-3 bg-gray-100 p-3">
+                                            <span className="md:text-2xl text-black text-2xl">
+                                            ● 
+                                            </span>
+                                            <span className="text-2xl text-black md:text-lg">
+                                                {item}
+                                            </span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-lg md:text-xl">
+                                        No {section.title.toLowerCase()} listed.
+                                    </p>
+                                )}
+                            </ul>
+                        </div>
+                    ))}
                         <hr className="mt-4 md:mt-6 text-gray-300" />
                     </div>
                 ))}
@@ -607,10 +680,28 @@ const Index = () => {
                                 <h3 className="text-2xl text-black md:text-2xl">
                                     {property?.listedBy || "Landlord"}
                                 </h3>
-                                    {
+                                       <div className="flex items-center gap-2">
+                                     {
                                         isVerified ? (
                                             <div className="flex items-center gap-2">
-                                             <span className="text-red-600 font-light">
+                                             <span className="text-green-600 font-light">
+                                                    Verified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "lightgreen",
+                                                    }}
+                                                />
+                                            </div>
+                                        ) : (
+
+                                            <div className="flex items-center gap-2">
+                                                 <span className="text-red-600 font-light">
                                                     Unverified
                                                 </span>
                                                 <FontAwesomeIcon
@@ -623,28 +714,11 @@ const Index = () => {
                                                         color: "red",
                                                     }}
                                                 />
-                                            </div>
-                                        ) : (
-
-                                            <div className="flex items-center gap-2">
-                                                 <span className="text-green-600 font-light">
-                                                    Verified
-                                                </span>
-                                                <FontAwesomeIcon
-                                                    icon={faCircleInfo}
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        background: "white",
-                                                        borderRadius: "50%", 
-                                                        padding: "2px",
-                                                        color: "lightgreen",
-                                                    }}
-                                                />
                                                
                                             </div>
                                         )
                                     }               
-                                
+                                </div>
                             </div>
                         </div>
                     </form>

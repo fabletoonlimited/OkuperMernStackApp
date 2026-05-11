@@ -1,11 +1,62 @@
 "use client";
-
 import React from "react";
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import PropertyCard from "@/components/propertyCard";
 import { FaBookmark, FaEnvelope, FaHistory, FaClock } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+
 
 const Page = () => {
+    const [tenant, setTenant] = useState(null);
+    const [tenantKyc, setTenantKyc] = useState(null);
+
+    useEffect(() => {
+          const fetchTenant = async () => {
+            try {
+              const res = await fetch("/api/tenant", {
+                method: "GET",
+                credentials: "include",
+              });
+    
+              if (!res.ok) {
+                console.error("Failed to fetch tenant");
+                return;
+              }
+    
+              const tenant = await res.json();
+              setTenant(tenant);
+            } catch (err) {
+              console.error("Tenant fetch error:", err);
+            }
+          };
+    
+          fetchTenant();
+        }, []);
+
+    useEffect(() => {
+      const fetchKyc = async () => {
+      try {
+        const kycRes = await fetch("/api/tenantKyc", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        if (!kycRes) {
+          toast.error("Failed to fetch tenant KYC");
+          return;
+        }
+        const kycData = await kycRes.json();
+        if (kycData) {
+          setTenantKyc(kycData);
+        }
+      }
+      catch (err) {
+        toast.error("KYC fetch error:", err);
+      }
+      fetchKyc();
+    }}, []);
+
     return (
         <div className="flex bg-gray-100">
             {/* Sidebar */}
@@ -17,16 +68,16 @@ const Page = () => {
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <p className="text-sm text-gray-500">Mon, 19 2026</p>
-                        <h1 className="text-3xl font-bold text-blue-950">
-                            Welcome back, Name!
+                        <h1 className="text-3xl font-bold text-blue-950 mb-2">
+                            Welcome back, {tenant?.firstName + " " + tenant?.lastName || "Tenant"}!
                         </h1>
                         <p className="text-gray-500">
-                            This is your dashboard summary report
+                            This is your complete dashboard summary report
                         </p>
                     </div>
 
                     <img
-                        src="https://i.pravatar.cc/40"
+                        src={tenantKyc?.previewPic}
                         className="w-10 h-10 rounded-full"
                     />
                 </div>

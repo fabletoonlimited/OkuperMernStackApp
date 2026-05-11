@@ -14,19 +14,39 @@ import { useState, useEffect } from "react";
 function Banner() {
 
 const [isAuthenticated, setIsAuthenticated] = useState(false);
+const [loading, setLoading] = useState(false);
+const [userRole, setUserRole] = useState("");
+
+
 const router = useRouter();
-useEffect(() => {
+
+ useEffect(() => {
     const checkAuth = async () => {
+        setLoading(true);
+        
         try {
-            const res = await fetch("/api/auth/me", 
-                { credentials: "include" });
-            setIsAuthenticated(res.ok);
-        } catch {
-            setIsAuthenticated(false);
+            const res = await fetch("/api/user/me", {
+            credentials: "include",
+            });
+
+        if (res.ok) {
+          const data = await res.json();
+          setIsAuthenticated(true);
+          setUserRole(data.role || null); 
+        } else {
+          setIsAuthenticated(false);
+          setUserRole(null);
         }
+      } catch (err){
+        setIsAuthenticated(false);
+        setUserRole(null);
+      } finally {
+        setLoading(false);
+      }
     };
+
     checkAuth();
-}, []);
+  }, []);
     
     const goToContact = () => {
         router.push("/contact");
@@ -48,7 +68,11 @@ useEffect(() => {
     return (
         <div className="relative w-full md:bg-transparent bg-white px-10 md:px-0 mb-10 md:mb-8 z-10">
             {/* Model Image */}
-            <div className="absolute bottom-45 left-[33%] transform -translate-x-1/2 z-30 hidden md:block">
+            <div className="absolute bottom-45 left-[33%] z-30 hidden md:block animate-slideX hover:scale-105 transition"
+                // onLoad={() => {
+                //     e.currentTarget.style.transform = "translateX(-60%)"
+                // }}
+                >
                 <img
                     src={BASE_URL + "/bannerboy_eygggt"}
                     alt="bannerModel"
@@ -56,7 +80,7 @@ useEffect(() => {
                 />
             </div>
 
-            <div className="relative w-full min-h-[470px] md:h-[480px] ">
+            <div className="relative w-full min-h-[470px] md:h-[480px] animate-fadeIn">
                 {/* Background Image */}
                 <Image
                     src={BASE_URL + "/Banner_2_o4ie3w"}
@@ -67,7 +91,7 @@ useEffect(() => {
                 />
 
                 {/* Support Icon */}
-                <div className="absolute top-10 right-4 md:top-10 md:right-10 h-12 w-12 md:h-16 md:w-16 bg-amber-600 rounded-full animate-bounce z-30 flex items-center justify-center">
+                <div className="hover:scale-95 transition absolute top-10 right-4 md:top-10 md:right-10 h-12 w-12 md:h-16 md:w-16 bg-amber-600 rounded-full animate-bounce hover:animate-none z-30 flex items-center justify-center">
                     <button onClick={() => router.push("/contact")}>
                         <FontAwesomeIcon
                             icon={faHeadset}
@@ -97,11 +121,11 @@ useEffect(() => {
                     {/* Buttons */}
                     <div className="mt-15 md:mt-6 flex flex-col md:flex-row gap-5 md:gap-5 w-full md:w-auto">
                         
-                        <button className="bg-blue-950 flex text-white hover:rounded-full px-22 md:px-8 gap-2 pt-3 md:py-3text-md md:text-base hover:bg-blue-300 hover:text-[#0E1D48] transition"
-                            onClick={
-                                isAuthenticated || !isAuthenticated === true
-                                    ? goTopropertyListing
-                                    : goToSignUp
+                        <button className="bg-blue-950 hover:scale-105 transition flex text-white hover:rounded-full px-22 md:px-8 gap-2 pt-3 md:py-3text-md md:text-base hover:bg-blue-300 hover:text-[#0E1D48]"
+                            onClick={() =>
+                                isAuthenticated
+                                    ? goTopropertyListing()
+                                    : goToSignUp()
                             }
                             style={{ cursor: "pointer" }}
                         >
@@ -116,12 +140,8 @@ useEffect(() => {
                         </button>
 
                       
-                        <button className="bg-white text-blue-950 hover:rounded-full flex gap-3 md:px-8 px-22 pt-3 md:py-3  text-md md:text-base hover:bg-amber-200 transition"
-                            onClick={
-                                isAuthenticated || !isAuthenticated === true
-                                    ? goToRent
-                                    : goToRent
-                            }
+                        <button className="hover:scale-105 transition bg-white text-blue-950 hover:rounded-full flex gap-3 md:px-8 px-22 pt-3 md:py-3  text-md md:text-base hover:bg-amber-200"
+                            onClick={goToRent}
                             style={{ cursor: "pointer" }}
                         >
                                 
@@ -142,10 +162,8 @@ useEffect(() => {
             </div>
 
             {/* Feature Boxes */}
-            <div
-                className="bannerBoxes relative z-30 top-30 md:row md:gap-6 md:px-30 px-12 mb-30
-py-0 h-65 flex flex-row md:top-0 gap-8 mt-[-80px] md:mt-[-80px] pb-3
-md:overflow-hidden overflow-x-auto max-w-auto w-full md:w-auto"
+            <div className="bannerBoxes relative z-30 top-30 md:row md:gap-6 md:px-30 px-12 mb-30 py-0 h-65 flex flex-row md:top-0 gap-8 mt-[-80px] md:mt-[-80px] pb-3
+                md:overflow-hidden overflow-x-auto max-w-auto w-full md:w-auto"
                 style={{
                     scrollbarWidth: "none", // Firefox
                     msOverflowStyle: "none", // IE & Edge
@@ -158,8 +176,8 @@ md:overflow-hidden overflow-x-auto max-w-auto w-full md:w-auto"
                 ].map((text, index) => (
                     <div
                         key={index}
-                        className="w-full md:max-w-[280px] h-250px md:h-[250px] bg-sky-100
-rounded-xl px-10 md:px-5.5 py-10 md:py-6 pt-10 shadow-md flex-shrink-0 hover:bg-amber-200 transition"
+                        className="hover:scale-95 transition w-full md:max-w-[280px] h-250px md:h-[250px] bg-sky-100
+                            rounded-xl px-10 md:px-5.5 py-10 md:py-6 pt-10 shadow-md flex-shrink-0 hover:bg-amber-200"
                         style={{ cursor: "pointer" }}>
                         <FontAwesomeIcon
                             icon={faCircleCheck}

@@ -38,7 +38,7 @@ function Footer() {
           <Link href="https://web.facebook.com/profile.php?id=61568283636863" target='_blank'>
             <Image 
               className='hover:scale-120'
-              src={Facebook} alt="Facebook" width={50} height={30} 
+              src={Facebook} alt="Facebook" width={45} height={30} 
             />
           </Link>
           <Link href="https://www.x.com/@okuper_" target='_blank'>

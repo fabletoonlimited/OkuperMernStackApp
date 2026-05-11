@@ -51,10 +51,6 @@ export const createProperty = async (data) => {
   if (!bath) throw new Error("At least one number of bath is required");
   if (!status) throw new Error("At least one status is required");
   if (!listedBy) throw new Error("Property listed by is required");
- 
-
-  // Format address safely
-  // const formattedAddress = `${address?.line1 || ""} ${address?.line2 || ""}`.trim();
 
   // Use **strings** for images (your schema expects string)
   previewPic = Array.isArray(previewPic) ? previewPic[0]?.url || previewPic[0] || previewPic : previewPic;
@@ -106,7 +102,6 @@ export const createProperty = async (data) => {
     
   } catch (dbError) {
     console.error("DB error:", dbError);
-    // re-throw the real error so we can see what Mongoose is actually rejecting
     throw new Error(dbError.message || "Failed to create property");
   }
 };

@@ -128,7 +128,7 @@ export const loginLandlord = async (data) => {
 
     //create a token
     const token = jwt.sign(
-      { id: landlord._id },
+      { id: landlord._id , role: landlord.role},
       process.env.JWT_SECRET,
       { expiresIn: "1d" }, //1day
     );
@@ -148,7 +148,7 @@ export const loginLandlord = async (data) => {
 
     response.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "development",
       sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1day

@@ -1,7 +1,7 @@
 import Tenant from "../models/tenantModel.js";
-import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 //Signup Tenant
 export const signupTenant = async (req) => {
@@ -103,71 +103,65 @@ export const signupTenant = async (req) => {
   }
 };
 
-export const loginTenant = async (req) => {
+export const loginTenant = async (data) => {
   try {
-    const { email, password } = req;
+    const { email, password } = data;
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 },
-      );
+   if (!email || !password) {
+      return { status: 400, message: "Email and password are required" };
     }
 
-    // Normalize email (trim and lowercase to match signup)
     const normalizedEmail = email.trim().toLowerCase();
 
     const tenant = await Tenant.findOne({ email: normalizedEmail });
+    
     if (!tenant) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 400 },
-      );
+      return { status: 404, message: "Invalid credentials" };
     }
 
     const isMatch = await bcrypt.compare(password, tenant.password);
     if (!isMatch) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+      return { status: 401, message: "Invalid password" };
     }
 
-    //create a token
+    // Create a token
     const token = jwt.sign(
-      { id: tenant._id },
+      { id: tenant._id, role: tenant.role }, 
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }, //1day
+      { expiresIn: "1d" } //1 day
     );
 
     const response = NextResponse.json(
       {
-        success: true,
-        tenant: {
-          id: tenant._id,
-          name: `${tenant.firstName} ${tenant.lastName}`,
-          email: tenant.email,
-        },
-        message: "Login successful",
+      success: true,
+      tenant: {
+        id: tenant._id,
+        name: `${tenant.firstName} ${tenant.lastName}`,
+        email: tenant.email,
       },
-      { status: 200 },
+      message: "Login successful",
+    },
+      { status: 200 }
     );
 
     response.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "development",
       sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1day
     });
 
-    return response;
+   return response;
   } catch (err) {
     console.error("Login Error:", err.message);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    return { status: 500, message: "Server error" };
   }
 };
 
-export const getTenant = async (req) => {
+export const getTenant = async (data) => {
   try {
-    const { _id } = req.tenant;
+    const { _id } = data;
 
     const tenant = await Tenant.findById(_id)
       .populate("User")
@@ -177,19 +171,16 @@ export const getTenant = async (req) => {
       .populate("Property");
 
     if (!tenant) {
-      return NextResponse.json(
-        { message: "Tenant not found" },
-        { status: 404 },
-      );
+      return { status: 404, message: "Tenant not found" };
     }
 
-    return NextResponse.json(tenant, { status: 200 });
+    return { status: 200, success: true, tenant };
   } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return { status: 500, message: error.message || "Server error" };
   }
 };
 
-export const getAllTenant = async (req) => {
+export const getAllTenant = async () => {
   try {
     const allTenant = await Tenant.find()
       .select("-password")
@@ -199,19 +190,15 @@ export const getAllTenant = async (req) => {
       .populate("TenantDashboard")
       .populate("Property");
 
-    return NextResponse.json(allTenant, { status: 200 });
+    return { status: 200, success: true, tenants: allTenant };
   } catch (error) {
-    return NextResponse.json(
-      { message: "error getting tenant" },
-      { status: 500 },
-    );
+    return { status: 500, message: error.message || "Server error" };
   }
 };
 
-export const updateTenant = async (req) => {
+export const updateTenant = async (data) => {
   try {
-    const body = await req.json();
-    const { _id, firstName, lastName, email } = body;
+    const { _id, firstName, lastName, email } = data;
     // const { searchParams } = new URL(req.url);
     // const id = searchParams.get("id");
 
@@ -254,10 +241,9 @@ export const updateTenant = async (req) => {
   }
 };
 
-export const deleteTenant = async (req) => {
+export const deleteTenant = async (data) => {
   try {
-    const { searchParams } = new URL(req.url);
-    const _id = searchParams.get("id");
+    const { _id } = data;
 
     if (!_id) {
       return NextResponse.json(
@@ -286,8 +272,9 @@ export const deleteTenant = async (req) => {
 };
 
 // ================== ARRAY UPLOAD ==================
-export const arrayUpload = async (req) => {
+export const arrayUpload = async (data) => {
   try {
+    const { req } = data;
     const formData = await req.formData();
     const files = formData.getAll("files");
 

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
+import { User } from "lucide-react";
 
 export async function GET() {
   try {
@@ -14,14 +15,19 @@ export async function GET() {
       );
     }
 
-
     await jwtVerify(
       token,
       new TextEncoder().encode(process.env.JWT_SECRET)
     );
 
     return NextResponse.json(
-      { authenticated: true }, 
+      { authenticated: true,
+        User: {
+          tenant: User.Tenant,
+          landlord: User.Landlord,
+          admin: User.Admin,
+        }
+      },
       { status: 200 }
     );
       

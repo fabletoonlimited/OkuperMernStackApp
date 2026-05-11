@@ -34,7 +34,7 @@ function Rent() {
             const mixed = insertAdBanners(filtered);
                 setPropertyItems(mixed);
             } catch (err) {
-                console.error("Error loading properties:", err);
+                console.error("Error loading properties: No internet", err);
                 setError("Failed to load properties.");
             } finally {
                 setLoading(false);

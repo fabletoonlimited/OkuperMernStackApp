@@ -7,7 +7,7 @@ const Index = () => {
    <div className="flex flex-col items-center md:flex-row md:justify-between md:gap-6 px-4 md:px-40 py-8 mb-10">
     {/* Buy */}
     <div 
-    className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center mb-8 md:mb-0 pointer-cursor hover:shadow-xl transition-shadow hover:scale-105 duration-300">
+    className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center mb-8 md:mb-0 pointer-cursor hover:shadow-xl hover:scale-105 transition duration-300">
       <Image 
         height={190}
         width={190}
@@ -20,14 +20,14 @@ const Index = () => {
         Find your place with a photo experience and the most listings, including things you won’t find anywhere else.
       </h5>
       <Link href='/buy'>
-        <button className="font-bold rounded-lg mb-8 w-full text-lg py-2 bg-blue-950 text-white hover:bg-blue-900 transition">
+        <button className="font-bold rounded-lg hover:rounded-none mb-8 w-full text-lg py-2 bg-blue-950 text-white hover:bg-blue-900 transition">
           Browse Homes
         </button>
       </Link>
     </div>
 
     {/* Rent */}
-    <div className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center mb-8 md:mb-0 pointer-cursor hover:shadow-xl transition-shadow hover:scale-105 duration-300">
+    <div className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center mb-8 md:mb-0 pointer-cursor hover:shadow-xl transition hover:scale-105 duration-300">
       <Image 
         height={170}
         width={170}
@@ -40,14 +40,14 @@ const Index = () => {
         Find rentals with ease — from verified listings to short lets, everything is curated to suit your lifestyle.
       </h5>
       <Link href='/rent'> 
-        <button className="font-bold rounded-lg mb-8 w-full text-lg py-2 bg-blue-950 text-white hover:bg-blue-900 transition">
+        <button className="font-bold rounded-lg hover:rounded-none mb-8 w-full text-lg py-2 bg-blue-950 text-white hover:bg-blue-900 transition">
           Browse Rentals
         </button>    
       </Link>  
     </div>
 
     {/* Short Let */}
-    <div className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center pointer-cursor hover:shadow-xl transition-shadow hover:scale-105 duration-300">
+    <div className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center pointer-cursor hover:shadow-xl transition hover:scale-105 duration-300">
       <Image 
         height={200}
         width={200}
@@ -60,7 +60,7 @@ const Index = () => {
         Discover short-term stays with comfort, style, and convenience. Ideal for travel, remote work, or quick city visits.
       </h5>
       <Link href='/shortlets'>
-        <button className="font-bold rounded-lg mb-8 w-full text-lg py-2 bg-blue-950 text-white hover:bg-blue-900 transition">
+        <button className="font-bold rounded-lg hover:rounded-none mb-8 w-full text-lg py-2 bg-blue-950 text-white hover:bg-blue-900 transition">
           Explore Shortlets
         </button>
       </Link>

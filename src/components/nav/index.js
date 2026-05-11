@@ -14,31 +14,32 @@ function Nav() {
   const [userRole, setUserRole] = useState(null); // "landlord" | "tenant" | "admin" | null
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // 🔐 CHECK AUTH SESSION
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/user/me", {
-          credentials: "include",
-        });
+        try {
+            const res = await fetch("/api/user/me", {
+            credentials: "include",
+            });
 
-        if (res.ok) {
-          const data = await res.json();
-          setIsAuthenticated(true);
-          setUserRole(data.role || null); // "landlord" or "tenant"
-        } else {
-          setIsAuthenticated(false);
-          setUserRole(null);
+            if (res.ok) {
+            const data = await res.json();
+            setIsAuthenticated(true);
+            setUserRole(data.role || null); 
+            } else {
+            setIsAuthenticated(false);
+            setUserRole(null);
+            }
+        } catch {
+            setIsAuthenticated(false);
+            setUserRole(null);
+        } finally {
+            setLoading(false);
         }
-      } catch {
-        setIsAuthenticated(false);
-        setUserRole(null);
-      } finally {
-        setLoading(false);
-      }
     };
 
     checkAuth();
@@ -83,14 +84,14 @@ function Nav() {
               {/* Desktop logo */}
               <div
                   className={`${styles.navbar__logo} ${styles["navbar__logo--desktop"]}`}>
-                  <Link href="/">
-                      <Image
-                          src="/logo.png"
-                          alt="Logo"
-                          width={330}
-                          height={250}
-                      />
-                  </Link>
+                    <Link href="/">
+                        <Image
+                            src="/logo.png"
+                            alt="Logo"
+                            width={330}
+                            height={250}
+                        />
+                    </Link>
               </div>
 
               <Link href="/manage" onClick={() => setIsMenuOpen(false)}>
@@ -116,22 +117,48 @@ function Nav() {
                                     SIGN UP / SIGN IN
                                 </li>
                         </Link>
-                
                         ) : (
-                            <li
-                                className={styles.navbar__item}
-                                onClick={() => {
-                                    setIsMenuOpen(false);
-                                    // Route to the correct dashboard based on role
-                                    if (userRole === "tenant") {
-                                        router.push("/tenantDashboard");
-                                    } else {
-                                        router.push("/landlordDashboard");
-                                    }
-                                }}
-                                style={{ cursor: "pointer" }}>
-                                <FontAwesomeIcon icon={faUserCircle} size="lg" />
-                            </li>
+                            <li className="relative">
+                                <div
+                                    onClick={() => setShowDropdown((prev) => !prev)}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                >
+                                    <FontAwesomeIcon icon={faUserCircle} size="lg" />
+                                </div>
+
+                                {showDropdown && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
+                                    
+                                    <button
+                                        onClick={() => {
+                                        if (userRole === "tenant") {
+                                            router.push("/tenantDashboard");
+                                        } else {
+                                            router.push("/landlordDashboard");
+                                        }
+                                        setShowDropdown(false);
+                                        }}
+                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                    >
+                                        Dashboard
+                                    </button>
+
+                                    <button
+                                        onClick={async () => {
+                                        await fetch("/api/auth/logout", {
+                                            method: "POST",
+                                            credentials: "include",
+                                        });
+                                        router.push("/");
+                                        }}
+                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                    >
+                                        Logout
+                                    </button>
+
+                                    </div>
+                                )}
+                                </li>
                         )}
                     </>
                 )}

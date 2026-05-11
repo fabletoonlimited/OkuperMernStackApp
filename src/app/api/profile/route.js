@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { getProfileByActorId } from "@/app/lib/profileData";
-import Landlord from "../models/landlordModel.js";
-import Tenant from "../models/tenantModel.js";
-import LandlordKyc from "../models/landlordKycModel.js";
-import TenantKyc from "../models/tenantKycModel.js";
+import Landlord from "@/app/api/models/landlordModel.js";
+import Tenant from "@/app/api/models/tenantModel.js";
+import LandlordKyc from "@/app/api/models/landlordKycModel.js";
+import TenantKyc from "@/app/api/models/tenantKycModel.js";
 
 export async function GET(request) {
   try {
@@ -58,7 +58,7 @@ export async function GET(request) {
 
 const buildKycUpdate = (payload, role, actor) => {
   const documentImage =
-    payload.documentImage || payload.profilePic || payload.avatar;
+    payload.documentImage || payload.previewPic || payload.avatar;
   const companyAddress = Array.isArray(payload.companyAddress)
     ? payload.companyAddress
     : payload.companyAddress
@@ -92,6 +92,7 @@ const buildKycUpdate = (payload, role, actor) => {
     state: payload.state,
     country: payload.country,
     zipCode: payload.zipCode,
+    stateOfOrigin: payload.stateOfOrigin,
   };
 
   if (role === "landlord") {

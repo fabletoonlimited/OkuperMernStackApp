@@ -4,6 +4,7 @@ import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Tenant from "../models/tenantModel.js";
 import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
+import jwt from "jsonwebtoken";
 // import Tenant from "../controllers/tenant.controller";
 
 // CREATE TENANT
@@ -79,44 +80,24 @@ export async function GET(request) {
   await dbConnect();
 
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const email = searchParams.get("email");
+    const token = request.cookies.get("token")?.value;
 
-    if (id) {
-      const tenant = await Tenant.findById(id).select("-password");
-
-      if (!tenant) {
-        return NextResponse.json(
-          { message: "Tenant not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json(tenant, { status: 200 });
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    if (email) {
-      const tenant = await Tenant.findOne({ email }).select("-password");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      if (!tenant) {
-        return NextResponse.json(
-          { message: "Tenant not found" },
-          { status: 404 }
-        );
-      }
+    const tenant = await Tenant.findById(decoded.id).select("-password");
 
-      return NextResponse.json(tenant, { status: 200 });
+    if (!tenant) {
+      return NextResponse.json({ message: "Tenant not found" }, { status: 404 });
     }
 
-    const tenants = await Tenant.find().select("-password");
-    return NextResponse.json(tenants, { status: 200 });
+    return NextResponse.json(tenant, { status: 200 });
 
   } catch (err) {
-    return NextResponse.json(
-      { message: err.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: err.message }, { status: 500 });
   }
 }
 

@@ -22,7 +22,7 @@ export default function StarRating({ rating: propRating = 0 }) {
             <FaStar
               className="cursor-pointer"
               color={ratingValue <= (hover || currentRating) ? "#ffc107" : "#e4e5e9"}
-              size={20}
+              size={30}
               onMouseEnter={() => setHover(ratingValue)}
               onMouseLeave={() => setHover(null)}
             />

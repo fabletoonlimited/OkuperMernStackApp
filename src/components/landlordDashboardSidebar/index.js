@@ -5,16 +5,14 @@ import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {useRouter} from "next/navigation";
 
 const index = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [referralCode, setReferralCode] = useState("—");
   const [loadingReferral, setLoadingReferral] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleSidebar = () => {setIsOpen(!isOpen)};
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -68,7 +66,7 @@ const index = () => {
         <>
           <div
             onClick={toggleSidebar}
-            className="fixed inset-0 bg-black/40 z-40 md:hidden">
+            className="fixed inset-0 bg-black/40 z-40 md:hidden cursor-pointer">
           </div> 
           <div className="flex bg-transparent w-76"></div>
         </>
@@ -87,31 +85,31 @@ const index = () => {
 
         <ul className="m-8 -mt-2 justify-between w-30 flex flex-col space-y-6 cursor-pointer">
           <Link href="/landlordDashboard">
-            <li>Dashboard</li>
+            <li className="hover:text-yellow-500">Dashboard</li>
           </Link>
 
           <Link href="/helpCenter">
-            <li> Help Center </li>
+            <li className="hover:text-yellow-500"> Help Center </li>
           </Link>
 
           <Link href="/savedHomes">
-            <li> Saved Homes </li>
+            <li className="hover:text-yellow-500"> Saved Homes </li>
           </Link>
 
           <Link href="/landlordDashboardInbox">
-            <li>Messages</li>
+            <li className="hover:text-yellow-500">Messages</li>
           </Link>
 
           <Link href="/propertyListingLanding">
-            <li> Listings </li>
+            <li className="hover:text-yellow-500"> Listings </li>
           </Link>
 
           <Link href="/verification">
-            <li> Verification </li>
+            <li className="hover:text-yellow-500"> Verification </li>
           </Link>
 
           <Link href="/homeInterest">
-            <li> Home Interests </li>
+            <li className="hover:text-yellow-500"> Home Interests </li>
           </Link>
 
           <Link
@@ -126,7 +124,7 @@ const index = () => {
 
                 if (response.ok) {
                   toast.success("Logged out successfully");
-                  router.push("/"); // Redirect to home page
+                  router.push("/"); 
                 } else {
                   toast.error("Failed to logout. Please try again.");
                 }
@@ -134,9 +132,8 @@ const index = () => {
                 console.error("Logout error:", error);
                 toast.error("An error occurred during logout");
               }
-            }}
-          >
-            <li> Logout </li>
+            }}>
+              <li className="hover:text-yellow-500"> Logout </li>
           </Link>
 
           <li className="mt-2 text-sm text-white/80">

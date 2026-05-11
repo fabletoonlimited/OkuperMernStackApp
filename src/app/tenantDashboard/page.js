@@ -4,9 +4,11 @@ import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 import React, { useState, useEffect } from "react";
 import TenantDashboardCompleted from "../tenantDashboardCompleted/page.js";
+import { toast } from "react-toastify";
 
 function tenantDashboard() {
    const [profilePercent, setProfilePercent] = useState(null);
+   const [tenant, setTenant] = useState(null);
   
     useEffect(() => {
       const fetchCompletion = async () => {
@@ -30,12 +32,34 @@ function tenantDashboard() {
   
       fetchCompletion();
     }, []);
+
+    useEffect(() => {
+      const fetchTenant = async () => {
+        try {
+          const res = await fetch("/api/tenant", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          if (!res.ok) {
+            toast.error("Failed to fetch tenant");
+            return;
+          }
+
+          const tenant = await res.json();
+          setTenant(tenant);
+        } catch (err) {
+          toast.error("Tenant fetch error:", err);
+        }
+      };
+
+      fetchTenant();
+    }, []);
+
   return (
     <>
-      {profilePercent === 15 && (
-       <TenantDashboardCompleted />
-       ) }
-      {profilePercent === 100 && (
+      {profilePercent === 100 && (<TenantDashboardCompleted />) }
+      {profilePercent !== null && (
       <div className="tenantDashboardContainer flex">
         {/* Sidebar */}
         <TenantDashboardSidebar />
@@ -48,8 +72,8 @@ function tenantDashboard() {
               boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <h1 className="font-bold md:text-5xl text-2xl pl-7">
-              Welcome, tenant!
+            <h1 className="font-bold md:text-5xl text-2xl pl-7 mb-2">
+              Welcome, {tenant?.firstName + " " + tenant?.lastName || "Tenant"}!
             </h1>
             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
               We are thrilled that you have chosen Okuper to rent your next
@@ -62,7 +86,7 @@ function tenantDashboard() {
               Your next steps
             </h3>
             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-              In order to complete your profile and listing, there are a few
+              In order to begin your rental journey, please complete your profile. There are a few
               things left to do.
             </p>
           </div>

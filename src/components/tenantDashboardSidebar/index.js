@@ -4,15 +4,14 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {useRouter} from "next/navigation";
 
 const index = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [referralCode, setReferralCode] = useState("—");
-  const [loadingReferral, setLoadingReferral] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+    const router = useRouter();
+    const [isOpen, setIsOpen] = useState(false);
+    const [referralCode, setReferralCode] = useState("—");
+    const [loadingReferral, setLoadingReferral] = useState(false);
+    const toggleSidebar = () => {setIsOpen(!isOpen)};
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -61,15 +60,17 @@ const index = () => {
 
   return (
       <>
-          {/* Overlay (shows only when sidebar is open) */}
-          {isOpen && (
-              <>
-                  <div
+        {/* Overlay (shows only when sidebar is open) */}
+            {isOpen && (
+                <>
+                    <div
                       onClick={toggleSidebar}
-                      className="fixed inset-0 bg-black/40 z-40 md:hidden"></div>
+                      className="fixed inset-0 bg-black/40 z-40 md:hidden cursor-pointer">
+
+                    </div>
                   <div className="flex bg-transparent w-76"></div>
-              </>
-          )}
+                </>
+            )}
 
           <ToastContainer position="top-center" autoClose={2000} />
 
@@ -91,59 +92,60 @@ const index = () => {
               </Link>
               <ul className="m-8 -mt-2 justify-between w-42 flex flex-col space-y-6 cursor-pointer">
                   <Link href="/tenantDashboard">
-                      <li>Dashboard</li>
+                      <li className="hover:text-yellow-500">Dashboard</li>
                   </Link>
 
                   <Link href="/helpCenter">
-                      <li> Help Center </li>
+                      <li className="hover:text-yellow-500"> Help Center </li>
                   </Link>
 
                   <Link href="/savedHomes">
-                      <li> Saved Homes </li>
+                      <li className="hover:text-yellow-500"> Saved Homes </li>
                   </Link>
 
                   <Link href="/tenantDashboardInbox">
-                      <li> Messages </li>
+                      <li className="hover:text-yellow-500"> Messages </li>
                   </Link>
 
                   <Link href="/propertyLanding">
-                      <li>Property History</li>
+                      <li className="hover:text-yellow-500">Property History</li>
                   </Link>
 
                   <Link href="/verification">
-                      <li> Verification </li>
+                      <li className="hover:text-yellow-500"> Verification </li>
                   </Link>
 
                   <Link href="/homeInterest">
-                      <li className="flex items-center gap-1">
+                      <li className="flex items-center gap-1 hover:text-yellow-500">
                           Short Let Bookings
                           <span className="w-3 h-3 bg-orange-500 rounded-full inline-block ml-2"></span>
                       </li>
                   </Link>
 
                   <Link
-                      href="#"
-                      onClick={async (e) => {
-                          e.preventDefault();
-                          try {
-                              const response = await fetch("/api/auth/logout", {
-                                  method: "POST",
-                                  credentials: "include",
-                              });
-                              if (response.ok) {
-                                  toast.success("Logged out successfully");
-                              } else {
-                                  toast.error(
-                                      "Failed to logout. Please try again.",
-                                  );
-                              }
-                          } catch (error) {
-                              console.error("Logout error:", error);
-                              toast.error("An error occurred during logout");
-                          }
-                      }}>
-                      <li> Logout </li>
-                  </Link>
+                        href="#"
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            try {
+                                const response = await fetch("/api/auth/logout", {
+                                    method: "POST",
+                                    credentials: "include",
+                                });
+                                if (response.ok) {
+                                    toast.success("Logged out successfully");
+                                    router.push("/");
+                                } else {
+                                    toast.error(
+                                        "Failed to logout. Please try again.",
+                                    );
+                                }
+                            } catch (error) {
+                                console.error("Logout error:", error);
+                                toast.error("An error occurred during logout");
+                            }
+                        }}>
+                            <li className="hover:text-yellow-500"> Logout </li>
+                    </Link>
 
                   <li className="mt-2 text-sm text-white/80">
                       <div className="font-semibold text-white">
@@ -167,12 +169,7 @@ const index = () => {
           </aside>
 
           {/* Always show hamburger */}
-          <button
-              className="
-          w-10 h-10 fixed top-4 left-4 
-          z-[60] bg-white/70
-          rounded-md flex items-center justify-center shadow-md
-        "
+          <button className="w-10 h-10 fixed top-4 left-4 z-[60] bg-white/70 rounded-md flex items-center justify-center shadow-md cursor-pointer"
               onClick={toggleSidebar}>
               {isOpen ? <X /> : <Menu />}
           </button>

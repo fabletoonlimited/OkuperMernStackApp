@@ -1,15 +1,15 @@
 "use client";
-
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
-
 import { CloudUpload } from "lucide-react";
+// import { status } from "init";
 
 
 const emptyProfile = {
+    previewPic: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -17,12 +17,14 @@ const emptyProfile = {
     documentType: "",
     idNumber: "",
     documentImage: "",
+    status: "",
     gender: "",
     age: "",
     occupation: "",
+    specifyOccupation: "",
     maritalStatus: "",
     spouseName: "",
-    numberOfChildren: "",
+    noOfChildren: "",
     religion: "",
     companyName: "",
     companyAddress: "",
@@ -33,6 +35,7 @@ const emptyProfile = {
     state: "",
     country: "",
     zipCode: "",
+    stateOfOrigin: "",
 };
 
 const steps = [
@@ -81,6 +84,46 @@ const options = {
         { value: "business", label: "Business" },
         { value: "other", label: "Other" },
     ],
+    stateOfOrigin: [
+        { value: "", label: "Select state of origin" },
+        { value: "Abia", label: "Abia" },
+        { value: "Adamawa", label: "Adamawa" },
+        { value: "Akwa Ibom", label: "Akwa Ibom" },
+        { value: "Anambra", label: "Anambra" },
+        { value: "Bauchi", label: "Bauchi" },
+        { value: "Bayelsa", label: "Bayelsa" },
+        { value: "Benue", label: "Benue" },
+        { value: "Borno", label: "Borno" },
+        { value: "Cross River", label: "Cross River" },
+        { value: "Delta", label: "Delta" },
+        { value: "Ebonyi", label: "Ebonyi" },
+        { value: "Edo", label: "Edo" },
+        { value: "Ekiti", label: "Ekiti" },
+        { value: "Enugu", label: "Enugu" },
+        { value: "Gombe", label: "Gombe" },
+        { value: "Imo", label: "Imo" },
+        { value: "Jigawa", label: "Jigawa" },
+        { value: "Kaduna", label: "Kaduna" },
+        { value: "Kano", label: "Kano" },
+        { value: "Katsina", label: "Katsina" },
+        { value: "Kebbi", label: "Kebbi" },
+        { value: "Kogi", label: "Kogi" },
+        { value: "Kwara", label: "Kwara" },
+        { value: "Lagos", label: "Lagos" },
+        { value: "Nasarawa", label: "Nasarawa" },
+        { value: "Niger", label: "Niger" },
+        { value: "Ogun", label: "Ogun" },
+        { value: "Ondo", label: "Ondo" },
+        { value: "Osun", label: "Osun" },
+        { value: "Oyo", label: "Oyo" },
+        { value: "Plateau", label: "Plateau" },
+        { value: "Rivers", label: "Rivers" },
+        { value: "Sokoto", label: "Sokoto" },
+        { value: "Taraba", label: "Taraba" },
+        { value: "Yobe", label: "Yobe" },
+        { value: "Zamfara", label: "Zamfara" },
+        { value: "FCT", label: "FCT" },
+    ],
 };
 
 const inputClass =
@@ -88,6 +131,7 @@ const inputClass =
 const labelClass = "text-sm font-semibold text-blue-950";
 
 const ProfilePage = () => {
+    
   const router = useRouter();
   
     const [formData, setFormData] = useState(emptyProfile);
@@ -96,6 +140,7 @@ const ProfilePage = () => {
     const [uploading, setUploading] = useState(false);
     const [stepIndex, setStepIndex] = useState(0);
     const [role, setRole] = useState(null);
+    const [imagePreviews, setImagePreviews] = useState({});
 
     const progressPercent = useMemo(() => {
         if (!steps.length) return 0;
@@ -125,10 +170,10 @@ const ProfilePage = () => {
                     companyAddress: Array.isArray(profile.companyAddress)
                         ? profile.companyAddress.join(", ")
                         : profile.companyAddress || "",
-                    numberOfChildren:
-                        profile.numberOfChildren !== undefined &&
-                        profile.numberOfChildren !== null
-                            ? String(profile.numberOfChildren)
+                    noOfChildren:
+                        profile.noOfChildren !== undefined &&
+                        profile.noOfChildren !== null
+                            ? String(profile.noOfChildren)
                             : "",
                 });
             } catch (err) {
@@ -147,12 +192,19 @@ const ProfilePage = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleUpload = async (e) => {
+    useEffect(() => {
+    if (formData.maritalStatus !== "Married") {
+        setFormData(prev => ({ ...prev, spouseName: "" }));
+    }
+}, [formData.maritalStatus]);
+
+    const handleUpload = async (e, field) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         try {
             setUploading(true);
+
             const payload = new FormData();
             payload.append("file", file);
 
@@ -163,13 +215,19 @@ const ProfilePage = () => {
             });
 
             const data = await res.json();
+
             if (!res.ok) {
                 toast.error(data.message || "Upload failed");
                 return;
             }
 
-            setFormData((prev) => ({ ...prev, documentImage: data.url }));
-            toast.success("Document uploaded");
+            setFormData((prev) => ({ 
+                ...prev, 
+                [field]: data.url,
+            }));
+
+            toast.success(`${field} uploaded`);
+            console.log("Upload Response:", data);
         } catch (err) {
             console.error("Upload error:", err);
             toast.error("Upload failed");
@@ -178,54 +236,33 @@ const ProfilePage = () => {
         }
     };
 
-    const handleProfile = async (e) => {
-        const img = e.target.files?.[0];
-        if (!img) return;
-
-        const imgKey = e.target.id;
-
-        const data = new FormData();
-        data.append("file", img);
-        data.append("upload_preset", "okuper");
-
-        try {
-            const res = await fetch(
-                "https://api.cloudinary.com/v1_1/dfdzbuk0c/image/upload",
-                {
-                    method: "POST",
-                    body: data,
-                },
-            );
-
-            const uploadResult = await res.json();
-
-            if (!uploadResult.secure_url) {
-                toast.error("Image upload failed");
-                return;
-            }
-
-            setImagePreviews((prev) => ({
-                ...prev,
-                [imgKey]: uploadResult.secure_url,
-                // [imgKey]: URL.createObjectURL(img),
-            }));
-
-            // wrap image in array object
-            setFormData((prev) => ({
-                ...prev,
-                [imgKey]: uploadResult.secure_url,
-                // [imgKey]: [{ publicId: "", url: uploadResult.secure_url }],
-            }));
-
-            toast.success(`${imgKey} Image uploaded successfully`);
-        } catch (err) {
-            console.error(err);
-            toast.error("Upload error");
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        console.log("Submit Caled");
+        
+        if (!formData.firstName || !formData.lastName) {
+                toast.error("Please complete required fields");
+                return;
+            }
+
+        if (stepIndex !== steps.length - 1) return;
+
+        if (!formData.previewPic) {
+            toast.error("please upload a diplay picture");
+            return;
+        }
+
+        if (!formData.currentAddress) {
+            toast.error("kindly fill current address");
+            return
+        }
+        if (!formData.stateOfOrigin) {
+            toast.error("kindly fill state of origin");
+            return
+        }
+
         try {
             setSaving(true);
             const res = await fetch("/api/profile", {
@@ -243,7 +280,11 @@ const ProfilePage = () => {
 
             toast.success("Profile updated successfully");
 
-            router.push("/landlordDashboardComplete");
+            router.push( 
+                role === "landlord"
+                ? "/landlordDashboardCompleted"
+                : "/tenantDashboardCompleted",
+            );
 
         } catch (err) {
             console.error("Profile update error:", err);
@@ -256,15 +297,34 @@ const ProfilePage = () => {
         if (stepIndex === 0) {
             return (
                 <div>
+                    
                     <label className={labelClass}>
                         Profile Picture
-                        <div className="mt-2 flex flex-col gap-3 rounded-lg border border-dashed border-blue-200 bg-blue-50 p-4">
+                        <div className="mt-2 flex flex-col hover:bg-blue-100 hover:cursor-pointer gap-3 rounded-lg border border-dashed border-blue-200 bg-blue-50 p-4">
                             <input
                                 type="file"
                                 accept="image/*,application/pdf"
-                                onChange={handleUpload}
+                                onChange={(e) => handleUpload(e, "previewPic")}
                                 className="text-sm"
                             />
+
+                        
+                            <div className="text-xs text-gray-600">
+                                {uploading
+                                    ? "Uploading document..."
+                                    : formData.previewPic
+                                      ? "Document uploaded successfully"
+                                      : "Upload a clear image or PDF of your ID"}
+                            </div>
+                            {formData.previewPic && (
+                                <a
+                                    href={formData.previewPic}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-xs font-semibold text-blue-900 underline">
+                                    View uploaded document
+                                </a>
+                            )}  
                         </div>
                     </label>
                     <div className="grid gap-4 md:grid-cols-2">
@@ -322,12 +382,13 @@ const ProfilePage = () => {
                             className={inputClass}
                             name="documentType"
                             value={formData.documentType}
-                            onChange={handleProfile}>
+                            onChange={handleChange}>
                             {options.documentType.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
+
                         </select>
                     </div>
                     <div>
@@ -342,11 +403,11 @@ const ProfilePage = () => {
                     </div>
                     <div className="md:col-span-2">
                         <label className={labelClass}>Document upload</label>
-                        <div className="mt-2 flex flex-col gap-3 rounded-lg border border-dashed border-blue-200 bg-blue-50 p-4">
+                        <div className="mt-2 flex flex-col gap-3 rounded-lg border hover:bg-blue-100 hover:cursor-pointer border-dashed border-blue-200 bg-blue-50 p-4">
                             <input
                                 type="file"
                                 accept="image/*,application/pdf"
-                                onChange={handleUpload}
+                                onChange={(e) => handleUpload(e, "documentImage")}
                                 className="text-sm"
                             />
                             <div className="text-xs text-gray-600">
@@ -440,7 +501,7 @@ const ProfilePage = () => {
                             ))}
                         </select>
                     </div>
-                    {formData.maritalStatus === "Married" && (
+                     {formData.maritalStatus === "Married" ? (
                         <>
                             <div>
                                 <label className={labelClass}>
@@ -460,17 +521,31 @@ const ProfilePage = () => {
                                 </label>
                                 <input
                                     className={inputClass}
-                                    name="numberOfChildren"
+                                    name="noOfChildren"
                                     placeholder="Number of children"
-                                    value={formData.numberOfChildren}
+                                    value={formData.noOfChildren}
                                     onChange={handleChange}
                                 />
                             </div>
                         </>
+                    ) : (
+                        <div>
+                            <label className={labelClass}>
+                                Number of children
+                            </label>
+                            <input
+                                className={inputClass}
+                                name="noOfChildren"
+                                placeholder="Number of children"
+                                value={formData.noOfChildren}
+                                onChange={handleChange}
+                            />
+                        </div>
                     )}
                 </div>
             );
         }
+                
 
         if (stepIndex === 3) {
             return (
@@ -519,60 +594,75 @@ const ProfilePage = () => {
             );
         }
 
-        return (
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2">
-                    <label className={labelClass}>Current address</label>
-                    <input
-                        className={inputClass}
-                        name="currentAddress"
-                        placeholder="Current address"
-                        value={formData.currentAddress}
-                        onChange={handleChange}
-                    />
+
+        if (stepIndex === 4) {
+            return (
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label className={labelClass}>Current Address</label>
+                        <input
+                            className={inputClass}
+                            name="currentAddress"
+                            placeholder="Current address"
+                            value={formData.currentAddress}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div>
+                        <label className={labelClass}>City</label>
+                        <input
+                            className={inputClass}
+                            name="city"
+                            placeholder="City"
+                            value={formData.city}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div>
+                        <label className={labelClass}>State</label>
+                        <input
+                            className={inputClass}
+                            name="state"
+                            placeholder="State"
+                            value={formData.state}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div>
+                        <label className={labelClass}>Country</label>
+                        <input
+                            className={inputClass}
+                            name="country"
+                            placeholder="Country"
+                            value={formData.country}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div>
+                        <label className={labelClass}>Zip code</label>
+                        <input
+                            className={inputClass}
+                            name="zipCode"
+                            placeholder="Zip code"
+                            value={formData.zipCode}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className={labelClass}>State of origin</label>
+                        <input
+                            className={inputClass}
+                            name="stateOfOrigin"
+                            placeholder="State of origin"
+                            value={formData.stateOfOrigin}
+                            onChange={handleChange}
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label className={labelClass}>City</label>
-                    <input
-                        className={inputClass}
-                        name="city"
-                        placeholder="City"
-                        value={formData.city}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>State</label>
-                    <input
-                        className={inputClass}
-                        name="state"
-                        placeholder="State"
-                        value={formData.state}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>Country</label>
-                    <input
-                        className={inputClass}
-                        name="country"
-                        placeholder="Country"
-                        value={formData.country}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>Zip code</label>
-                    <input
-                        className={inputClass}
-                        name="zipCode"
-                        placeholder="Zip code"
-                        value={formData.zipCode}
-                        onChange={handleChange}
-                    />
-                </div>
-            </div>
-        );
+            );
+        }
+    
     };
 
     return (
@@ -586,8 +676,7 @@ const ProfilePage = () => {
                                 Complete Your Profile
                             </h1>
                             <p className="mt-2 text-sm text-blue-950/70">
-                                Provide accurate details to help us verify your
-                                profile.
+                                Provide accurate details to help us verify your profile.
                             </p>
                         </div>
                         <Link
@@ -618,18 +707,19 @@ const ProfilePage = () => {
                         </div>
                         <div className="grid gap-3 md:grid-cols-5">
                             {steps.map((step, index) => (
-                                <button
-                                    type="button"
-                                    key={step.key}
-                                    onClick={() => setStepIndex(index)}
-                                    className={`rounded-lg border px-3 py-2 text-xs font-semibold ${
-                                        index === stepIndex
-                                            ? "border-blue-900 bg-blue-50 text-blue-900"
-                                            : "border-gray-200 text-gray-500"
-                                    }`}>
-                                    {step.title}
-                                </button>
-                            ))}
+                    <button
+                        type="button"
+                        key={step.key}
+                        onClick={() => setStepIndex(index)}
+                        className={`rounded-lg border px-3 py-2 text-xs cursor-pointer hover:rounded-sm hover:scale-105 font-semibold ${
+                            index === stepIndex
+                                ? "border-blue-900 bg-blue-50 text-blue-900"
+                                : "border-gray-200 text-gray-500"
+                        }`}
+                    >
+                        {step.title}
+                    </button>
+))}
                         </div>
                     </div>
                 </div>
@@ -639,7 +729,7 @@ const ProfilePage = () => {
                         Loading profile...
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
                         <div className="rounded-xl bg-white p-6 shadow-md">
                             <h2 className="text-xl font-bold text-blue-950">
                                 {steps[stepIndex].title}
@@ -656,30 +746,28 @@ const ProfilePage = () => {
                                         Math.max(prev - 1, 0),
                                     )
                                 }
-                                className="rounded-xl border border-blue-900 px-6 py-3 text-sm font-semibold text-blue-900 disabled:border-gray-300 disabled:text-gray-400">
+                                className="rounded-xl cursor-pointer border border-blue-900 transition-all duration-200 hover:rounded-sm hover:scale-110 px-6 py-3 text-sm font-semibold text-blue-900 disabled:border-gray-300 disabled:text-gray-400">
                                 Back
                             </button>
 
                             {stepIndex < steps.length - 1 ? (
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        setStepIndex((prev) =>
-                                            Math.min(
-                                                prev + 2,
-                                                steps.length - 1,
-                                            ),
-                                        )
-                                    }
-                                    className="rounded-xl bg-blue-900 px-6 py-3 text-sm font-semibold text-white">
+                                    onClick={() => {
+                                        setStepIndex((prev) => prev + 1);
+                                
+                                    }}
+                                    disabled={saving || uploading}
+                                    className="rounded-xl bg-blue-900 cursor-pointer hover:rounded-sm hover:scale-110 hover:bg-blue-700 transition-all duration-200 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                                >
                                     Next
-                                </button>
+                            </button>
                             ) : (
                                 <button
                                     type="submit"
                                     disabled={saving || uploading}
-                                    className="rounded-xl bg-blue-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                                    onClick={handleSubmit}>
+                                    className="rounded-xl bg-blue-900 cursor-pointer hover:rounded-sm hover:scale-110 hover:bg-blue-700 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                                >
                                     {saving ? "Saving..." : "Submit"}
                                 </button>
                             )}

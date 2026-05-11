@@ -50,7 +50,7 @@ export async function POST(req) {
           subject: "Your Okuper Verification Code",
           html: `
             <div style="font-family: Arial, sans-serif; padding: 20px;">
-              <h1 style="color: #003399;">Okuper Verification Code</h1>
+              <h1 style="color: #000000;">Okuper Verification Code</h1>
               <p>Your verification code is:</p>
               <h2 style="color: #003399; font-size: 32px; letter-spacing: 5px;">${result.otpCode}</h2>
               <p>This code will expire in 5 minutes.</p>

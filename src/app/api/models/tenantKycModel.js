@@ -4,6 +4,19 @@ const tenantKycSchema = new mongoose.Schema(
   {
     previewPic: { type: String, required: true },
 
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+
     phone: {
       type: String,
       required: true,
@@ -14,6 +27,10 @@ const tenantKycSchema = new mongoose.Schema(
       required: true,
     },
     idNumber: {
+      type: String,
+      required: true,
+    },
+    documentImage: {
       type: String,
       required: true,
     },
@@ -99,6 +116,49 @@ const tenantKycSchema = new mongoose.Schema(
     },
     zipCode: {
       type: String,
+    },
+    stateOfOrigin: {
+      type: String,
+      required: true,
+      enum: [
+        "Abia",
+        "Adamawa",
+        "Akwa Ibom",
+        "Anambra",
+        "Bauchi",
+        "Bayelsa",
+        "Benue",
+        "Borno",
+        "Cross River",
+        "Delta",          
+        "Ebonyi",
+        "Edo",
+        "Ekiti",
+        "Enugu",
+        "Gombe",
+        "Imo",
+        "Jigawa",
+        "Kaduna",
+        "Kano",
+        "Katsina",
+        "Kebbi",
+        "Kogi",
+        "Kwara",
+        "Lagos",
+        "Nasarawa",
+        "Niger",
+        "Ogun", 
+        "Ondo",
+        "Osun",
+        "Oyo",
+        "Plateau",
+        "Rivers",
+        "Sokoto",
+        "Taraba",
+        "Yobe",
+        "Zamfara",
+        "FCT Abuja",
+      ],
     },
 
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
