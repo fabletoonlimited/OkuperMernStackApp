@@ -16,7 +16,7 @@ const Page = () => {
             });
 
             if (res.ok) {
-                router.replace("/dashboardSuperAdmin");
+                router.replace("/dashboardAgent");
             }
         };
         checkAuth();
@@ -43,7 +43,7 @@ const Page = () => {
         setLoading(true);
 
         try {
-            const response = await fetch("/api/loginSuperAdmin", {
+            const response = await fetch("/api/loginAgent", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -78,7 +78,7 @@ const Page = () => {
 
     return (
         <>
-            <h1 className="font-bold text-4xl mt-16 ml-10">Sign in Super Admin</h1>
+            <h1 className="font-bold text-4xl mt-16 ml-10">Sign in Agent</h1>
 
             <ToastContainer position="top-center" autoClose={3000} />
 

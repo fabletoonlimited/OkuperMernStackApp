@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Tenant", "Landlord", "Admin"],
+      enum: ["tenant", "landlord", "admin", "superAdmin", "agent", "support"],
       required: true,
     },
 
@@ -46,6 +46,9 @@ const userSchema = new mongoose.Schema(
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord" },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant" },
     admin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
+    superAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin" },
+    agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+    support: { type: mongoose.Schema.Types.ObjectId, ref: "Support" }
     
   }, { timestamps: true },
 );

@@ -39,15 +39,20 @@ const tenantSchema = new mongoose.Schema(
         default: "tenant"
     },
 
+    isSelected: {
+        type: Boolean,
+        default: false
+    },
+
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
     tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc"},
     tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
-    message: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
+    messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
     property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
-    payment: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
-    disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]
+    payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Dispute"}]
 
 }, {timestamps: true});
 

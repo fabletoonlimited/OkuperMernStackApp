@@ -5,18 +5,39 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 
+
 const Page = () => {
     const router = useRouter();
 
     // Check auth
     useEffect(() => {
         const checkAuth = async () => {
+            try {
             const res = await fetch("/api/auth/me", {
                 credentials: "include",
             });
 
-            if (res.ok) {
-                router.replace("/landlordDashboard");
+            if (!res.ok) return;
+
+                const user = await res.json();
+
+                if (user.role === "landlord") {
+                    router.replace("/landlordDashboard");
+                }
+
+                if (user.role === "tenant") {
+                    router.replace("/tenantDashboard");
+                }
+
+                if (user.role === "admin") {
+                    router.replace("/dashboardAdmin");
+                }
+
+                if (user.role === "superAdmin") {
+                    router.replace("/dashboardSuperAdmin");
+                }
+            } catch (error) {
+                console.error("Auth check error:", error);
             }
         };
         checkAuth();
@@ -64,11 +85,12 @@ const Page = () => {
                 setLoading(false);
                 return;
             }
-
             toast.success("Login successful! 🎉");
-            setTimeout(() => {
-                router.push("/landlordDashboard");
-            }, 1000);
+
+            setLoading(false);
+
+            router.replace("/landlordDashboard");
+
         } catch (error) {
             console.error("Login error:", error);
             toast.error("Something went wrong. Please try again.");

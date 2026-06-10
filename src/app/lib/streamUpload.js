@@ -1,5 +1,5 @@
 import streamifier from "streamifier";
-import cloudinary from "../utils/cloudinary.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export const streamUpload = (buffer, folder = "Bills&ID") => {
   return new Promise((resolve, reject) => {

@@ -6,7 +6,7 @@ import crypto from "crypto";
 import Invite from "../models/inviteModel.js"
 import AuditLog from "../models/auditLogModel.js";
 
-// ================= Signup Super Admin =================
+// ================= Signup Admin =================
 export const signupSuperAdmin = async (data) => {
   const { firstName, lastName, password, token } = data;
 
@@ -46,21 +46,21 @@ export const signupSuperAdmin = async (data) => {
     });
 
     if (existingAdmin) {
-      return { status: 400, message: "Admin already exists" };
+        return { status: 400, message: "Admin already exists" };
     }
 
     const allowedRoles = ["admin", "superAdmin", "support", "agent"];
-      if (!allowedRoles.includes(invite.role)) {
-      return { status: 400, message: "Invalid role" };
-      }
+        if (!allowedRoles.includes(invite.role)) {
+        return { status: 400, message: "Invalid role" };
+        }
         
     // Prevent super admin (still keep, but DB index is the real protection)
     if (invite.role === "superAdmin") {
     const existingSuperAdmin = await SuperAdmin.findOne({ role: "superAdmin" });
 
     if (existingSuperAdmin) {
-      return { status: 403, message: "Super admin already exists" };
-      }
+        return { status: 403, message: "Super admin already exists" };
+    }
     }
 
   try {
@@ -83,8 +83,6 @@ export const signupSuperAdmin = async (data) => {
       success: true,
       message: "Admin created successfully",
     };
-    
-    
   } catch (error) {
     if (error.code === 11000) {
       return { status: 400, message: "Admin already exists" };
@@ -95,7 +93,7 @@ export const signupSuperAdmin = async (data) => {
 };
 
 
-// ================= Signin SuperAdmin =================
+// ================= Login SuperAdmin =================
 export const loginSuperAdmin = async (data) => {
   try {
     const { email, password } = data;
@@ -171,7 +169,7 @@ export const loginAdmin = async (data) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    const admin = await SuperAdmin.findOne({
+    const admin = await Admin.findOne({
       email: normalizedEmail,
     });
 
@@ -263,211 +261,3 @@ export const revokeAdmin = async ({ adminId, revokedAdminId }) => {
   return { success: true };
 };
 
-// ================= Login Agent =================
-export const loginAgent = async (data) => {
-  try {
-    const { email, password } = data;
-
-    if (!email || !password) {
-      return { status: 400, message: "Email and password are required" };
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-
-    const agent = await SuperAdmin.findOne({
-      email: normalizedEmail,
-    });
-
-    if (!agent || !(await bcrypt.compare(password, agent.password))) {
-      return { status: 400, message: "Invalid credentials" };
-    }
-
-    if (!agent.isVerified) {
-      return { status: 403, message: "Account not verified" };
-    }
-
-    const token = jwt.sign(
-      {
-        id: agent._id,
-        role: agent.role, // ✅ dynamic role
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "12h" }
-    );
-
-    const response = NextResponse.json(
-      {
-        success: true,
-        agent: {
-          id: agent._id,
-          name: `${agent.firstName} ${agent.lastName}`,
-          email: agent.email,
-          role: agent.role,
-        },
-        message: "Login successful",
-      },
-      { status: 200 }
-    );
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: false,
-      // secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 12,
-    });
-
-    return response;
-  } catch (err) {
-    console.error("Login Error:", err);
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
-  }
-};
-
-//======== Invite Agent =============
-
-export const inviteAgent = async ({ email, role, agentId }) => {
-  const token = crypto.randomBytes(32).toString("hex");
-
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
-
-  const invite = await Invite.create({
-    email,
-    role,
-    token: hashedToken,
-    expiresAt: Date.now() + 1000 * 60 * 60 * 24, // 24hrs
-  });
-
-  await AuditLog.create({
-    action: "INVITE_AGENT",
-    performedBy: agentId,
-    metadata: { email, role },
-  });
-
-  return token; // send via email
-};
-
-export const revokeAgent = async ({ agentId, revokedAgentId }) => {
-  await SuperAdmin.findByIdAndDelete(revokedAgentId);
-
-  await AuditLog.create({
-    action: "REVOKE_AGENT",
-    performedBy: agentId,
-    targetId: revokedAgentId,
-  });
-
-  return { success: true };
-};
-
-
-// ================= Login Support =================
-export const loginSupport = async (data) => {
-  try {
-    const { email, password } = data;
-
-    if (!email || !password) {
-      return { status: 400, message: "Email and password are required" };
-    }
-
-    const normalizedEmail = email
-    .trim()
-    .toLowerCase();
-
-    const support = await SuperAdmin.findOne({
-      email: normalizedEmail,
-    });
-
-    if (!support || !(await bcrypt.compare(password, support.password))) {
-      return { status: 400, message: "Invalid credentials" };
-    }
-
-    if (!support.isVerified) {
-      return { status: 403, message: "Account not verified" };
-    }
-
-    const token = jwt.sign(
-      {
-        id: support._id,
-        role: support.role, // ✅ dynamic role
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "12h" }
-    );
-
-    const response = NextResponse.json(
-      {
-        success: true,
-        support: {
-          id: support._id,
-          name: `${support.firstName} ${support.lastName}`,
-          email: support.email,
-          role: support.role,
-        },
-        message: "Login successful",
-      },
-      { status: 200 }
-    );
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: false,
-      // secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 12,
-    });
-
-    return response;
-  } catch (err) {
-    console.error("Login Error:", err);
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
-  }
-};
-
-//======== Invite Support =============
-
-export const inviteSupport = async ({ email, role, supportId }) => {
-  const token = crypto.randomBytes(32).toString("hex");
-
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
-
-  const invite = await Invite.create({
-    email,
-    role,
-    token: hashedToken,
-    expiresAt: Date.now() + 1000 * 60 * 60 * 24, // 24hrs
-  });
-
-  await AuditLog.create({
-    action: "INVITE_SUPPORT",
-    performedBy: supportId,
-    metadata: { email, role },
-  });
-
-  return token; // send via email
-};
-
-export const revokeSupport = async ({ supportId, revokedSupportId }) => {
-  await SuperAdmin.findByIdAndDelete(revokedSupportId);
-
-  await AuditLog.create({
-    action: "REVOKE_SUPPORT",
-    performedBy: supportId,
-    targetId: revokedSupportId,
-  });
-
-  return { success: true };
-};

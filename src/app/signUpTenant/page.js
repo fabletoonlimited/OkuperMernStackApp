@@ -47,7 +47,7 @@ const page = () => {
     setError("");
 
     if (!userId) {
-      toast.error("Signup flow is invalid. Please restart signup.");
+      toast.error("Create a user profile first before signing up as a tenant. Please restart signup from the beginning.");
       return;
     }
 

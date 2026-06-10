@@ -29,7 +29,7 @@ const superAdminSchema = new mongoose.Schema(
 
     role: {
         type: String,
-        enum: ["superAdmin", "admin", "support", "moderator"],
+        enum: ["superAdmin", "admin", "support", "agent"],
         default: "admin",
     },
 
@@ -42,7 +42,7 @@ const superAdminSchema = new mongoose.Schema(
     transactions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Transactions"}],
     subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscribers"}],
     disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
-    referals: [{ type: mongoose.Schema.Types.ObjectId, ref: "Referals"}]
+    referals: [{ type: mongoose.Schema.Types.ObjectId, ref: "Referals"}],
 
 }, {timestamps: true});
 

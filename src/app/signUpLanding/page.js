@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 const page = () => {
 const router = useRouter();
 
-
   /* =======================
      STATE
   ======================= */
@@ -18,14 +17,36 @@ const router = useRouter();
   const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
   const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
   const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
-
-
+  const hasCheckedAuth = React.useRef(false); // To prevent multiple auth checks
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  
   /* =======================
      EFFECTS
   ======================= */
 
   // Residency dropdown
   useEffect(() => {
+    const existingUser = localStorage.getItem("existingUser");
+    const role = localStorage.getItem("role");
+
+    if (existingUser === "true") {
+      if (role === "tenant") {
+        setSelectResidencyStatus(localStorage.getItem("residencyStatus") || null);
+        setSelectWhoIsUsingPlatform(localStorage.getItem("whoIsUsingPlatform") || null);
+        router.replace("/signInTenant");
+      } else if (role === "landlord") {
+        setSelectResidencyStatus(localStorage.getItem("residencyStatus") || null);
+        setSelectWhoIsUsingPlatform(localStorage.getItem("whoIsUsingPlatform") || null);
+        router.replace("/signInLandlord");
+      }
+    }
+  }, [router]);
+
+  // Residency dropdown validation
+  useEffect(() => {
+
     if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
       setShowResidencyStatus(true);
     } else {
@@ -46,25 +67,94 @@ const router = useRouter();
 
   // ✅ Resume signup safely (FIXED)
   useEffect(() => {
-    const resumeSignup = async () => {
-    const res = await fetch("/api/user/me", {
-      credentials: "include",
+  if (hasCheckedAuth.current) return 
+    hasCheckedAuth.current = true;
+
+  const clearStorage = () => {
+    localStorage.removeItem("existingUser");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("residencyStatus");
+    localStorage.removeItem("whoIsUsingPlatform");
+  };
+
+  const resumeSignup = async () => {
+    try {
+      const res = await fetch("/api/user/me", {
+        credentials: "include",
       });
 
-      if (res.ok) {
-        const user = await res.json();
-
-        router.replace(
-          user.role === "Tenant"
-            ? "/tenantDashboard"
-            : "/landlordDashboard"
-        );               
-        return;
-      } 
+    if (res.status === 401 || !res.ok) {
+      clearStorage();
+      return;
     };
 
-    resumeSignup();
-  }, [router]);
+    const data = await res.json();
+
+    const role = (data.role || "").toLowerCase();
+
+    if (!role) {
+      clearStorage();
+      return;
+    }
+
+    if (role === "tenant") router.replace("/tenantDashboard");
+    else if (role === "landlord") router.replace("/landlordDashboard");
+    else if (role === "admin") router.replace("/dashboardAdmin");
+    else if (role === "superadmin") router.replace("/dashboardSuperAdmin");
+    
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+resumeSignup();
+}, [router]);
+
+
+useEffect(() => {
+  if (hasCheckedAuth.current) return;
+  hasCheckedAuth.current = true;
+}, [router]);
+
+
+ useEffect(() => {
+    const checkAuth = async () => {
+        setLoading(true);
+        
+        try {
+            const res = await fetch("/api/user/me", {
+            credentials: "include",
+            });
+
+        if (res.ok) {
+          const data = await res.json();
+          setIsAuthenticated(true);
+          setUserRole(data.role || null); 
+        } else {
+          setIsAuthenticated(false);
+          setUserRole(null);
+        }
+      } catch (err){
+        setIsAuthenticated(false);
+        setUserRole(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+    
+  const goToSignInLandlord = () => {
+    router.push("/signInLandlord");
+  };
+
+  const goToSignInTenant = () => {
+    router.push("/signInTenant");
+  };
+
+
 
   /* =======================
      CONSTANTS
@@ -72,14 +162,6 @@ const router = useRouter();
 
   const residencyStatus = {
     selectOne: "Select One",
-    citizen: "Citizen",
-    permanentResident: "Permanent Resident",
-    workPermit: "Work Permit",
-    studentVisa: "Student Visa",
-    visitorVisa: "Visitor Visa",
-  };
-
-  const residencyMap = {
     citizen: "Citizen",
     permanentResident: "Permanent Resident",
     workPermit: "Work Permit",
@@ -136,7 +218,9 @@ const router = useRouter();
       };
 
       // Capitalize role to match schema enum
-      const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
+      // const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
+
+      const normalizedRole = role.toLowerCase();
 
       const response = await fetch("/api/user", {
         method: "POST",
@@ -144,14 +228,14 @@ const router = useRouter();
         body: JSON.stringify({
           residencyStatus: residencyMap[selectResidencyStatus],
           whoIsUsingPlatform: selectWhoIsUsingPlatform,
-          role: capitalizedRole,
+          role: normalizedRole,
         }),
       });
 
       const data = await response.json();
 
       console.log("BUTTON ROLE:", role);
-      console.log("CAPITALIZED ROLE:", capitalizedRole);
+      console.log("NORMALIZED ROLE:", normalizedRole);
       console.log("FULL API RESPONSE:", data);
       console.log("USER ROLE:", data.role || data.user?.role);
 
@@ -165,6 +249,10 @@ const router = useRouter();
 
       localStorage.setItem("userId", userId);
       localStorage.setItem("role", userRole);
+      localStorage.setItem("existingUser", "true");
+
+      localStorage.setItem("whoIsUsingPlatform", selectWhoIsUsingPlatform);
+      localStorage.setItem("residencyStatus", residencyMap[selectResidencyStatus]);
 
       toast.success(
         data.exists
@@ -173,7 +261,7 @@ const router = useRouter();
       );
 
       router.replace(
-        userRole === "Tenant"
+        userRole === "tenant"
           ? `/signUpTenant?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`
           : `/signUpLandlord?userId=${userId}&residencyStatus=${residencyMap[selectResidencyStatus]}&whoIsUsingPlatform=${selectWhoIsUsingPlatform}`,
       );
@@ -191,6 +279,7 @@ const router = useRouter();
         Sign Up
       </h1>
 
+
       {/*Residency Status*/}
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-10">
         <ToastContainer position="top-center" autoClose={3000} />
@@ -202,7 +291,7 @@ const router = useRouter();
             flexDirection: "column",
             maxWidth: "556px",
             // width: '100%',
-            height: "650px",
+            height: "350px",
             maxHeight: "100%",
             border: "1px solid #ccc",
             padding: "20px",
@@ -229,7 +318,7 @@ const router = useRouter();
                 padding: "2px",
               }}
             >
-              <strong>{selectResidencyStatus}</strong> (click to change)
+              <strong>{residencyStatus[selectResidencyStatus]}</strong> (click to change)
             </p>
           )}
           {showResidencyStatus && (
@@ -261,11 +350,10 @@ const router = useRouter();
             <>
               <button
                 className={`rounded-lg md:p-5 p-2 md:px-15 px-0 border-2 md:w-60 w-30 text-2xl text-center cursor-pointer 
-                                ${
-                                  selectWhoIsUsingPlatform === "myself"
-                                    ? "text-blue-950 border-blue-950 bg-blue-400"
-                                    : "text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white"
-                                }`}
+                  ${ selectWhoIsUsingPlatform === "myself"
+                    ? "text-blue-950 border-blue-950 bg-blue-400"
+                    : "text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white"
+                  }`}
                 onClick={() => setSelectWhoIsUsingPlatform("myself")}
               >
                 Myself
@@ -297,41 +385,47 @@ const router = useRouter();
           style={{ display: "flex", gap: "20px" }}
         >
           <button
-            onClick={() => createUser("Tenant")}
-            className="signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:w-60 border-1px solid #ccc text-2xl text-center cursor-pointer"
+            onClick={() => createUser("tenant")}
+            className="signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-100 md:w-64 border-1px solid #ccc text-2xl text-center cursor-pointer"
           >
             Sign Up as Tenant
           </button>
 
           <button
-            onClick={() => createUser("Landlord")}
-            className="signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-75 md:65 border-1px solid #ccc text-2xl text-center cursor-pointer"
+            onClick={() => createUser("landlord")}
+            className="signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-100 md:w-70 border-1px solid #ccc text-2xl text-center cursor-pointer"
           >
             Sign Up as Landlord
           </button>
         </div>
+   
       </div>
 
+      <p className="md:ml-12 ml-12 md:-mt-40 underline -mt-20 md:mb-20 -mb-20 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
+        style={{ cursor: "pointer"}}
+        onClick={() => {
+          if (userRole === "landlord") {
+            router.push("/signInLandlord");
+          } else {
+            router.push("/signInTenant");
+          }
+      }}> Sign In as Tenant or Landlord (if you already have an account)
+      </p>
+
       {/*Banner Section*/}
-      <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-295 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
+      <div className="bannerSection md:flex md:justify-right md:items-right mt-30 md:-mt-190 ml-10 md:ml-190 md:mb-20 mb-10 md:w-100% w-50% md:mr-10 mr-10">
+        
         {/* RIGHT SECTION */}
-        <div
-          className={"relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170"}
-        >
-          <div
-            className={
-              "relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor "
-            }
-          >
-            <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-justify md:text-center">
+        <div className={"relative h-40 rounded-2xl shadow-lg bannerBgColor mb-200"}>
+          <div className={"relative p-10 rounded-t-2xl md:w-155 w-50% bg-[rgba(0,51,153,1)] py-2 md:h-20 leading-relaxed bannerBgColor"}>
+            <h2 className="font-medium md:text-4xl text-3xl text-white leading-8 md:leading-12 md:pt-15 pt-20 px-2 md:px-2 text-center md:text-center">
               <b>
-                Sign up on Okuper to connect directly with landlords and
-                tenants.
+                Sign up on Okuper to connect directly with landlords and tenants.
               </b>
             </h2>
           </div>
 
-          <p className="absolute md:font-medium leading-[1.5] -mt-10 md:text-[20px] text-white text-center px-5 md:px-20 text-xl md:text-center">
+          <p className="absolute text-sm md:font-medium leading-[1.5] mt-5 md:mt-40 md:text-[20px] text-white text-center px-15 md:px-25 md:text-center">
             No agents. No hidden fees. Just verified people and real homes.
           </p>
 
@@ -339,16 +433,14 @@ const router = useRouter();
           <img
             src={BASE_URL + "/bannerlady_uzwewr"}
             alt="bannerlady"
-            className={
-              "bannerLady md:h-auto h-60 md:w-155 w-75 bottom-[-315px] md:bottom-[-721px]"
-            }
+            className={"bannerLady md:h-auto h-60 md:w-120 w-120 bottom-[-541px] md:bottom-[-654px]"}
             style={{ position: "absolute", height: "auto" }}
           />
 
           <img
             src="/BannerSam.png"
             alt="Ad Banner Sam"
-            className={"rounded-b-2xl"}
+            className={"rounded-b-2xl -mt-2 md:w-155"}
           />
         </div>
       </div>

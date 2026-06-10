@@ -2,32 +2,18 @@ import Tenant from "../models/tenantModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import { streamUpload } from "@/app/lib/streamUpload.js";
 
 //Signup Tenant
 export const signupTenant = async (req) => {
   const body = await req.json();
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    otp,
-    referalCode,
-    surveyInputField,
-    terms,
-  } = body;
+  const {firstName,lastName, email, password, otp, referalCode, surveyInputField, terms} = body;
 
-  if (
-    !firstName ||
-    !lastName ||
-    !email ||
-    !password ||
-    !surveyInputField ||
-    !terms
-  ) {
-    return NextResponse.json(
-      { message: "Kindly fill all fields required" },
-      { status: 400 },
+  if (!firstName || !lastName || !email || !password || !surveyInputField || !terms) 
+    {
+      return NextResponse.json(
+        { message: "Kindly fill all fields required" },
+        { status: 400 },
     );
   }
 
@@ -51,6 +37,8 @@ export const signupTenant = async (req) => {
       survey: surveyInputField,
       terms,
       role: "tenant",
+      isVerified: false,
+      isSelected: false
     });
 
     await newTenant.save();
@@ -97,7 +85,7 @@ export const signupTenant = async (req) => {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "Something went wrong", error: error.message },
+      { message: "Something went wrong"},
       { status: 500 },
     );
   }
@@ -108,7 +96,10 @@ export const loginTenant = async (data) => {
     const { email, password } = data;
 
    if (!email || !password) {
-      return { status: 400, message: "Email and password are required" };
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 },
+      );
     }
 
     const normalizedEmail = email.trim().toLowerCase();
@@ -116,12 +107,18 @@ export const loginTenant = async (data) => {
     const tenant = await Tenant.findOne({ email: normalizedEmail });
     
     if (!tenant) {
-      return { status: 404, message: "Invalid credentials" };
+      return NextResponse.json(
+        {success: false, message: "Tenant not found with this email" },
+        { status: 401  },
+      );
     }
 
     const isMatch = await bcrypt.compare(password, tenant.password);
     if (!isMatch) {
-      return { status: 401, message: "Invalid password" };
+      return NextResponse.json(
+        { success: false, message: "Invalid password" },
+        { status: 401 },
+      );
     }
 
     // Create a token
@@ -141,20 +138,20 @@ export const loginTenant = async (data) => {
       },
       message: "Login successful",
     },
-      { status: 200 }
-    );
+    {status: 200}
+  );
 
     response.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "development",
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1day
     });
 
    return response;
-  } catch (err) {
-    console.error("Login Error:", err.message);
+  } catch (error) {
+    console.error("Login Error:", error.message);
     return { status: 500, message: "Server error" };
   }
 };
@@ -168,7 +165,11 @@ export const getTenant = async (data) => {
       .populate("Otp")
       .populate("TenantKyc")
       .populate("TenantDashboard")
-      .populate("Property");
+      .populate("Property")
+      .populate("Messages")
+      .populate("HomeInterests")
+      .populate("Payments")
+      .populate("Disputes");
 
     if (!tenant) {
       return { status: 404, message: "Tenant not found" };
@@ -272,9 +273,8 @@ export const deleteTenant = async (data) => {
 };
 
 // ================== ARRAY UPLOAD ==================
-export const arrayUpload = async (data) => {
+export const arrayUpload = async (req) => {
   try {
-    const { req } = data;
     const formData = await req.formData();
     const files = formData.getAll("files");
 

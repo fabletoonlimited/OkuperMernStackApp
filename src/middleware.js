@@ -5,6 +5,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
+
   const token = req.cookies.get("token")?.value;
 
   let user = null;
@@ -29,17 +30,17 @@ export async function middleware(req) {
     "/signUpSuperAdmin",
   ];
 
-  const SIGNIN_REDIRECT = {
-    tenant: "/signInTenant",
-    landlord: "/signInLandlord",
-    admin: "/signInAdmin",
-    superAdmin: "/signInSuperAdmin",
+  const DASHBOARD_REDIRECT = {
+    tenant: "/tenantDashboard",
+    landlord: "/landlordDashboard",
+    admin: "/dashboardAdmin",
+    superAdmin: "/dashboardSuperAdmin",
   };
 
   // 🚫 Block signup pages ONLY for authenticated users
   if (SIGNUP_ROUTES.some(route => pathname.startsWith(route))) {
     if (isAuthenticated) {
-      const redirectTo = SIGNIN_REDIRECT[user.role] || "/";
+      const redirectTo = DASHBOARD_REDIRECT[user.role] || "/";
       return NextResponse.redirect(new URL(redirectTo, req.url));
     }
 
@@ -48,10 +49,11 @@ export async function middleware(req) {
 
   const PUBLIC_ROUTES = [
     "/signInAdmin",
-    "/signInSupport",
-    "/signInSuperAdmin",
-    "/signInTenant",
+    "/signInAgent",
     "/signInLandlord",
+    "/signInSuperAdmin",
+    "/signInSupport",
+    "/signInTenant",
     "/lib",
     "/manage",
     "/policy",
@@ -65,46 +67,70 @@ export async function middleware(req) {
   ];
 
   const PUBLIC_API_ROUTES = [
-    "/api/admin",
-    "/api/loginAdmin",
-    "/api/auth/reset-password",
-    "/api/landlord",
-    "/api/landlordKyc",
-    "/api/loginLandlord",
-    "/api/loginSuperAdmin",
-    "/api/loginTenant",
-    "/api/otp",
-    "/api/rent",
-    "/api/send-email",
-    "/api/user",
-    "/api/support",
-    "/api/loginSupport",
     "/api/script",
-    "/api/sell",
-    "/api/superAdmin",
+    "/api/send-email",
+
+    "/api/user",
+
+    "/api/landlord",
+    "/api/loginLandlord",
+
     "/api/tenant",
+    "/api/loginTenant",
+
+    // "/api/admin",
+    "/api/loginAdmin",
+
+    // "/api/agent",
+    "/api/loginAgent",
+
+    // "/api/support",
+    "/api/loginSupport",
+
+    // "/api/superAdmin",
+    "/api/loginSuperAdmin",
+
+    "/api/otp",
+    
+    "/api/auth/reset-password",
+    "/api/landlordKyc",
+    
+    "/api/rent",
+
+    "/api/sell",
+    "/api/shortlets",
+    "/api/report",
+    "/api/policy",
+    "/api/terms",
+    "/api/privacy",
+    "/api/xStories",
   ];
 
   const PROTECTED_ROUTES = [
+    "/landlordDashboard",
+    "/landlordDashboardCompleted",
+    "/landlordDashboardInbox",
+    "/landlord/properties",
+    "/landlord/messages",
     "/landlordAddressVerification",
     "/landlordSubscription",
-    "/message",
-    "/profile",
+
     "/property",
     "/propertyRequestForm",
-    "/tenantVerification",
+
     "/tenantDashboard",
     "/tenantDashboardCompleted",
     "/tenantDashboardInbox",
     "/tenant/properties",
     "/tenant/messages",
+    "/tenantVerification",
     "/tenant/profile",
+
+
     "/landlord/profile",
     "/propertyListingLanding",
     "/propertyListingUploadForm",
-    "/landlordDashboardInbox",
-    "/landlord/properties",
-    "/landlord/messages",
+    
     "/savedHomes",
     "/admin/users",
     "/propertyCardExpanded",
@@ -124,18 +150,20 @@ export async function middleware(req) {
     "/api/property",
     "/api/propertyRequestForm",
     "/api/tenantVerification",
-    "/api/tenantDashboard",
-    "/api/tenantDashboardCompleted",
-    "/api/tenantDashboardInbox",
-    "/api/tenant/properties",
-    "/api/tenant/messages",
-    "/api/tenant/profile",
+    // "/api/tenantDashboard",
+    // "/api/tenantDashboardCompleted",
+    // "/api/tenantDashboardInbox",
+    // "/api/tenant/properties",
+    // "/api/tenant/messages",
+    // "/api/tenant/profile",
     "/api/landlord/profile",
     "/api/propertyListingLanding",
     "/api/propertyListingUploadForm",
-    "/api/landlordDashboardInbox",
-    "/api/landlord/properties",
-    "/api/landlord/messages",
+    // "/api/landlordDashboard",
+    // "/api/landlordDashboardCompleted",
+    // "/api/landlordDashboardInbox",
+    // "/api/landlord/properties",
+    // "/api/landlord/messages",
     "/api/savedHomes",
     "/api/admin/users",
     "/api/propertyCardExpanded",
@@ -145,6 +173,14 @@ export async function middleware(req) {
     "/api/settings",
     "/api/tenantDisputeForm",
     "/api/verification",
+    "/api/disputes",
+    "/api/verification",
+    "/api/payment",
+    "/api/paystack",
+    "/api/subscription",
+    "/api/referral",
+    "/api/analytics",
+    "/api/notifications",
   ];
 
   // ======================
@@ -156,14 +192,6 @@ export async function middleware(req) {
     }
   }
 
-  // ======================
-  // 🔒 Protect page routes
-  // ======================
-  if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/signInLanding", req.url));
-    }
-  }
 
   // ======================
   // ✅ Allow public APIs
@@ -189,6 +217,12 @@ export async function middleware(req) {
       if (user.role === "superAdmin") {
         return NextResponse.redirect(new URL("/dashboardSuperAdmin", req.url));
       }
+      if (user.role === "agent") {
+        return NextResponse.redirect(new URL("/agentDashboard", req.url));
+      }
+      if (user.role === "support") {
+        return NextResponse.redirect(new URL("/supportDashboard", req.url));
+      }
     }
 
     return NextResponse.next();
@@ -197,7 +231,6 @@ export async function middleware(req) {
   // ======================
   // 🔒 Protect dashboards
   // ======================
-
   if (pathname.startsWith("/landlordDashboard")) {
     if (!isAuthenticated || user.role !== "landlord") {
       return NextResponse.redirect(new URL("/signInLandlord", req.url));
@@ -219,6 +252,18 @@ export async function middleware(req) {
   if (pathname.startsWith("/dashboardSuperAdmin")) {
     if (!isAuthenticated || user.role !== "superAdmin") {
       return NextResponse.redirect(new URL("/signInSuperAdmin", req.url));
+    }
+  }
+
+    if (pathname.startsWith("/agentDashboard")) { 
+    if (!isAuthenticated || user.role !== "agent") {
+      return NextResponse.redirect(new URL("/signInAgent", req.url));
+    }
+  }
+
+    if (pathname.startsWith("/supportDashboard")) {
+    if (!isAuthenticated || user.role !== "support") {
+      return NextResponse.redirect(new URL("/signInSupport", req.url));
     }
   }
 

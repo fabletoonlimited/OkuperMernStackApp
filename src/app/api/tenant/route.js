@@ -49,6 +49,7 @@ export async function POST(req) {
       terms,
       isVerified: false,
       role: "tenant",
+      isSelected: false
     });
 
     return NextResponse.json(
@@ -59,7 +60,8 @@ export async function POST(req) {
           firstName: newTenant.firstName,
           lastName: newTenant.lastName,
           email: newTenant.email,
-          isVerified: newTenant.isVerified
+          isVerified: newTenant.isVerified,
+          isSelected: newTenant.isSelected
         }, 
         message: "Tenant created successfully!"
       }, 

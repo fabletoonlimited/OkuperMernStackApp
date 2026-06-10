@@ -28,6 +28,9 @@ const page = () => {
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return; // Prevent multiple submissions
+
+
     if (!email || !password) {
       toast.error("Please fill in all required fields");
       return;
@@ -155,6 +158,15 @@ const page = () => {
             </button>
           </div>
         </form>
+        <span style={{ paddingLeft: 45, marginBottom: 30 }}>
+          Don't have an account?{" "}
+          <Link href="/signUpTenant">
+            <span className="cursor-pointer hover:text-blue-600">
+              Sign Up here
+            </span>
+          </Link>
+        </span>
+     
 
         {/*Banner Section*/}
         <div className="bannerSection md:flex md:justify-right md:items-right mt-10 md:-mt-186 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">

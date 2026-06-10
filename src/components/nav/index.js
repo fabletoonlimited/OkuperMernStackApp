@@ -15,6 +15,7 @@ function Nav() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
+  const existingUser = typeof window !== "undefined" ? localStorage.getItem("existingUser") : null;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -46,8 +47,8 @@ function Nav() {
   }, []);
 
   const navbar__item = "text-sm"
-  return (
-      <nav className="flex justify-around gap-2 ">
+    return (
+        <nav className="flex justify-around gap-2">
           {/* Hamburger Icon */}
             <div className={styles.navbar__hamburger} onClick={toggleMenu}>
                 <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} size="lg" />
@@ -61,50 +62,48 @@ function Nav() {
             </div>
 
           {/* Menu */}
-          <ul
-              className={`${styles.navbar__menu} ${
-                  isMenuOpen ? styles["navbar__menu--open"] : ""
-              }`}>
-              <Link href="/rent" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">RENT</li>
-              </Link>
+            <ul className={`${styles.navbar__menu} ${
+                    isMenuOpen ? styles["navbar__menu--open"] : ""
+                }`}>
+                <Link href="/rent" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">RENT</li>
+                </Link>
 
-              <Link href="/sell" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">SELL</li>
-              </Link>
+                <Link href="/sell" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">SELL</li>
+                </Link>
 
-              <Link href="/buy" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">BUY</li>
-              </Link>
+                <Link href="/buy" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">BUY</li>
+                </Link>
 
-              <Link href="/shortlets" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">SHORTLETS</li>
-              </Link>
+                <Link href="/shortlets" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">SHORTLETS</li>
+                </Link>
 
-              {/* Desktop logo */}
-              <div
-                  className={`${styles.navbar__logo} ${styles["navbar__logo--desktop"]}`}>
+            {/* Desktop logo */}
+                <div className={`${styles.navbar__logo} ${styles["navbar__logo--desktop"]}`}>
                     <Link href="/">
                         <Image
                             src="/logo.png"
                             alt="Logo"
-                            width={330}
-                            height={250}
+                            width={300}
+                            height={220}
                         />
                     </Link>
-              </div>
+                </div>
 
-              <Link href="/manage" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">MANAGE</li>
-              </Link>
+                <Link href="/manage" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">MANAGE</li>
+                </Link>
 
-              <Link href="/advertise" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">ADVERTISE</li>
-              </Link>
+                <Link href="/advertise" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">ADVERTISE</li>
+                </Link>
 
-              <Link href="/help" onClick={() => setIsMenuOpen(false)}>
-                  <li className="text-sm">HELP</li>
-              </Link>
+                <Link href="/help" onClick={() => setIsMenuOpen(false)}>
+                    <li className="text-sm">HELP</li>
+                </Link>
 
                 {/* 🔐 AUTH SECTION */}
                 {!loading && (
@@ -128,43 +127,41 @@ function Nav() {
 
                                 {showDropdown && (
                                     <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
-                                    
-                                    <button
-                                        onClick={() => {
-                                        if (userRole === "tenant") {
-                                            router.push("/tenantDashboard");
-                                        } else {
-                                            router.push("/landlordDashboard");
-                                        }
-                                        setShowDropdown(false);
-                                        }}
-                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                                    >
-                                        Dashboard
-                                    </button>
+                                        <button
+                                            onClick={() => {
+                                            if (userRole === "tenant") {
+                                                router.push("/tenantDashboard");
+                                            } else {
+                                                router.push("/landlordDashboard");
+                                            }
+                                            setShowDropdown(false);
+                                            }}
+                                            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            Dashboard
+                                        </button>
 
-                                    <button
-                                        onClick={async () => {
-                                        await fetch("/api/auth/logout", {
-                                            method: "POST",
-                                            credentials: "include",
-                                        });
-                                        router.push("/");
-                                        }}
-                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                                    >
-                                        Logout
-                                    </button>
-
+                                        <button
+                                            onClick={async () => {
+                                            await fetch("/api/auth/logout", {
+                                                method: "POST",
+                                                credentials: "include",
+                                            });
+                                            router.push("/");
+                                            }}
+                                            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                        >
+                                            Logout
+                                        </button>
                                     </div>
                                 )}
-                                </li>
+                            </li>
                         )}
                     </>
                 )}
-          </ul>
-      </nav>
-  );
+            </ul>
+        </nav>
+    );
 }
 
 export default Nav;

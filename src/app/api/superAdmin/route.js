@@ -11,10 +11,10 @@ export async function POST (req) {
 
         const body = await req.json();
 
-        const { firstName, lastName, email, token} = body;
-        if (!firstName || !lastName || !email|| !token) {
+        const { firstName, lastName, password, token} = body;
+        if (!firstName || !lastName || !password || !token) {
             return NextResponse.json(
-            { message: error.message || "Server error, something went wrong" },
+            { message: "missing required fields" },
             { status: 500 },
             );
         }
@@ -24,7 +24,7 @@ export async function POST (req) {
     } catch (error) {
         console.error("Super Admin creation error:", error);
         return NextResponse.json(
-            { message: error.message || "Server error, something went wrong" },
+            { message: "Server error, something went wrong" },
             { status: 500 },
         );
     }

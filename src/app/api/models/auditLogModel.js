@@ -10,4 +10,4 @@ const auditSchema = new mongoose.Schema({
   metadata: Object,
 }, { timestamps: true });
 
-export default mongoose.model("AuditLog", auditSchema);
+export default mongoose.models.AuditLog || mongoose.model("AuditLog", auditSchema);

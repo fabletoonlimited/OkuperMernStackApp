@@ -8,7 +8,7 @@ import Landlord from "../../models/landlordModel.js";
 import Tenant from "../../models/tenantModel.js";
 import User from "../../models/userModel.js";
 
-export async function GET() {
+export async function GET(req) {
   try {
     await dbConnect();
 
@@ -67,14 +67,32 @@ export async function GET() {
         authenticated: true,
         role,
         actorId: actorId.toString(),
-        actorType: role === "landlord" ? "Landlord" : "Tenant",
+        actorType: role,
         referralCode: user.referralCode,
         referredBy: user.referredBy,
       },
       { status: 200 },
     );
   } catch (error) {
-    console.error("User /me fetch error:", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  console.error("User /me fetch error:", error);
+
+  const response = NextResponse.json(
+    {
+      authenticated: false,
+      message: "Invalid or expired token",
+    },
+    { status: 401 },
+  );
+
+    // ✅ Clear expired/invalid token cookie
+    response.cookies.set("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      expires: new Date(0),
+      path: "/",
+    });
+
+    return response;
   }
 }

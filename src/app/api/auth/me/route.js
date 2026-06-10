@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 import { User } from "lucide-react";
 
@@ -10,33 +10,33 @@ export async function GET() {
     
     if (!token) {
       return NextResponse.json(
-        { authenticated: false, message: "No token provided" },
+        { authenticated: false, 
+          message: "No token provided" },
         { status: 401 }
       );
     }
 
-    await jwtVerify(
-      token,
-      new TextEncoder().encode(process.env.JWT_SECRET)
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     return NextResponse.json(
       { authenticated: true,
-        User: {
-          tenant: User.Tenant,
-          landlord: User.Landlord,
-          admin: User.Admin,
-        }
-      },
+        role: decoded.role,
+        id: decoded.id,
+        message: "User authenticated"
+       },
       { status: 200 }
     );
       
   } catch (error) {
-    console.error("Auth error", error.message);
-    
-    return NextResponse.json(
+    const res = NextResponse.json(
       { authenticated: false, message: "Invalid or expired token" },
-      { status: 401 }
+      { status: 401}
     );
+    
+    res.cookies.delete("token", {
+      maxAge: 0,
+      path: "/",
+    });
+    return res;
   }
 }

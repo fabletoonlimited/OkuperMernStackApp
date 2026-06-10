@@ -1,10 +1,10 @@
 export const runtime = "nodejs";
 
 import dbConnect from "@/app/lib/mongoose";
-import { loginLandlord } from "../controllers/landlord.controller.js";
+import { loginSupport } from "../controllers/superAdmin.controller.js";
 import { NextResponse } from "next/server";
 
-//Login Landlord
+//Login Support
 export async function POST(req) {
   try {
     await dbConnect();
@@ -30,24 +30,31 @@ export async function POST(req) {
     // Normalize email (trim and lowercase to match signup)
     const normalizedBody = {
       email: email.trim().toLowerCase(),
-      password,
+      password: password,
     };
 
-    return await loginLandlord(normalizedBody);
-    
-    } catch (error) {
-        console.error("❌ API ERROR:", error);
+    const result = await loginSupport(normalizedBody);
+    const response = NextResponse.json(result, {
+      status: result.status || 200,
+    });
 
-        if (error.code === "ERR_JWT_EXPIRED") {
-            return NextResponse.json(
-            { message: error.message || "Token expired" },
-            { status: 401 },
-        ); 
+    if (result?.token) {
+      response.cookies.set("token", result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 24 * 60 * 60 * 1000, // 1day
+      });
     }
-  
+
+    return response;
+  } catch (error) {
+    console.error("❌ API ERROR:", error);
+
     return NextResponse.json(
-      { message: error.message || "Something went wrong" },
+      { message: error.message || "Server error" },
       { status: 500 },
-    );  
+    );
   }
 }

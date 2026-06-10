@@ -2,24 +2,11 @@ import Landlord from "../models/landlordModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server.js";
+import { streamUpload } from "@/app/lib/streamUpload.js";
 
 //Signup Landlord
 export const signupLandlord = async (data) => {
-  const {
-    userId,
-    firstName,
-    lastName,
-    email,
-    password,
-    otp,
-    referralCode,
-    referalCode,
-    survey,
-    surveyInputField,
-    terms,
-    isSubscribed,
-    isVerified,
-  } = data;
+  const {userId, firstName, lastName, email, password, otp, referralCode,referalCode, survey, surveyInputField, terms, isSubscribed, isVerified} = data;
 
   if (!firstName || !lastName || !email || !password || !terms) {
     return { status: 400, message: "Kindly fill all fields required" };
@@ -109,7 +96,10 @@ export const loginLandlord = async (data) => {
     const { email, password } = data;
 
     if (!email || !password) {
-      return { status: 400, message: "Email and password are required" };
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 },
+      );
     }
 
     // Normalize email (trim and lowercase to match signup)
@@ -118,15 +108,21 @@ export const loginLandlord = async (data) => {
     const landlord = await Landlord.findOne({ email: normalizedEmail });
 
     if (!landlord) {
-      return { status: 404, message: "landlord not found with this email" };
+      return NextResponse.json(
+        { success: false, message: "landlord not found with this email" },
+        { status: 404 },
+      );
     }
 
     const isMatch = await bcrypt.compare(password, landlord.password);
     if (!isMatch) {
-      return { status: 401, message: "Invalid password" };
+      return NextResponse.json(
+        { success: false, message: "Invalid password" },
+        { status: 401 },
+      );
     }
 
-    //create a token
+    //Create a token
     const token = jwt.sign(
       { id: landlord._id , role: landlord.role},
       process.env.JWT_SECRET,
@@ -148,15 +144,15 @@ export const loginLandlord = async (data) => {
 
     response.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "development",
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1day
     });
 
     return response;
-  } catch (err) {
-    console.error("Login Error:", err.message);
+  } catch (error) {
+    console.error("Login Error:", error.message);
     return { status: 500, message: "Server error" };
   }
 };
@@ -262,7 +258,7 @@ export const deleteLandlord = async (data) => {
 };
 
 // ================== ARRAY UPLOAD ==================
-export const arrayUpload = async (data) => {
+export const arrayUpload = async (req) => {
   try {
     const formData = await req.formData();
     const files = formData.getAll("files");

@@ -33,15 +33,19 @@ export async function POST(req) {
             password: password
         };
 
-        const result = await loginTenant(normalizedBody);
-        return result;
-
-    } catch (error) {
-        console.error("❌ API ERROR:", error);
-
+           return await loginTenant(normalizedBody);
+           
+           } catch (error) {
+               console.error("❌ API ERROR:", error);
+       
+               if (error.code === "ERR_JWT_EXPIRED") {
+                   return NextResponse.json(
+                   { message: error.message || "Token expired" },
+                   { status: 401 },
+               ); 
+            }}
         return NextResponse.json(
-        { message: error.message || "Server error" },
-        { status: 500 }
-        ); 
-    }
+        { message: error.message || "Something went wrong" },
+        { status: 500 },
+    );  
 }

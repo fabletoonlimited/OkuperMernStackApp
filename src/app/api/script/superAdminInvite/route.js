@@ -1,5 +1,4 @@
 // /api/admin/invite/route.js
-
 import crypto from "crypto";
 import Invite from "@/app/api/models/inviteModel";
 import dbConnect from "@/app/lib/mongoose";
@@ -41,4 +40,14 @@ export async function POST(req) {
   return NextResponse.json({
     inviteLink: `${process.env.BASE_URL}/signUpAdmin?token=${rawToken}`,
   });
+}
+
+export async function GET() {
+  await dbConnect();
+  const invites = await Invite
+  .find()
+  .select("-__v")
+  .lean();
+  
+  return NextResponse.json(invites);
 }

@@ -1,19 +1,25 @@
 import { mongoose } from "@/app/lib/mongoose";
 
 const inviteSchema = new mongoose.Schema({
-  token: { type: String, required: true }, // hashed
-  email: { type: String, required: true, trim: true},
+  token: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  }, // hashed
+
+  email: { 
+    type: String, 
+    required: true, 
+    trim: true
+  },
 
   role: {
     type: String,
-    enum: ["superAdmin","admin", "support", "moderator"],
-    default: "admin",
+    enum: ["superAdmin","admin", "support", "agent"],
+    default: "admin"
   },
 
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "SuperAdmin",
-  },
+  createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin"},
 
   isActive: {
     type: Boolean,

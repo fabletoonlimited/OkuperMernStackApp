@@ -87,21 +87,24 @@ const propertySchema = new mongoose.Schema(
    
     status: {
       type: String,
-      enum: ["rented", "vacant", "sold"],
+      enum: ["vacant","rented", "sold"],
       default: "vacant"
     },
 
     rating: { type: Number, min: 0, max: 5, default: 0 },
-
     listedBy: { type: String, required: true },
+    agent: { type: String, requied: false },
 
     savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
     isVerified: { type: Boolean, default: true },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
+    admin: [{ type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin" }],
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
   },
+
   { timestamps: true }
+
 );
 
 export default mongoose.models.Property || mongoose.model("Property", propertySchema);
