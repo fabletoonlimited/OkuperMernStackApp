@@ -284,8 +284,7 @@ useEffect(() => {
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-10">
         <ToastContainer position="top-center" autoClose={3000} />
 
-        <div
-          className="residencyStatusSection text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10"
+        <div className="residencyStatusSection text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -301,15 +300,13 @@ useEffect(() => {
             marginTop: "20px",
             marginLeft: "50px",
             marginBottom: "50px",
-          }}
-        >
+          }}>
           <p style={{ paddingTop: 40, marginBottom: 30 }}>
             What is your residency status?
           </p>
 
           {selectResidencyStatus && !showResidencyStatus && (
-            <p
-              className="text-start text-muted text-2xl mb-2 px-1"
+            <p className="text-start text-muted text-2xl mb-2 px-1"
               onClick={() => setShowResidencyStatus(true)}
               style={{
                 cursor: "pointer",
@@ -327,6 +324,7 @@ useEffect(() => {
               onChange={(e) => setSelectResidencyStatus(e.target.value)}
               style={{
                 padding: "10px",
+                cursor: "pointer",
                 fontSize: "16px",
                 borderRadius: "4px",
                 border: "1px solid #ccc",
@@ -341,6 +339,7 @@ useEffect(() => {
           )}
           {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
         </div>
+
         {/*Who is Button*/}
         <div
           className="whoIsUsingThePlatform mt-10 mb-15 ml-12 md:pr-10 pr-10 md:items-center"
@@ -349,10 +348,10 @@ useEffect(() => {
           {showWhoIsUsingPlatform && (
             <>
               <button
-                className={`rounded-lg md:p-5 p-2 md:px-15 px-0 border-2 md:w-60 w-30 text-2xl text-center cursor-pointer 
+                className={`rounded-full hover:scale-105 md:p-5 p-2 md:px-15 px-0 border-2 md:w-60 w-40 text-2xl text-center cursor-pointer 
                   ${ selectWhoIsUsingPlatform === "myself"
-                    ? "text-blue-950 border-blue-950 bg-blue-400"
-                    : "text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white"
+                    ? "text-blue-950 border-blue-950 bg-blue-900"
+                    : "text-blue-950 border-blue-950 hover:bg-blue-800 hover:text-white"
                   }`}
                 onClick={() => setSelectWhoIsUsingPlatform("myself")}
               >
@@ -360,11 +359,11 @@ useEffect(() => {
               </button>
 
               <button
-                className={`rounded-lg md:p-5 p-2 md:px-7 px-0 border-2 md:w-74 w-55 text-2xl text-center cursor-pointer '
+                className={`rounded-full hover:scale-105 md:p-5 p-2 md:px-7 px-0 border-2 md:w-74 w-55 text-2xl text-center cursor-pointer '
                                 ${
                                   selectWhoIsUsingPlatform === "someoneElse"
-                                    ? " text-blue-950 border-blue-950 bg-blue-400"
-                                    : "text-blue-950 border-blue-950 hover:bg-blue-400 hover:text-white"
+                                    ? " text-blue-950 border-blue-950 bg-blue-900"
+                                    : "text-blue-950 border-blue-950 hover:bg-blue-800 hover:text-white"
                                 }`}
                 onClick={() => setSelectWhoIsUsingPlatform("someoneElse")}
               >
@@ -381,40 +380,39 @@ useEffect(() => {
 
         {/*SignUpAs*/}
         <div
-          className="whoIsUsingPlatform mt-10 md:mb-50 mb-30 md:mr:20 ml-12 md:ml:20 md:flex-row flex-col"
+          className="whoIsUsingPlatform mt-10 md:mb-50 mb-40 md:mr:20 ml-12 md:ml:20 md:flex-row flex-col"
           style={{ display: "flex", gap: "20px" }}
         >
           <button
             onClick={() => createUser("tenant")}
-            className="signUpTenant bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-100 md:w-64 border-1px solid #ccc text-2xl text-center cursor-pointer"
-          >
+            className="signUpTenant bg-blue-950 hover:scale-105 hover:bg-blue-800 text-white rounded-lg hover:rounded-full p-4 w-100 md:w-64 border-1px solid #ccc text-2xl text-center cursor-pointer">
             Sign Up as Tenant
           </button>
 
-          <button
-            onClick={() => createUser("landlord")}
-            className="signUpLandlord bg-blue-950 hover:bg-blue-800 text-white rounded-lg p-4 w-100 md:w-70 border-1px solid #ccc text-2xl text-center cursor-pointer"
-          >
+          <button 
+            onClick={() => createUser("landlord")} className="signUpLandlord bg-blue-950 hover:scale-105 hover:bg-blue-800 hover:rounded-full text-white rounded-lg p-4 w-100 md:w-70 border-1px solid #ccc text-2xl text-center cursor-pointer">
             Sign Up as Landlord
           </button>
         </div>
-   
       </div>
-
-      <p className="md:ml-12 ml-12 md:-mt-40 underline -mt-20 md:mb-20 -mb-20 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
+      
+      <p className="md:ml-12 ml-12 md:-mt-40 underline -mt-20 md:mb-20 -mb-15 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
         style={{ cursor: "pointer"}}
         onClick={() => {
-          if (userRole === "landlord") {
-            router.push("/signInLandlord");
-          } else {
-            router.push("/signInTenant");
-          }
-      }}> Sign In as Tenant or Landlord (if you already have an account)
+          router.push("/signInTenant");
+        }}> Sign In as a Tenant (if you already have an account)
+      </p>
+      
+      <p className="md:ml-12 ml-12 -md:mt-8 underline -mt-15 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
+        style={{ cursor: "pointer"}}
+        onClick={() => {
+          router.push("/signInLandlord");   
+        }}> Sign In as a Landlord (if you already have an account)
       </p>
 
       {/*Banner Section*/}
-      <div className="bannerSection md:flex md:justify-right md:items-right mt-30 md:-mt-190 ml-10 md:ml-190 md:mb-20 mb-10 md:w-100% w-50% md:mr-10 mr-10">
-        
+      <div className="bannerSection md:flex md:justify-right md:items-right mt-30 md:-mt-200 ml-10 md:ml-190 md:mb-20 mb-10 md:w-100% w-50% md:mr-10 mr-10">
+      
         {/* RIGHT SECTION */}
         <div className={"relative h-40 rounded-2xl shadow-lg bannerBgColor mb-200"}>
           <div className={"relative p-10 rounded-t-2xl md:w-155 w-50% bg-[rgba(0,51,153,1)] py-2 md:h-20 leading-relaxed bannerBgColor"}>

@@ -66,45 +66,9 @@ const index = () => {
                           Update Your profile{" "}
                       </button>
                   </Link>
-              </div>
-              <div
-                  className="md:px-10 -space-y-3 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto px-5 p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
-                      Address Verification
-                  </h4>
-                  <p className="md:text-justify">
-                      Verify your listing by providing the required
-                      documentation
-                  </p>
-                  <Link
-                      href="./"
-                      className="bg-blue-900 md:p-2 p-3 rounded-xl  text-white text-sm ">
-                      <button className="md:p-8 md:m-0 mt-10 cursor-pointer">
-                          Update Your profile{" "}
-                      </button>
-                  </Link>
-              </div>
-              <div
-                  className="md:px-10 space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto px-5 p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
-                      Property Preferences
-                  </h4>
-                  <p className="text-justify">
-                      These preferences will help us match better with homes
-                  </p>
-                  <Link
-                      href="./"
-                      className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white text-sm">
-                      <button className="md:p-8 md:m-0 mt-10 cursor-pointer">
-                          Update Your profile{" "}
-                      </button>
-                  </Link>
-              </div>
-              <div
-                  className="md:px-10 space-y-2  rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto px-5 p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
+                </div>
+
+                <div className="md:px-10 space-y-2  rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto px-5 p-5 md:p-8 mb-4" style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
                   <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
                       Card Details
                   </h4>
