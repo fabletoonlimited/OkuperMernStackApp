@@ -34,10 +34,10 @@ const index = () => {
               <div
                   className="items-center space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto p-5 md:p-8 mb-4"
                   style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="font-black md:text-2xl text-xl md:leading-7 mb-3">
-                      Your profile
+                  <h4 className="font-black md:text-2xl text-xl text-center md:text-left md:leading-7 mb-3">
+                      Your Profile
                   </h4>
-                  <p className="md:text-justify">
+                  <p className="text-center md:text-justify">
                       {profilePercent === null
                           ? "Your profile information is loading"
                           : `Your profile information is ${profilePercent}% complete`}
@@ -46,40 +46,40 @@ const index = () => {
                       href="/profile"
                       className="bg-blue-900 rounded-xl md:p-2 p-3  text-white text-sm">
                       <button className="md:p-8 md:m-0 mt-4 cursor-pointer">
-                          Update Your profile{" "}
+                          {profilePercent === 100 ? " Completed" : "Update Your profile"}{" "}
                       </button>
                   </Link>
-              </div>
-              <div
-                  className=" md:px-10 space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto p-5 md:p-8 mb-4"
-                  style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
-                      Profile Picture
-                  </h4>
-                  <p className="text-justify">
-             Add a profile picture to help the guests know you better
-                  </p>
+                </div>
+                
+                <div className=" md:px-10 space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto p-5 md:p-8 mb-4"
+                    style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
+                    <h4 className="font-black md:text-2xl text-xl text-center md:text-left leading-7 mb-3">
+                        Utility Bill
+                    </h4>
+                    <p className="text-center md:text-justify">
+                        Upload your recent (3months) utility bill to verify your residency
+                    </p>
                   <Link
                       href="./"
                       className="bg-blue-900  md:p-2 p-3 rounded-xl text-white text-sm">
                       <button className="md:p-8 md:m-0 mt-3 cursor-pointer ">
-                          Update Your profile{" "}
+                          {profilePercent === 100 ? "Upload your utility bill" : "Completed"}{" "}
                       </button>
                   </Link>
                 </div>
 
                 <div className="md:px-10 space-y-2  rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto px-5 p-5 md:p-8 mb-4" style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-                  <h4 className="font-black md:text-2xl text-xl leading-7 mb-3">
+                  <h4 className="font-black md:text-2xl text-xl text-center md:text-left leading-7 mb-3">
                       Card Details
                   </h4>
-                  <p className="md:text-justify">
-                      Add your card deatils to enable us process your payments so the landlord closing home
+                  <p className="text-center md:text-justify">
+                      Add your card details to enable us process your payments.
                   </p>
                   <Link
                       href="./"
                       className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white text-sm ">
                       <button className="md:p-8 md:m-0 mt-8 cursor-pointer">
-                          Update Your profile{" "}
+                          {profilePercent === 100 ? "Add Card Details" : "Completed"}{" "}
                       </button>
                   </Link>
               </div>

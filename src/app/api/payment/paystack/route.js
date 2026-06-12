@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { 
   initializePayment, 
   verifyPayment 
-} from "@/app/lib/services/payment.service";
+} from "@/app/lib/services/paystackPayment.service";
 
 //POST Payment initialization
 export async function POST(req) {

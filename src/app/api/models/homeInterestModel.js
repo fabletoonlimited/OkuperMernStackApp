@@ -12,8 +12,16 @@ const homeInterestSchema = new mongoose.Schema({
     trim: true
   },
   message: {type: String, required: true},
+  status: {
+    type: String, 
+    enum: ['pending', 'reviewed', 'accepted', 'rejected'],
+    default: 'pending'
+  },
+  createdAt: {type: Date, default: Date.now},
 
   property: { type: mongoose.Schema.Types.ObjectId, ref: "Property", required: true},
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}
   
 }, { timestamps: true }
 );

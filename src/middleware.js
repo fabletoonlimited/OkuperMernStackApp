@@ -62,6 +62,7 @@ export async function middleware(req) {
     "/report",
     "/sell",
     "/shortlets",
+    "/propertyCardExpanded",
     "/terms",
     "/xStories"
   ];
@@ -101,6 +102,7 @@ export async function middleware(req) {
     "/api/shortlets",
     "/api/report",
     "/api/policy",
+    "/api/propertyInterest",
     "/api/terms",
     "/api/privacy",
     "/api/xStories",

@@ -58,7 +58,7 @@ function tenantDashboard() {
 
   return (
     <>
-      {profilePercent === 100 && (<TenantDashboardCompleted />) }
+      {profilePercent === 100 && (<TenantDashboardCompleted /> ===100) }
       {profilePercent !== null && (
       <div className="tenantDashboardContainer flex">
         {/* Sidebar */}
@@ -86,8 +86,7 @@ function tenantDashboard() {
               Your next steps
             </h3>
             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-              In order to begin your rental journey, please complete your profile. There are a few
-              things left to do.
+              There are a few things left to do. In order to begin your rental journey, please complete your profile.
             </p>
           </div>
           <div className="md:px-16 px-0">
