@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import { User } from "lucide-react";
 
 export async function GET() {
   try {
@@ -40,3 +39,19 @@ export async function GET() {
     return res;
   }
 }
+
+// const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+// export async function getUserFromRequest() {
+//   const cookieStore = cookies();
+//   const token = cookieStore.get("token")?.value;
+
+//   if (!token) return null;
+
+//   try {
+//     const { payload } = await jwt(token, secret);
+//     return payload; // contains userId, role, etc.
+//   } catch (err) {
+//     return null;
+//   }
+// }

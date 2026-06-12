@@ -40,8 +40,10 @@ const userSchema = new mongoose.Schema(
 
     referralCount: {
       type: Number,
-      default: 0,
+      default: null,
     },
+
+   
 
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord" },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant" },

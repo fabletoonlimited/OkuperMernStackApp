@@ -114,11 +114,13 @@ export async function middleware(req) {
     "/landlordDashboardInbox",
     "/landlord/properties",
     "/landlord/messages",
-    "/landlordAddressVerification",
+    "/landlordVerification",
     "/landlordSubscription",
-
-    "/property",
-    "/propertyRequestForm",
+    "/landlord/profile",
+    "/landlord/disputes",
+    "/landlord/subscription",
+    "/landlord/payment",
+   
 
     "/tenantDashboard",
     "/tenantDashboardCompleted",
@@ -127,15 +129,20 @@ export async function middleware(req) {
     "/tenant/messages",
     "/tenantVerification",
     "/tenant/profile",
+    "/tenant/disputes",
+    "/tenant/payment",
 
+    "/utilityBillUploadPage",
 
-    "/landlord/profile",
+    "/property",
+    "/propertyRequestForm",
     "/propertyListingLanding",
     "/propertyListingUploadForm",
+    "/propertyCardExpanded",
     
     "/savedHomes",
     "/admin/users",
-    "/propertyCardExpanded",
+   
     "/auth",
     "/auth/me",
     "/auth/logout",
@@ -177,8 +184,9 @@ export async function middleware(req) {
     "/api/verification",
     "/api/disputes",
     "/api/verification",
-    "/api/payment",
-    "/api/paystack",
+    "/api/payment/Xpress",
+    
+    "/api/uploads/utilityBill",
     "/api/subscription",
     "/api/referral",
     "/api/analytics",

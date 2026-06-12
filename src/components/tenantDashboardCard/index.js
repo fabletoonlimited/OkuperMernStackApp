@@ -1,10 +1,41 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, {useState, useEffect} from "react";
 
 const index = () => {
-  const [profilePercent, setProfilePercent] = useState(null);
+    const [profilePercent, setProfilePercent] = useState(null);
+    
+    const [loadingUtility, setLoadingUtility] = useState(true);
+    const [uploadedUtility, setUploadedUtility] = useState(false);
 
+useEffect(() => {
+  const fetchUtilityUpload = async () => {
+    try {
+      setLoadingUtility(true);
+
+      const res = await fetch("/api/uploads/utilityBill", {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        setUploadedUtility(false);
+        return;
+      }
+
+      const data = await res.json();
+
+      setUploadedUtility(Boolean(data.uploaded)); // safer
+    } catch (err) {
+      setUploadedUtility(false);
+    } finally {
+      setLoadingUtility(false);
+    }
+  };
+
+  fetchUtilityUpload();
+}, []);
+
+  // Profile completion
   useEffect(() => {
     const fetchCompletion = async () => {
       try {
@@ -18,15 +49,16 @@ const index = () => {
         }
 
         const data = await res.json();
-        setProfilePercent(Number.isFinite(data.percent) ? data.percent : 0);
+        setProfilePercent(data.percent || 0);
       } catch (err) {
-        console.error("Profile completion error:", err);
+        console.error(err);
         setProfilePercent(null);
       }
     };
 
     fetchCompletion();
   }, []);
+
   return (
       // {cards}
       <div className="md:mt-10 p-2 pr-4 md:px-12">
@@ -39,15 +71,16 @@ const index = () => {
                   </h4>
                   <p className="text-center md:text-justify">
                       {profilePercent === null
-                          ? "Your profile information is loading"
-                          : `Your profile information is ${profilePercent}% complete`}
+                          ? "loading..."
+                          : `Your profile is ${profilePercent}% complete`}
                   </p>
-                  <Link
-                      href="/profile"
-                      className="bg-blue-900 rounded-xl md:p-2 p-3  text-white text-sm">
-                      <button className="md:p-8 md:m-0 mt-4 cursor-pointer">
-                          {profilePercent === 100 ? " Completed" : "Update Your profile"}{" "}
-                      </button>
+                  <Link href="/profile" className="bg-blue-900 rounded-xl md:p-2 p-3  text-white text-sm">
+                        <button
+                        className="md:p-8 md:m-0 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={profilePercent === 100}
+                        >
+                        {profilePercent === 100 ? "Uploaded" : "Update Your profile"}
+                        </button>
                   </Link>
                 </div>
                 
@@ -57,14 +90,20 @@ const index = () => {
                         Utility Bill
                     </h4>
                     <p className="text-center md:text-justify">
-                        Upload your recent (3months) utility bill to verify your residency
+                      {uploadedUtility
+                        ? "Utility bill uploaded"
+                        : "Upload your 3 months LAWMA, Water or Electricity utility bill"
+                        }
                     </p>
                   <Link
-                      href="./"
+                      href="/utilityBillUploadPage"
                       className="bg-blue-900  md:p-2 p-3 rounded-xl text-white text-sm">
-                      <button className="md:p-8 md:m-0 mt-3 cursor-pointer ">
-                          {profilePercent === 100 ? "Upload your utility bill" : "Completed"}{" "}
-                      </button>
+                        <button
+                            className="md:p-8 md:m-0 mt-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={loadingUtility || uploadedUtility}
+                            >
+                            {loadingUtility ? "Checking..." : uploadedUtility ? "Uploaded" : "Upload"}
+                        </button>
                   </Link>
                 </div>
 
@@ -73,14 +112,16 @@ const index = () => {
                       Card Details
                   </h4>
                   <p className="text-center md:text-justify">
-                      Add your card details to enable us process your payments.
+                      Add your card details to enable quick payments. <i>(coming soon)</i>
                   </p>
                   <Link
-                      href="./"
-                      className="bg-blue-900  md:p-2 p-3 rounded-xl  text-white text-sm ">
-                      <button className="md:p-8 md:m-0 mt-8 cursor-pointer">
-                          {profilePercent === 100 ? "Add Card Details" : "Completed"}{" "}
-                      </button>
+                      href="#"
+                      className="bg-blue-900/50  md:p-2 p-3 rounded-xl  text-white text-sm ">
+                        <button
+                            className="md:p-8 md:m-0 mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                            Add card
+                        </button>
                   </Link>
               </div>
           </div>

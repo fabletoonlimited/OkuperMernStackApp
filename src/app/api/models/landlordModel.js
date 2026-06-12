@@ -11,6 +11,10 @@ const landlordSchema = new mongoose.Schema(
     terms: {type: Boolean, required: true},
     forgotPasswordToken: {type: String},
     forgotPasswordTokenExpiry: {type: Date},
+    utilityBillUrl: {
+      type: String,
+      default: "",
+    },
 
     isVerified: {
       type: Boolean,

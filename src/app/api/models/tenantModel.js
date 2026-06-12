@@ -24,6 +24,11 @@ const tenantSchema = new mongoose.Schema(
     forgotPasswordToken: {type: String},
     forgotPasswordTokenExpiry: {type: Date},
 
+    utilityBillUrl: {
+      type: String,
+      default: "",
+    },
+
     isVerified: {
         type: Boolean,
         default: false
