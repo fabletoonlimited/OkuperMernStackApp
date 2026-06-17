@@ -29,26 +29,26 @@ export async function POST(req) {
 }
 
 // Get Tenant Disputes
-export async function GET(req) {
-  await dbConnect();
+// export async function GET(req) {
+//   await dbConnect();
 
-  try {
-    const { searchParams } = new URL(req.url);
+//   try {
+//     const { searchParams } = new URL(req.url);
 
-    const tenantId = searchParams.get("tenantId");
+//     const tenantId = searchParams.get("tenantId");
 
-    const result = await getTenantDispute(tenantId);
+//     const result = await getTenantDispute(tenantId);
 
-    return NextResponse.json(result, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        message: error.message || "Server error, something went wrong",
-      },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json(result, { status: 200 });
+//   } catch (error) {
+//     return NextResponse.json(
+//       {
+//         message: error.message || "Server error, something went wrong",
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 // Update Dispute Status
 export async function PUT(req) {

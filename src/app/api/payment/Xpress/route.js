@@ -10,18 +10,19 @@ export async function POST(req) {
         await dbConnect();
 
         const body = await req.json();
-        const res = await initializePayment(body);
 
-        const { email, amount, transactionId } = body;
+        const { reference, email, amount, status, transactionId } = body;
 
-        if ( !email || !amount || !transactionId) {
+        if ( !reference || !email || !amount || !status || !transactionId) {
         return NextResponse.json(
-            { error: "Amount, email, and transactionId are required" },
+            { error: "Reference, email, Amount, and transactionId are required" },
             { status: 400 }
         );
     }
-    return NextResponse.json(res);
-  } catch (error) {
+        const res = await initializePayment(body);
+
+        return NextResponse.json(res);
+    } catch (error) {
     return NextResponse.json(
         { error: error.message }, 
         { status: 500 }
@@ -43,7 +44,7 @@ export async function GET(request) {
 
     } catch (error) {
         return NextResponse.json(
-            { error: error.message }, 
-            { status: 500 });
-    }
-}
+        { error: error.message }, 
+        { status: 500 }
+    )};
+};

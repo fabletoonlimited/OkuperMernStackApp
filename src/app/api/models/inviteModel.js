@@ -29,6 +29,7 @@ const inviteSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true },
 
   used: { type: Boolean, default: false },
+  
 }, { timestamps: true });
 
 export default mongoose.models.Invite || mongoose.model("Invite", inviteSchema);

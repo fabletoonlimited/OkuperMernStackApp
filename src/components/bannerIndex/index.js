@@ -92,6 +92,7 @@ const router = useRouter();
                     className="h-[1800px] w-auto object-contain"
                 />
             </div>
+            
 
             <div className="relative w-full min-h-[470px] md:h-[480px] animate-fadeIn">
                 {/* Blue Background */}

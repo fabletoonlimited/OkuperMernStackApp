@@ -28,7 +28,7 @@ const page = () => {
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
 
-    if (loading) return; // Prevent multiple submissions
+    if (loading) return; 
 
 
     if (!email || !password) {

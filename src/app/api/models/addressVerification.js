@@ -39,6 +39,7 @@ const addressVerificationSchema = new mongoose.Schema({
     // user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true},
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
+    property: [{type: mongoose.Schema.Types.ObjectId, ref: "Property, required: true"}]
 
 }, {timestamps: true});  
 
@@ -74,6 +75,8 @@ addressVerificationSchema.pre('save', async function(next) {
         next();
     }
 });
+
+
 
 export default mongoose.models. AddressVerification || mongoose.model( "AddressVerification",  addressVerificationSchema);
 

@@ -1,14 +1,14 @@
-import Dispute from "../models/disputesModel.js";
+import Dispute from "@/app/api/models/disputeModel.js";
 import User from "../models/userModel.js";
 
 // Create dispute
 export const createDispute = async (data) => {
-    const data = await req.json();
+    const body = await req.json();
 
-    const { tenant, property, complaint, rating } = data;
+    const { tenant, property, complaint, rating } = body;
 
     if (!tenant || !property || !complaint || !rating) {
-        throw new Error("Kindly fill all required fields");
+      throw new Error("Kindly fill all required fields");
     }
 
     const tenantDetails = await User.findById(tenant);
@@ -30,6 +30,18 @@ export const createDispute = async (data) => {
 
   return newDispute;
 };
+
+//Get disputes
+export const getDisputes = async (userId) => {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  return await Dispute.find({ user: userId })
+    .populate("user", "firstName lastName email")
+    .populate("property");
+};
+
 
 // Get tenant disputes
 export const getTenantDisputes = async (tenantId) => {

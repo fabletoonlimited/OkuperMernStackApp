@@ -86,6 +86,7 @@ const page = ({ currentUserId }) => {
     status: "",
     status: "",
     listedBy: "",
+    agent: ""
   });
 
   const [imagePreviews, setImagePreviews] = useState({
@@ -867,6 +868,20 @@ const page = ({ currentUserId }) => {
                               className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
                           />
                       </li>
+
+                      <li>
+                          Marketer:
+                          <input
+                              type="text"
+                              name="agent"
+                              value={formData.agent}
+                              onChange={handleInputChange}
+                            
+                              placeholder="Marketer's full name"
+                              className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
+                          />
+                      </li>
+
 
                       <span className="flex justify-center mt-15">
                           <button

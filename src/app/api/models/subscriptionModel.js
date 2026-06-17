@@ -21,8 +21,10 @@ const subscriptionSchema = new mongoose.Schema(
             required: true
         },
         
-        payment: { type: mongoose.Schema.Types.ObjectId, ref: "Payment", required: true },
-        landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord"},
+        // payment: { type: mongoose.Schema.Types.ObjectId, ref: "Payment", required: true },
+        property: { type: mongoose.Schema.Types.ObjectId, ref: "Property"},
     }, { timestamps: true }
 );
 

@@ -107,8 +107,8 @@ const index = () => {
                       <li className="hover:text-yellow-500"> Messages </li>
                   </Link>
 
-                  <Link href="/propertyLanding">
-                      <li className="hover:text-yellow-500">Property History</li>
+                  <Link href="/disputes">
+                      <li className="hover:text-yellow-500">Disputes</li>
                   </Link>
 
                   <Link href="/verification">

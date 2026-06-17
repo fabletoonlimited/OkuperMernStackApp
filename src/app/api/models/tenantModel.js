@@ -54,10 +54,11 @@ const tenantSchema = new mongoose.Schema(
     tenantKyc: { type: mongoose.Schema.Types.ObjectId, ref: "TenantKyc"},
     tenantDashboard: { type: mongoose.Schema.Types.ObjectId, ref: "TenantDashboard"},
     messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
-    homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
     property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
-    disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Dispute"}]
+    disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Dispute"}],
+    homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
+    subscription: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}]
 
 }, {timestamps: true});
 

@@ -18,6 +18,10 @@ function landlordDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const [checking, setChecking] = useState(false);
     const [profilePercent, setProfilePercent] = useState(100);
+
+    const [bankCompletion, setBankCompletion] = useState(false);
+    const [utilityLoading, setUtilityLoading] = useState(true);
+    const [landlord, setLandlord] = useState(null);
     
     // landlord state
     const [landlordEmail, setLandlordEmail] = useState(null);
@@ -151,8 +155,8 @@ function landlordDashboard() {
     return (
         <>
             <div className="flex bg-gray-100">
-                {profilePercent === 100 && (<LandlordDashboardComplete />) }
-                    {profilePercent !== null && (
+               {profilePercent && utilityCompletion && bankCompletion === 100 && (<LandlordDashboardCompleted />) }
+                {profilePercent && utilityCompletion && !bankCompletion !== null &&  (
       
                 <div className="flex min-h-screen bg-gray-100">
                     <LandlordDashboardSidebar />

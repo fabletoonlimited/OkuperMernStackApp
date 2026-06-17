@@ -1,65 +1,109 @@
-"use client"
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
-import React, { useState, useEffect } from "react";
 import TenantDashboardCompleted from "../tenantDashboardCompleted/page.js";
-import { toast } from "react-toastify";
 
-function tenantDashboard() {
-   const [profilePercent, setProfilePercent] = useState(null);
-   const [tenant, setTenant] = useState(null);
-  
-    useEffect(() => {
-      const fetchCompletion = async () => {
-        try {
-          const res = await fetch("/api/profile/completion", {
-            credentials: "include",
-          });
-  
-          if (!res.ok) {
-            setProfilePercent(null);
-            return;
-          }
-  
-          const data = await res.json();
-          setProfilePercent(Number.isFinite(data.percent) ? data.percent : 0);
-        } catch (err) {
-          console.error("Profile completion error:", err);
+function TenantDashboard() {
+  const [profilePercent, setProfilePercent] = useState(null);
+  const [utilityCompletion, setUtilityCompletion] = useState(false);
+  const [utilityLoading, setUtilityLoading] = useState(true);
+  const [tenant, setTenant] = useState(null);
+
+  // Utility
+  useEffect(() => {
+    const fetchCompleteUtility = async () => {
+      try {
+        const res = await fetch("/api/uploads/utilityBill", {
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setUtilityCompletion(false);
+          return;
+        }
+
+        const data = await res.json();
+        setUtilityCompletion(Boolean(data.uploaded));
+      } catch (err) {
+        console.error(err);
+        setUtilityCompletion(false);
+      } finally {
+        setUtilityLoading(false);
+      }
+    };
+
+    fetchCompleteUtility();
+  }, []);
+
+  // Profile
+  useEffect(() => {
+    const fetchCompletion = async () => {
+      try {
+        const res = await fetch("/api/profile/completion", {
+          credentials: "include",
+        });
+
+        if (!res.ok) {
           setProfilePercent(null);
+          return;
         }
-      };
-  
-      fetchCompletion();
-    }, []);
 
-    useEffect(() => {
-      const fetchTenant = async () => {
-        try {
-          const res = await fetch("/api/tenant", {
-            method: "GET",
-            credentials: "include",
-          });
+        const data = await res.json();
+        setProfilePercent(Number.isFinite(data.percent) ? data.percent : 0);
+      } catch (err) {
+        console.error("Profile completion error:", err);
+        setProfilePercent(null);
+      }
+    };
 
-          if (!res.ok) {
-            toast.error("Failed to fetch tenant");
-            return;
-          }
+    fetchCompletion();
+  }, []);
 
-          const tenant = await res.json();
-          setTenant(tenant);
-        } catch (err) {
-          toast.error("Tenant fetch error:", err);
+  // Tenant
+  useEffect(() => {
+    const fetchTenant = async () => {
+      try {
+        const res = await fetch("/api/tenant", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          toast.error("Failed to fetch tenant");
+          return;
         }
-      };
 
-      fetchTenant();
-    }, []);
+        const data = await res.json();
+        setTenant(data);
+      } catch (err) {
+        console.error(err);
+        toast.error("Tenant fetch error");
+      }
+    };
+  fetchTenant();
+}, []);
+
+  if (profilePercent === 100 && utilityCompletion) {
+    return (
+      <>
+        <TenantDashboardCompleted />
+        <TenantDashboardFooter />
+      </>
+    );
+  }
+
+  if (profilePercent === null || utilityLoading) {
+    return <TenantDashboardFooter />;
+  }
 
   return (
     <>
-      {profilePercent === 100 && (<TenantDashboardCompleted /> ===100) }
-      {profilePercent !== null && (
+      {profilePercent && utilityCompletion === 100 && (<TenantDashboardCompleted />) }
+      {profilePercent && utilityCompletion !== null && (
       <div className="tenantDashboardContainer flex">
         {/* Sidebar */}
         <TenantDashboardSidebar />
@@ -95,9 +139,8 @@ function tenantDashboard() {
         </div>
       </div>
 ) }
-      <TenantDashboardFooter />
-    </>
+  <TenantDashboardFooter />
+  </>
   );
 }
-
-export default tenantDashboard;
+export default TenantDashboard;

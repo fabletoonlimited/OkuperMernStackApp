@@ -4,7 +4,6 @@ import React, {useState, useEffect} from "react";
 
 const index = () => {
     const [profilePercent, setProfilePercent] = useState(null);
-    
     const [loadingUtility, setLoadingUtility] = useState(true);
     const [uploadedUtility, setUploadedUtility] = useState(false);
 
@@ -24,7 +23,7 @@ useEffect(() => {
 
       const data = await res.json();
 
-      setUploadedUtility(Boolean(data.uploaded)); // safer
+      setUploadedUtility(Boolean(data.uploaded));
     } catch (err) {
       setUploadedUtility(false);
     } finally {

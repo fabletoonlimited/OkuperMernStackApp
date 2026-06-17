@@ -1,18 +1,27 @@
 "use client";
 import React from "react";
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
+import TrendingRentIndexCarousel from "@/components/trendingRentIndexCarousel"
 import PropertyCard from "@/components/propertyCard";
 import { FaBookmark, FaEnvelope, FaHistory, FaClock } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import Link from "next/link"
 
 
-const Page = () => {
+const Page = (_id) => {
     const [tenant, setTenant] = useState(null);
     const [tenantKyc, setTenantKyc] = useState(null);
+    const [savedHomesCount, setSavedHomesCount] = useState(null);
+    const [messages, setMessages] = useState(null);
+    const [disputes, setDisputes] = useState(null);
+    const [payment, setPayment] = useState(null);
+    const [property, setProperty] = useState(null);
 
+
+    //Fetch Tenant
     useEffect(() => {
-          const fetchTenant = async () => {
+        const fetchTenant = async () => {
             try {
               const res = await fetch("/api/tenant", {
                 method: "GET",
@@ -29,11 +38,12 @@ const Page = () => {
             } catch (err) {
               console.error("Tenant fetch error:", err);
             }
-          };
+        };
     
-          fetchTenant();
+            fetchTenant();
         }, []);
 
+    //Tenant KYC
     useEffect(() => {
       const fetchKyc = async () => {
       try {
@@ -57,6 +67,138 @@ const Page = () => {
       fetchKyc();
     }}, []);
 
+    //Fetch SavedHomes Count
+    useEffect(() => {
+        const fetchSavedHomesCount = async () => {
+            try {
+                const res = await fetch("/api/savedHomes", {
+                    method: "GET",
+                    credentials: "include",
+                });
+    
+                if (!res.ok) {
+                    setSavedHomesCount(null);
+                    return;
+                }
+                const savedHomesData = await res.json();
+                setSavedHomesCount(savedHomesData.Number || 0);
+            } catch (err) {
+                console.error("Saved Homes count error:", err);
+                setSavedHomesCount(null);
+            }
+        };
+        fetchSavedHomesCount()
+    }, []);
+
+    //Fetch Messages
+    useEffect(() => {
+        const fetchMessagesCount = async () => {
+            try {
+                const res = await fetch("/api/message", {
+                    method: "GET",
+                    credentials: "include",
+                });
+    
+                if (!res.ok) {
+                    setMessages(null);
+                    return;
+                }
+                const messageData = await res.json();
+                setMessages(messageData.Number || 0);
+            } catch (err) {
+                console.error("Messages count error:", err);
+                setMessages(null);
+            }
+        };
+        fetchMessagesCount()
+    }, []);
+
+    //Dispute Count
+    useEffect(() => {
+        const fetchDisputesCount = async () => {
+            try {
+                const res = await fetch("/api/disputes", {
+                    method: "GET",
+                    credentials: "include",
+                });
+    
+                if (!res.ok) {
+                    setDisputes(null);
+                    return;
+                }
+                const disputeData = await res.json();
+                setDisputes(disputeData.Number || 0);
+            } catch (err) {
+                console.error("Disputes count error:", err);
+                setDisputes(null);
+            }
+        };
+        fetchDisputesCount()
+    }, []);
+
+    //Transaction Count
+    useEffect(() => {
+        const fetchTransactionCount = async () => {
+            try {
+                const res = await fetch("/api/payment/Xpress", {
+                    method: "GET",
+                    credentials: "include",
+                    body: JSON.stringify({
+                        reference,
+                        email,
+                        amount,
+                        status: Pending, Successful, Failed,
+                        transactionId
+                    })
+                });
+    
+                if (!res.ok) {
+                    setPayment(null);
+                    return;
+                }
+                const paymentData = await res.json();
+                setPayment(paymentData.Number || 0);
+            } catch (err) {
+                console.error("Transactions count error:", err);
+                setPayment(null);
+            }
+        };
+        fetchTransactionCount()
+    }, []);
+
+    //Property
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const res = await fetch("/api/property", {
+                    method: "GET",
+                    credentials: "include",
+                    body: JSON.stringify({
+                        previewPic, img1, img2, img3, img4, img5,
+                        title, address, state, price, category,
+                        unitsAvailable, propertyType, bed, bath,
+                        buildingAmenities, propertyAmenities,
+                        neighbourhoodPostcode, nearbyPlaces,
+                        status: vacant, rented, sold, 
+                        rating, listedBy, agent
+                    })}
+                );
+    
+                if (!res.ok) {
+                    setProperty(null);
+                    return;
+                }
+                const propertyData = await res.json();
+                setPayment(propertyData.Number || 0);
+            } catch (err) {
+                console.error("Property fetch error:", err);
+                setProperty(null);
+            }
+        };
+        fetchProperty()
+    }, []);
+
+
     return (
         <div className="flex bg-gray-100">
             {/* Sidebar */}
@@ -77,7 +219,7 @@ const Page = () => {
                     </div>
 
                     <img
-                        src={tenantKyc?.previewPic}
+                        src={tenantKyc?.previewPic || null}
                         className="w-10 h-10 rounded-full"
                     />
                 </div>
@@ -91,7 +233,11 @@ const Page = () => {
 
                         <div>
                             <p className="text-sm text-blue-950">Saved Homes</p>
-                            <h2 className="text-3xl mt-1 font-bold">10</h2>
+                            <h2 className="text-3xl mt-1 font-bold">
+                                {savedHomesCount === null
+                                ? "0"
+                                : `${savedHomesCount}`}
+                            </h2>
                         </div>
                     </div>
 
@@ -102,7 +248,11 @@ const Page = () => {
 
                         <div>
                             <p className="text-sm text-blue-950">Messages</p>
-                            <h2 className="text-3xl mt-1 font-bold">5</h2>
+                                <h2 className="text-3xl mt-1 font-bold">
+                                    {messages === null
+                                    ? "0"
+                                    : `${messages}`}
+                                </h2>
                         </div>
                     </div>
 
@@ -113,9 +263,13 @@ const Page = () => {
 
                         <div>
                             <p className="text-sm text-blue-950">
-                                Property History
+                                Disputes
                             </p>
-                            <h2 className="text-3xl mt-1 font-bold">1</h2>
+                            <h2 className="text-3xl mt-1 font-bold">
+                                {disputes === null
+                                ? "0"
+                                : `${disputes}`}   
+                            </h2>
                         </div>
                     </div>
 
@@ -126,17 +280,21 @@ const Page = () => {
 
                         <div>
                             <p className="text-sm text-blue-950 font-medium">
-                                Short Let History
+                                Transaction History
                             </p>
-                            <h2 className="text-3xl mt-1 font-bold">40</h2>
+                                <h2 className="text-3xl mt-1 font-bold">
+                                {payment === null
+                                ? "0"
+                                : `${payment}`}   
+                                </h2>
                         </div>
                     </div>
                 </div>
 
-                {/* Transactions */}
+                {/* Transaction History card*/}
                 <div className="mb-10">
                     <h2 className="text-4xl font-semibold text-blue-950 mb-4">
-                        Transactions
+                        Transaction History
                     </h2>
 
                     <div className="grid grid-cols-6 text-sm font-medium text-gray-500 p-4">
@@ -149,16 +307,15 @@ const Page = () => {
                     </div>
                     <div className=" rounded-xl shadow">
                         {/* Rows */}
-                        {[1, 2, 3].map((item) => {
-                            const isPending = item === 1;
+                        {[payment].map((item) => {
+                            // const isPending = item === 1;
                             return (
-                                <div
-                                    key={item}
+                                <div key={item}
                                     className="grid grid-cols-6 items-center p-4 text-sm mb-5 bg-white rounded-2xl shadow-sm gap-4">
                                     {/* Profile picture before name */}
                                     <div className="flex items-center gap-2">
                                         <img
-                                            src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe"
+                                            src={tenantKyc?.previewPic || null}
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full"
                                         />
@@ -168,36 +325,37 @@ const Page = () => {
                                     {/* Status badge with conditional color */}
                                     <span
                                         className={`px-2 py-1 rounded text-xs w-fit ${
-                                            isPending
+                                            payment?.status
                                                 ? "bg-yellow-100 text-yellow-700"
                                                 : "bg-green-100 text-green-700"
                                         }`}>
-                                        {isPending ? "Pending" : "Successful"}
+                                        {/* {isPending ? "Pending" : "Successful"} */}
                                     </span>
 
-                                    <p>7456 - 1234 ****</p>
+                                    <p>{payment?.transactionId || null}</p>
 
-                                    <p>13 Jun 2024</p>
+                                    <p>{payment?.timestamps}</p>
 
-                                    <p>₦5,000,000</p>
+                                    <p>{payment?.amount}</p>
 
                                     {/* Original image + SLR-102 */}
                                     <div className="flex items-center gap-2">
                                         <img
-                                            src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6"
+                                            src={property?.previewPic}
                                             alt="Item"
                                             className="w-8 h-8 rounded-full"
                                         />
-                                        <span>SLR-102</span>
+                                        <span>{property?.transactionId}</span>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
-
-                    <div className="text-right mt-2 text-sm text-gray-500 cursor-pointer">
-                        view all →
-                    </div>
+                    {/* <Link href={`/property?id=${_id}`}> 
+                        <span className="text-right mt-2 text-sm text-gray-500 cursor-pointer">
+                            view all →
+                        </span>
+                    </Link> */}
                 </div>
 
                 {/* Recent Properties */}
@@ -207,9 +365,8 @@ const Page = () => {
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <PropertyCard />
-                        <PropertyCard />
-                        <PropertyCard />
+                        {/* {/* <PropertyCard /> */}
+                       <TrendingRentIndexCarousel />
                     </div>
                 </div>
             </div>

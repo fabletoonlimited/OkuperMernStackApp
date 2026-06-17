@@ -95,16 +95,16 @@ const propertySchema = new mongoose.Schema(
     listedBy: { type: String, required: true },
     agent: { type: String, requied: false },
 
-    savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
-    isVerified: { type: Boolean, default: true },
+
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
     admin: [{ type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin" }],
+    savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
+    isVerified: { type: Boolean, default: true },
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
-  },
-
-  { timestamps: true }
-
+    addressVerification: [{type: mongoose.Schema.Types.ObjectId, ref: "AddressVerification"}],
+    payment: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]
+  },{ timestamps: true }
 );
 
 export default mongoose.models.Property || mongoose.model("Property", propertySchema);

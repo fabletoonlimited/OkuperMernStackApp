@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import express from 'express';
 import {createAddress, getAddress, updateAddress, deleteAddress} from '../../api/controllers/tenantAddressVerificationController.js'
 import {authenticateTenant} from '../middlewares/tenantMiddleware.js'

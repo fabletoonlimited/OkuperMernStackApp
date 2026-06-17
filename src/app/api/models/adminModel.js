@@ -39,8 +39,8 @@ const superAdminSchema = new mongoose.Schema(
     property: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
     tenant: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}],
     landlord: [{ type: mongoose.Schema.Types.ObjectId, ref: "Landlord"}],
-    transactions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Transactions"}],
-    subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscribers"}],
+    payment: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    subscription: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}],
     disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
     referals: [{ type: mongoose.Schema.Types.ObjectId, ref: "Referals"}],
 
@@ -48,8 +48,8 @@ const superAdminSchema = new mongoose.Schema(
 
 // Password hashing
 superAdminSchema.pre("save", async function(next) {
-    if (!this.isModified("password")) return next();
-
+    if (!this.isModified("password")) 
+    return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });

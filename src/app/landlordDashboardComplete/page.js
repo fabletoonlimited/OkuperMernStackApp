@@ -7,6 +7,31 @@ import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
 
 const page = () => {
     const [profilePercent, setProfilePercent] = useState(100);
+    const [savedHomesCount, setSavedHomesCount] = useState(100);
+
+    //Fetch SavedHomes Count
+    useEffect(() => {
+        const fetchSavedHomesCount = async () => {
+            try {
+                const res = await fetch("/api/savedHomes", {
+                    credentials: "include",
+                });
+
+                if (!res.ok) {
+                    setSavedHomesCount(null);
+                    return;
+                }
+                const data = await res.json();
+                setSavedHomesCount(
+                    Number.isFinite(data.Number) ? data.Number : 0
+                );
+            } catch (err) {
+                console.error("Saved Homes count error:", err);
+                setSavedHomesCount(null);
+            }
+        };
+        fetchSavedHomesCount()
+    }, []);
 
     useEffect(() => {
         const fetchCompletion = async () => {
@@ -35,34 +60,35 @@ const page = () => {
 
     return (
         <>
-                <div className="flex min-h-screen w-full bg-gray-100">
-                    {/* Sidebar (fixed width) */}
-                    <LandlordDashboardSidebar/>
+            <div className="flex min-h-screen w-full bg-gray-100">
+                {/* Sidebar (fixed width) */}
+                <LandlordDashboardSidebar/>
 
-                    {/* Main Content */}
-                    <div className=" flex-1 p-6">
-                        {/* Header */}
-                        <div className="flex justify-between items-center mb-6">
-                            <div>
-                                <p className="text-sm text-blue-950">
-                                    Mon, 18 2026
-                                </p>
-                                <h1 className="text-2xl font-bold">
-                                    Welcome back, Name!
-                                </h1>
-                                <p className="text-blue-950">
-                                    This is your dashboard summary report
-                                </p>
-                            </div>
-
-                            <img
-                                src="https://i.pravatar.cc/40"
-                                className="w-10 h-10 rounded-full"
-                                alt="profile"
-                            />
+                {/* Main Content */}
+                <div className=" flex-1 p-6">
+                        
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <p className="text-sm text-blue-950">
+                                Mon, 18 2026
+                            </p>
+                            <h1 className="text-2xl font-bold">
+                                 Welcome back, Name!
+                            </h1>
+                            <p className="text-blue-950">
+                                This is your dashboard summary report
+                            </p>
                         </div>
 
-                        {/* Summary Cards */}
+                        <img
+                            src="https://i.pravatar.cc/40"
+                            className="w-10 h-10 rounded-full"
+                            alt="profile"
+                        />
+                    </div>
+
+                    {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                             <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4">
                                 <div className="bg-green-100 p-3 rounded-full text-green-600">

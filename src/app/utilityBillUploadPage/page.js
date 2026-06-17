@@ -35,22 +35,20 @@ const page = () => {
 
 
   const handleSubmit = async () => {
+    if (!file) {
+      toast.error("Please select a file.");
+        return;
+      }
+      setUploading(true)
+      
+    try {
+      const formData = new FormData()
+      formData.append('utilityBill', file)
 
-      if (!file) {
-          toast.error("Please select a file.");
-          return;
-        }
-        setUploading(true)
-        
-        try {
-          const formData = new FormData()
-          formData.append('utilityBill', file)
-
-          const res = await fetch("/api/uploads/utilityBill",{
-          method: "POST",
-          body: formData,
-        }
-    );
+      const res = await fetch("/api/uploads/utilityBill",{
+      method: "POST",
+      body: formData,
+      });
 
       const uploadResult = await res.json();
 
@@ -90,30 +88,22 @@ const page = () => {
       checkAuth();
   },  []);
 
-
-  // useEffect(() => {
-  //   if (!isAuthenticated) {
-  //     router.push("/signUpLanding");
-  //   }
-  // }, [isAuthenticated, router]);
-
-    // Fetch the logged-in user's ID from the JWT cookie on mount
-    useEffect(() => {
-      const fetchUserId = async () => {
-        try {
-          const res = await fetch("/api/user/me", 
-            { credentials: "include" });
+  // Fetch the logged-in user's ID from the JWT cookie on mount
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const res = await fetch("/api/user/me", 
+          { credentials: "include" });
           if (res.ok) {
             const data = await res.json();
             setUserId(data.actorId || null);
-          }
-        } catch (err) {
-          console.error("Failed to fetch user ID:", err);
         }
-      };
-      fetchUserId();
-    }, []);
-
+      } catch (err) {
+          console.error("Failed to fetch user ID:", err);
+      }
+    };
+    fetchUserId();
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 -mt-30">

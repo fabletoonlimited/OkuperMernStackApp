@@ -1,4 +1,5 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import StarRating from "../starRating/starRating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,7 +26,35 @@ export default function PropertyCard({
 }) 
 
 {
-    const imageSrc = previewPic || "/property-image.jpg";
+    const [property, setProperty] = useState(null);
+
+    //Property
+    useEffect(() => {
+    const handleSaveProperty = async (e) => {
+        e.preventDefault(); 
+        e.stopPropagation();
+
+        try{
+            const res = await fetch("/api/property", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                propertyId: _id
+            }),
+        });
+        const data = await res.json();
+
+        if(!res.ok) {
+            throw new Error(data.error);
+        }
+        alert("Property saved successfully!")
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         
@@ -36,8 +65,8 @@ export default function PropertyCard({
                 {/* IMAGE */}
                 <div className="relative w-full h-64">
                     <Image
-                        src={imageSrc}
-                        alt={`Property: ${title || desc || "Property"}`}
+                        src={property?.previewPic || null}
+                        alt={`property: ${title || desc || "property"}`}
                         fill
                         className="object-cover rounded-t-xl"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -46,10 +75,12 @@ export default function PropertyCard({
                     />
 
                     {savedHomes && (
-                        <div className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
+                        <div 
+                            className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
                             <FontAwesomeIcon
+                                onClick={handleSaveProperty}
                                 icon={faCircleCheck}
-                                className="text-white text-2xl md:text-4xl"
+                                className="text-white text-2xl md:text-4xl cursor-pointer"
                             />
                         </div>
                     )}
@@ -115,5 +146,5 @@ export default function PropertyCard({
                 </div>
             </div>
         </Link>
-    );
-}
+    )}
+)}

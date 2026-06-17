@@ -43,8 +43,6 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-   
-
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord" },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant" },
     admin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },

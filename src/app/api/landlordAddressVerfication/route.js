@@ -1,4 +1,7 @@
-import express from 'express';
+export const runtime = "nodejs";
+
+import dbConnect from "@/app/lib/mongoose";
+import { NextResponse } from "next/server";
 import {createAddress, getAddress, updateAddress, deleteAddress} from '../../api/controllers/landlordAddressVerificationController.js'
 import {authenticateLandlord} from '../middlewares/authLandlord.js'
 import upload from "../../lib/multer.js";

@@ -31,8 +31,8 @@ const landlordSchema = new mongoose.Schema(
       default: "landlord",
     },
     
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
-    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+    otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false},
     landlordKyc: { type: mongoose.Schema.Types.ObjectId, ref: "LandlordKyc"},
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
     messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
