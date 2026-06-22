@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import SubscriptionModal2 from "../../components/subscriptionModal2";
 import { useRouter } from "next/navigation";
 import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
-import { FaExclamationCircle, FaStar } from "react-icons/fa";
+// import { FaExclamationCircle, FaStar } from "react-icnons/fa";
 import PropertyCard from "@/components/propertyCard";
 
 const index = () => {

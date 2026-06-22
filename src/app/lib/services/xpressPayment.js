@@ -1,17 +1,27 @@
 import Payment from "@/app/api/models/paymentModel";
+import User from "@/app/api/models/userModel"
+
 
 export const initializePayment = async (data) => {
-  const { reference, email, amount, status, isSplitpayment, splitPaymentReference, user } = data;
+  const { reference, email, amount, currency, status, isSplitpayment, splitPaymentReference, user } = data;
 
-  if (!reference || !email || !amount || !status || !user) 
+  if (!reference || !email || !amount || !currency || !status || !user) 
     {throw new Error("All fields are required")}
+
+  if (isSplitpayment && !splitPaymentReference) 
+    {throw new Error("Split payment reference is required")}
 
   // Prevent duplicate payments
   const existingPayment = await Payment.findOne({ reference });
 
-  if (existingPayment) {throw new Error("Payment already exists")}
+  if (existingPayment) 
+    {throw new Error("Payment already exists")}
 
   const normalizedEmail = email.trim().toLowerCase();
+
+  //Calculate total amount for Xpress
+  const serviceCharge = amount * 0.05;
+  const finalPaidAmount = amount = serviceCharge;
 
   // Initialize payment with Xpress
   const response = await fetch(
@@ -22,42 +32,47 @@ export const initializePayment = async (data) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.NEXT_XPRESS_PUBLIC_KEY}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        data,
+        amount: finalPaidAmount
+      }),
     }
   );
-  // const response = await fetch(
-  //   `${process.env.NEXT_XPRESS_URL}/Payments/Initialize`,
-  //   {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${process.env.NEXT_XPRESS_SECRET_KEY}`,
-  //     },
-  //     body: JSON.stringify(data),
-  //   }
-  // );
 
   if (!response.ok) {throw new Error("Payment initialization failed")}
 
   const result = await response.json();
 
-  // Save as Pending (transactionId comes later)
-  const newPayment = await Payment
-    .create({
-      reference,
-      email: normalizedEmail,
-      amount,
-      status: "Pending",
-      isSplitpayment,
-      splitPaymentReference,
-      user,
+  const currentUser = await User.findById(user);
+
+  let payment;
+  
+  if (currentUser.role === "Tenant") {   
+    payment = await Payment.create({
+    reference, 
+    email: normalizedEmail, 
+    amount, 
+    currency, 
+    status, 
+    isSplitpayment, 
+    splitPaymentReference, 
+    user
     });
-
-    
-
+  } else {
+    payment = await Payment.create({
+    reference, 
+    email: normalizedEmail, 
+    amount, 
+    currency, 
+    status, 
+    user
+  });
+  }
   return {
-    status: "Successful",
-    transactionId
+    status: result.status,
+    transactionId: payment.transactionId,
+    amount: payment.finalPaidAmount,     
+    result,
   };
 };
 
@@ -72,13 +87,6 @@ export const verifyPayment = async (reference) => {
         "Content-Type": "application/json",
       },
     }
-    // {
-    //   method: "GET",
-    //   headers: {
-    //     Authorization: `Bearer ${process.env.NEXT_XPRESS_SECRET_KEY}`,
-    //     "Content-Type": "application/json",
-    //   },
-    // }
   );
 
   if (!response.ok) {

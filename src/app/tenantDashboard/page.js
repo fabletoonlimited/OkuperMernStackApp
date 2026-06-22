@@ -6,12 +6,62 @@ import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
 import TenantDashboardCompleted from "../tenantDashboardCompleted/page.js";
+import { useRouter } from "next/navigation";
 
 function TenantDashboard() {
+  const router = useRouter();
+
   const [profilePercent, setProfilePercent] = useState(null);
   const [utilityCompletion, setUtilityCompletion] = useState(false);
   const [utilityLoading, setUtilityLoading] = useState(true);
   const [tenant, setTenant] = useState(null);
+
+
+  // ✅ get logged in landlord
+  // useEffect(() => {
+  //   const getMe = async () => {
+  //     try {
+  //       const res = await fetch("/api/auth/me", {
+  //         method: "GET",
+  //         cache: "no-store",
+  //       });
+      
+  //       const data = await res.json();
+      
+  //       if (!res.ok) return;
+      
+  //       // adjust depending on your response shape
+  //       const email = data?.user?.email || data?.email;
+  //         setTenantEmail(email || null);
+  //       } catch (err) {
+  //       console.error("Auth me error:", err);
+  //     }
+  //   };
+  // })
+
+    // Tenant
+  useEffect(() => {
+    const fetchTenant = async () => {
+      try {
+        const res = await fetch("/api/tenant", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          toast.error("Failed to fetch tenant");
+          return;
+        }
+
+        const data = await res.json();
+        setTenant(data);
+      } catch (err) {
+        console.error(err);
+        toast.error("Tenant fetch error");
+      }
+    };
+  fetchTenant();
+}, []);
 
   // Utility
   useEffect(() => {
@@ -63,29 +113,6 @@ function TenantDashboard() {
     fetchCompletion();
   }, []);
 
-  // Tenant
-  useEffect(() => {
-    const fetchTenant = async () => {
-      try {
-        const res = await fetch("/api/tenant", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!res.ok) {
-          toast.error("Failed to fetch tenant");
-          return;
-        }
-
-        const data = await res.json();
-        setTenant(data);
-      } catch (err) {
-        console.error(err);
-        toast.error("Tenant fetch error");
-      }
-    };
-  fetchTenant();
-}, []);
 
   if (profilePercent === 100 && utilityCompletion) {
     return (

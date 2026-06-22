@@ -10,6 +10,7 @@ import {
   updateLandlord,
   deleteLandlord,
 } from "../controllers/landlord.controller.js";
+import Landlord from "@/app/api/models/landlordModel.js"
 
 // CREATE LANDLORD
 export async function POST(req) {
@@ -25,7 +26,9 @@ export async function POST(req) {
 
     const result = await signupLandlord(body);
     
-    return NextResponse.json(result, { status: result.status || 201 });
+    return NextResponse.json(result, 
+      { status: result.status || 201 }
+    );
   } catch (error) {
     console.error("Landlord creation error:", error);
     return NextResponse.json(
@@ -40,17 +43,22 @@ export async function GET(request) {
   await dbConnect();
 
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const email = searchParams.get("email");
+    const token = request.cookies.get("token")?.value;
 
-    if (id || email) {
-      const result = await getLandlord({ id, email });
-      return NextResponse.json(result, { status: result.status || 200 });
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await getAllLandlord();
-    return NextResponse.json(result, { status: result.status || 200 });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const landlord = await Landlord.findById(decoded.id).select("-password");
+
+    if (!landlord) {
+      return NextResponse.json({ message: "Landlord not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(landlord, { status: 200 });
+
   } catch (err) {
     return NextResponse.json({ message: err.message }, { status: 500 });
   }

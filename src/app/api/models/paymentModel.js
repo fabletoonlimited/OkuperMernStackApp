@@ -1,4 +1,5 @@
 import {mongoose} from "@/app/lib/mongoose.js"
+import crypto from "crypto"
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -15,6 +16,14 @@ const paymentSchema = new mongoose.Schema(
         type: Number, 
         required: true 
     },
+    currency: {
+        type: String,
+        enum: ["NGN", "DA", "Kz", "CFA", "P", "FBu", "FCFA", "Esc", "CF", "DF", 
+            "E£", "Nfk", "L/E", "Br", "D", "GH₵", "FG", "KSh", "L/M", "L$", "LD", 
+            "Ar", "MK", "UM", "Rs", "MAD", "MT", "N$", "NGN", "USD", "GBP", "EUR", 
+            "FRw", "Db", "Le", "Sh.So", "R", "SSP", "SDG", "TSh", "DT","USh", "ZK", "ZWL"],
+        default: "NGN"
+    },
     status: { 
         type: String,
         enum: ["Pending", "Successful", "Failed"],
@@ -22,8 +31,17 @@ const paymentSchema = new mongoose.Schema(
     },
     isSplitpayment: {
         type: Boolean,
-        default: null,
+        default: false,
     },
+    serviceCharge: {
+        type: Number,
+        default: 0,
+    },
+    finalPaidAmount: {
+        type: Number,
+        default: 0,
+    },
+
     splitPaymentReference: {
         type: String,
         default: null,
@@ -41,19 +59,22 @@ const paymentSchema = new mongoose.Schema(
 }, { timestamps: true });
 
 // Pre-save hook to deduct 5% automatically
-paymentSchema.pre('save', function(next) {
-  this.deductionAmount = this.amount * 0.05;
-  this.finalPaidAmount = this.amount - this.deductionAmount;
-  
+paymentSchema.pre("save", function (next) {
+  if (this.isModified("amount")) {
+    this.serviceCharge = this.amount * 0.05;
+    this.finalPaidAmount = this.amount + this.serviceCharge;
+  }
+
   next();
 });
 
 //Pre-save hook for transactionId
-paymentSchema.pre("save", async function (next) {
-    if (!this.transactionId) {
-        this.transactionId = `TXN-${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
-    }
-    next();
+paymentSchema.pre("save", function (next) {
+  if (!this.transactionId) {
+    this.transactionId = `TXN-${crypto.randomBytes(6).toString("hex").toUpperCase()}`;
+  }
+
+  next();
 });
 
 export default mongoose.models.Payment || mongoose.model("Payment", paymentSchema);
