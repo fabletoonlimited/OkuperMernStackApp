@@ -1,13 +1,15 @@
 "use client";
+
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation' 
 import { CloudUpload } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useParams } from "next/navigation"
 
 const page = () => {
+  const { propertyId } = useParams();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter()
@@ -43,7 +45,8 @@ const page = () => {
       
     try {
       const formData = new FormData()
-      formData.append('utilityBill', file)
+      formData.append('utilityBill', file);
+      formData.append("propertyId", propertyId)
 
       const res = await fetch("/api/uploads/utilityBill",{
       method: "POST",
@@ -58,11 +61,26 @@ const page = () => {
 
         toast.success("File uploaded successfully!");
 
-      if (role === "tenant") {
-        router.push("/tenantDashboard")
-      } else {
-        router.push("/landlordDashboard")
-      }
+ switch (uploadResult.property.category) {
+    case "Rent":
+      router.push("/rent");
+      break;
+
+    case "Buy":
+      router.push("/buy");
+      break;
+
+    case "Sell":
+      router.push("/sell");
+      break;
+
+    case "Shortlet":
+      router.push("/shortlet");
+      break;
+
+    default:
+      router.push("/allProperties");
+ }
       } else {
         console.error("Upload failed:", uploadResult);
         toast.error("Failed to upload file. Please try again.");

@@ -4,46 +4,52 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
-import { CloudUpload } from "lucide-react";
 import RatingStar from "../../components/ratingStar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CloudUpload, LoaderCircle } from "lucide-react";
 
 const page = ({ currentUserId }) => { 
-
- const [isAuthenticated, setIsAuthenticated] = useState(false);
- const router = useRouter();
+const [isAuthenticated, setIsAuthenticated] = useState(false);
+const router = useRouter();
  
- useEffect(() => {
-     const checkAuth = async () => {
-         try {
-             const res = await fetch("/api/auth/me", 
-                 { credentials: "include" });
-             setIsAuthenticated(res.ok);
-         } catch {
+useEffect(() => {
+    const checkAuth = async () => {
+        try {
+            const res = await fetch("/api/auth/me", 
+                { credentials: "include" });
+            setIsAuthenticated(res.ok);
+        } catch {
              setIsAuthenticated(false);
-         }
-     };
-     checkAuth();
- }, []);
+        }
+    };
+    checkAuth();
+}, []);
      
-     const goToContact = () => {
-         router.push("/contact");
-     };
-      const goToRent = () => {
-         router.push("/rent");
-     };
+    const goToContact = () => {
+        router.push("/contact");
+    };
+    const goToRent = () => {
+        router.push("/rent");
+    };
  
-     const goToSignUp = () => {
-         router.push("/signUpLanding");
-     };
-     const goTopropertyListing = () => {
-         router.push("/propertyListingLanding");
-     };
+    const goToSignUp = () => {
+        router.push("/signUpLanding");
+    };
+    const goTopropertyListing = () => {
+        router.push("/propertyListingLanding");
+    };
 
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
-
-  const [landlordId, setLandlordId] = useState(null);
+    const [selectedFeatures, setSelectedFeatures] = useState([]);
+    const [landlordId, setLandlordId] = useState(null);
+    const [uploadingImages, setUploadingImages] = useState({
+        previewPic: false,
+        Img1: false,
+        Img2: false,
+        Img3: false,
+        Img4: false,
+        Img5: false,
+    })
 
   // Fetch the logged-in landlord's ID from the JWT cookie on mount
   useEffect(() => {
@@ -79,13 +85,13 @@ const page = ({ currentUserId }) => {
     unitsAvailable: "",
     bed: "",
     bath: "",
+    rating: "",
+    status: "",
+    listedBy: "",
     buildingAmenities: "",
     propertyAmenities: "",
     neighbourhoodPostcode: "",
     nearbyPlaces: "",
-    status: "",
-    status: "",
-    listedBy: "",
     agent: ""
   });
 
@@ -116,6 +122,11 @@ const page = ({ currentUserId }) => {
 
     const imgKey = e.target.id;
 
+    setUploadingImages((prev) => ({
+    ...prev,
+    [imgKey]: true,
+    }));
+
     const data = new FormData();
     data.append("file", img);
     data.append("upload_preset", "okuper");
@@ -139,20 +150,23 @@ const page = ({ currentUserId }) => {
       setImagePreviews((prev) => ({
         ...prev,
         [imgKey]: uploadResult.secure_url,
-        // [imgKey]: URL.createObjectURL(img),
       }));
 
       // wrap image in array object
       setFormData((prev) => ({
         ...prev,
-         [imgKey]: uploadResult.secure_url,
-        // [imgKey]: [{ publicId: "", url: uploadResult.secure_url }],
+        [imgKey]: uploadResult.secure_url,
       }));
 
       toast.success(`${imgKey} Image uploaded successfully`);
     } catch (err) {
       console.error(err);
       toast.error("Upload error");
+    } finally {
+    setUploadingImages((prev) => ({
+      ...prev,
+      [imgKey]: false,
+    }));      
     }
   };
 
@@ -211,11 +225,7 @@ const page = ({ currentUserId }) => {
     const bed = formData.bed;
     const bath = formData.bath;
 
-    const status = {
-      rented: "rented",
-      vacant: "vacant",
-      sold: "sold"
-    }
+    const status = formData.status
 
     const stateMap = {
       Abia: "Abia", 
@@ -299,7 +309,8 @@ const page = ({ currentUserId }) => {
           propertyType,
           bed,
           bath,
-          status
+          status,
+          state
         }),
       });
 
@@ -309,29 +320,14 @@ const page = ({ currentUserId }) => {
         toast.error(data.message || "Upload failed");
         return;
       }
-
       toast.success("Property uploaded successfully");
 
-      switch (formData.category) {
-        case "Rent":
-          router.push("/rent");
-          break;
-          
-        case "Buy":
-          router.push("/buy");
-          break;
+      console.log(data);
+console.log(data.property?._id);
 
-        case "Sell":
-          router.push("/sell");
-          break;
-
-        case "Shortlet":
-          router.push("/shortlet");
-          break;
-        
-        default:
-          router.push("/allProperties");
-      }
+      setTimeout(() => {
+        router.push(`/utilityBillUploadPage/${data.property._id}`);
+      }, 1000);
     } catch (err) {
       console.error(err);
       toast.error("Property upload failed");
@@ -355,7 +351,7 @@ const page = ({ currentUserId }) => {
           </div>
 
           {/* Form Section*/}
-          <div className="bg-white md:w-[1300px] md:h-auto h-750 md:m-8 m-4 md:flex">
+          <div className="bg-white md:w-[1300px] md:h-auto h-auto md:m-8 m-4 md:flex">
               <form onSubmit={handlePropertyUpload}>
                   <ul className="font-semibold md:text-2xl md:space-y-10 space-y-8 p-10 md:pt-20 md:ml-18 ">
                       {/* Picture Upload Section */}
@@ -370,46 +366,51 @@ const page = ({ currentUserId }) => {
                                   className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
                                   id="previewPic"
                               />
-                              {imagePreviews.previewPic ? (
-                                  <img
-                                      src={imagePreviews.previewPic}
-                                      alt="Preview"
-                                      className="md:h-[126px] md:w-[150px] object-cover"
-                                  />
-                              ) : (
-                                  <>
-                                      <CloudUpload className="text-gray-300" />
-                                      <p className="text-gray-500 font-medium text-xl leading-normal">
-                                          Preview picture
-                                      </p>
-                                  </>
-                              )}
+                                {uploadingImages.previewPic ? (
+                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                                ) : imagePreviews.previewPic ? (
+                                    <img
+                                        src={imagePreviews.previewPic}
+                                        alt="Preview"
+                                        className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <CloudUpload className="text-gray-300" />
+                                        <p className="text-gray-500 font-medium text-xl">
+                                            Preview picture
+                                        </p>
+                                    </>
+                                )}
                           </span>
 
                           {/* Image 1 Uploads */}
                           <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
-                              <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
-                                  id="Img1"
-                              />
-                              {imagePreviews.Img1 ? (
-                                  <img
-                                      src={imagePreviews.Img1}
-                                      alt="Img1 Preview"
-                                      className="md:h-[126px] md:w-[145px] object-cover"
-                                  />
-                              ) : (
-                                  <>
-                                      <CloudUpload className="text-gray-300" />
-                                      <p className="text-gray-500 font-medium text-xl leading-normal">
-                                          Image1
-                                      </p>
-                                  </>
-                              )}
-                          </span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleChange}
+                                className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                                id="Img1"
+                                // disabled= {setLoading}
+                            />
+                                {uploadingImages.Img1 ? (
+                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                                ) : imagePreviews.Img1 ? (
+                                    <img
+                                        src={imagePreviews.Img1}
+                                        alt="Preview"
+                                        className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <CloudUpload className="text-gray-300" />
+                                        <p className="text-gray-500 font-medium text-xl">
+                                            Image 1
+                                        </p>
+                                    </>
+                                )}
+                            </span>
 
                           {/* Image 2 Uploads */}
                           <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
@@ -421,20 +422,22 @@ const page = ({ currentUserId }) => {
                                   id="Img2"
                               />
 
-                              {imagePreviews.Img2 ? (
-                                  <img
-                                      src={imagePreviews.Img2}
-                                      alt="Img2 Preview"
-                                      className="md:h-[126px] md:w-[150px] object-cover"
-                                  />
-                              ) : (
-                                  <>
-                                      <CloudUpload className="text-gray-300" />
-                                      <p className="text-gray-500 font-medium text-xl">
-                                          Image 2
-                                      </p>
-                                  </>
-                              )}
+                                {uploadingImages.Img2 ? (
+                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                                ) : imagePreviews.Img2 ? (
+                                    <img
+                                        src={imagePreviews.Img2}
+                                        alt="Preview"
+                                        className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <CloudUpload className="text-gray-300" />
+                                        <p className="text-gray-500 font-medium text-xl">
+                                            Image 2
+                                        </p>
+                                    </>
+                                )}
                           </span>
 
                           {/* Image 3 Uploads */}
@@ -446,21 +449,22 @@ const page = ({ currentUserId }) => {
                                   className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
                                   id="Img3"
                               />
-
-                              {imagePreviews.Img3 ? (
-                                  <img
-                                      src={imagePreviews.Img3}
-                                      alt="Img3 Preview"
-                                      className="md:h-[126px] md:w-[150px] object-cover"
-                                  />
-                              ) : (
-                                  <>
-                                      <CloudUpload className="text-gray-300" />
-                                      <p className="text-gray-500 font-medium text-xl">
-                                          Image 3
-                                      </p>
-                                  </>
-                              )}
+                                {uploadingImages.Img3 ? (
+                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                                ) : imagePreviews.Img3 ? (
+                                    <img
+                                        src={imagePreviews.Img3}
+                                        alt="Preview"
+                                        className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <CloudUpload className="text-gray-300" />
+                                        <p className="text-gray-500 font-medium text-xl">
+                                            Image 3
+                                        </p>
+                                    </>
+                                )}
                           </span>
 
                           {/* Image 4 Uploads */}
@@ -473,20 +477,22 @@ const page = ({ currentUserId }) => {
                                   id="Img4"
                               />
 
-                              {imagePreviews.Img4 ? (
-                                  <img
-                                      src={imagePreviews.Img4}
-                                      alt="Img4 Preview"
-                                      className="md:h-[126px] md:w-[150px] object-cover"
-                                  />
-                              ) : (
-                                  <>
-                                      <CloudUpload className="text-gray-300" />
-                                      <p className="text-gray-500 font-medium text-xl">
-                                          Image 4
-                                      </p>
-                                  </>
-                              )}
+                                {uploadingImages.Img4 ? (
+                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                                ) : imagePreviews.Img4 ? (
+                                    <img
+                                        src={imagePreviews.Img4}
+                                        alt="Preview"
+                                        className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <CloudUpload className="text-gray-300" />
+                                        <p className="text-gray-500 font-medium text-xl">
+                                            Image 4
+                                        </p>
+                                    </>
+                                )}
                           </span>
 
                           {/* Image 5 Uploads */}
@@ -498,21 +504,22 @@ const page = ({ currentUserId }) => {
                                   className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
                                   id="Img5"
                               />
-
-                              {imagePreviews.Img5 ? (
-                                  <img
-                                      src={imagePreviews.Img5}
-                                      alt="Img5 Preview"
-                                      className="md:h-[126px] md:w-[150px] object-cover"
-                                  />
-                              ) : (
-                                  <>
-                                      <CloudUpload className="text-gray-300" />
-                                      <p className="text-gray-500 font-medium text-xl">
-                                          Image 5
-                                      </p>
-                                  </>
-                              )}
+                                {uploadingImages.Img5 ? (
+                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                                ) : imagePreviews.Img5 ? (
+                                    <img
+                                        src={imagePreviews.Img5}
+                                        alt="Preview"
+                                        className="md:h-[126px] md:w-[150px] object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <CloudUpload className="text-gray-300" />
+                                        <p className="text-gray-500 font-medium text-xl">
+                                            Image 5
+                                        </p>
+                                    </>
+                                )}
                           </span>
                       </div>
 
@@ -754,12 +761,12 @@ const page = ({ currentUserId }) => {
                     onClick={() =>
                       setFormData((prev) => ({
                         ...prev,
-                        category: feature,
+                        status: feature,
                       }))
                     }
                     className={`w-32 h-15 rounded cursor-pointer transition
                       ${
-                        formData.category === feature
+                        formData.status === feature
                           ? "bg-blue-700 text-white"
                           : "bg-blue-900 text-white"
                       }
@@ -768,8 +775,8 @@ const page = ({ currentUserId }) => {
                     {feature}
                   </button>
                 ))}
-              </span>
-            </li>
+                </span>
+                </li>
 
                       <li className="md:flex">
                           <h5 className="mt-4">Listed By:</h5>
@@ -892,10 +899,9 @@ const page = ({ currentUserId }) => {
                       </span>
                   </ul>
               </form>
-          </div>
-
-          <LandlordDashboardFooter />
-      </div>
+            </div>
+        <LandlordDashboardFooter />
+    </div>
   );
 };
 

@@ -11,11 +11,11 @@ export async function POST(req) {
 
         const body = await req.json();
 
-        const { reference, email, amount, status, transactionId } = body;
+        const { reference, email, amount, currency, status, isSplitpayment, splitPaymentReference, user } = body;
 
-        if ( !reference || !email || !amount || !status || !transactionId) {
+        if ( !reference || !email || !amount || !currency || !status || !user) {
         return NextResponse.json(
-            { error: "Reference, email, Amount, and transactionId are required" },
+            { error: "Reference, Email, Amount, Currency and Status are required" },
             { status: 400 }
         );
     }

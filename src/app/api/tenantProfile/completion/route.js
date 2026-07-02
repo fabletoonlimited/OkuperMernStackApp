@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { getProfileByActorId } from "@/app/lib/profileData";
-import { computeProfileCompletion } from "@/app/lib/profileCompletion";
+import { computeProfileCompletion } from "@/app/lib/tenantProfileCompletion";
 
 export async function GET(request) {
   try {

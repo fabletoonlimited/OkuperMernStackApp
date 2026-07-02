@@ -5,8 +5,11 @@ import TenantKyc from "../api/models/tenantKycModel.js";
 
 const buildProfile = (role, actor, kyc) => {
   const name = `${actor?.firstName || ""} ${actor?.lastName || ""}`.trim();
+
   const currentAddress =
-    role === "landlord" ? kyc?.currentHomeAddress : kyc?.currentAddress;
+    role === "landlord"
+      ? kyc?.currentHomeAddress
+      : kyc?.currentAddress;
 
   return {
     _id: actor?._id,
@@ -15,28 +18,36 @@ const buildProfile = (role, actor, kyc) => {
     lastName: actor?.lastName,
     name,
     email: actor?.email,
+
     phone: kyc?.phone,
     documentType: kyc?.documentType,
     idNumber: kyc?.idNumber,
-    documentImage: kyc?.previewPic,
+    documentImage: kyc?.documentImage,
+
     gender: kyc?.gender,
     age: kyc?.age,
+
     occupation: kyc?.occupation,
     maritalStatus: kyc?.maritalStatus,
     spouseName: kyc?.spouseName,
     numberOfChildren: kyc?.noOfChildren,
     religion: kyc?.religion,
+
     companyName: kyc?.companyName,
     companyAddress: kyc?.companyAddress,
     companyPhone: kyc?.companyPhone,
     companyEmail: kyc?.companyEmail,
+
     currentAddress,
     city: kyc?.city,
     state: kyc?.state,
     country: kyc?.country,
     zipCode: kyc?.zipCode,
+    stateOfOrigin: kyc?.stateOfOrigin,
+
     profilePic: kyc?.previewPic,
     avatar: kyc?.previewPic,
+    previewPic: kyc?.previewPic,
   };
 };
 
@@ -46,8 +57,12 @@ export const getProfileByActorId = async (actorId) => {
   }
 
   const landlord = await Landlord.findById(actorId).lean();
+
   if (landlord) {
-    const kyc = await LandlordKyc.findOne({ landlord: actorId }).lean();
+    const kyc = await LandlordKyc.findOne({
+      landlord: actorId,
+    }).lean();
+
     return {
       role: "landlord",
       profile: buildProfile("landlord", landlord, kyc),
@@ -55,8 +70,12 @@ export const getProfileByActorId = async (actorId) => {
   }
 
   const tenant = await Tenant.findById(actorId).lean();
+
   if (tenant) {
-    const kyc = await TenantKyc.findOne({ tenant: actorId }).lean();
+    const kyc = await TenantKyc.findOne({
+      tenant: actorId,
+    }).lean();
+
     return {
       role: "tenant",
       profile: buildProfile("tenant", tenant, kyc),

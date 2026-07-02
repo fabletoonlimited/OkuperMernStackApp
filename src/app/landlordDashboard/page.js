@@ -1,18 +1,14 @@
 "use client"
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar/index.js";
 import LandlordDashboardCard from "../../components/landlordDashboardCard/index.js";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter/index.js";
-import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
-import { FaExclamationCircle, FaStar } from "react-icons/fa";
-import PropertyCard from "@/components/propertyCard";
-import { useState } from "react";
-import Link from "next/link";
-import { useEffect } from "react";
+import LandlordDashboardComplete from "../landlordDashboardComplete/page.js";
 import SubscriptionModal2 from "../../components/subscriptionModal2";
 import { useRouter } from "next/navigation";
-import LandlordDashboardComplete from "../landlordDashboardComplete/page.js";
 import { toast } from "react-toastify";
+
 
 function landlordDashboard() {
     const router = useRouter();
@@ -26,10 +22,12 @@ function landlordDashboard() {
     const [utilityLoading, setUtilityLoading] = useState(true);
     const [isSubscribed, setIsSubscribed] = useState(false)
     const [landlord, setLandlord] = useState(null);
+    const [propertyCount, setPropertyCount] = useState(0);
+    const [propertyUpload, setPropertyUpload] = useState(0);
+
     
     // landlord state
-    const [landlordEmail, setLandlordEmail] = useState(null);;
-    const [propertyCount, setPropertyCount] = useState(0);
+    const [landlordEmail, setLandlordEmail] = useState(null);
     
     // ✅ get logged in landlord
     useEffect(() => {
@@ -55,9 +53,33 @@ function landlordDashboard() {
 
     }, []);
 
+    // Landlord
+    useEffect(() => {
+        const fetchLandlord = async () => {
+            try {
+                const res = await fetch("/api/landlord", {
+                method: "GET",
+                credentials: "include",
+                });
+        
+                if (!res.ok) {
+                toast.error("Failed to fetch landlord");
+                return;
+                }
+        
+                const data = await res.json();
+                setLandlord(data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Landlord fetch error");
+            }
+        };
+        fetchLandlord();
+    }, []);
+        
 
-      // Utility
-      useEffect(() => {
+    // Utility
+    useEffect(() => {
         const fetchCompleteUtility = async () => {
           try {
             const res = await fetch("/api/uploads/utilityBill", {
@@ -81,11 +103,67 @@ function landlordDashboard() {
     
         fetchCompleteUtility();
     }, []);
+
+    //Bank Completion
+    useEffect(() => {
+        const fetchAddBank = async () => {
+          try {
+            const res = await fetch("/api/accounts/bankDetails", {
+              credentials: "include",
+              method: "GET"
+            });
     
+            if (!res.ok) {
+              setBankCompletion(false);
+              return;
+            }
+    
+            const data = await res.json();
+            
+            setBankCompletion(Boolean(data.bankDetails));
+
+          } catch (err) {
+            console.error(err);
+            setBankCompletion(false);
+          } finally {
+            setUtilityLoading(false);
+          }
+        };
+    
+        fetchAddBank();
+    }, []);
+
+    //Add Property listing
+    useEffect(() => {
+        const fetchAddProperty = async () => {
+          try {
+            const res = await fetch("/api/property", {
+              credentials: "include",
+            });
+    
+            if (!res.ok) {
+              setPropertyUpload(false);
+              return;
+            }
+    
+            const data = await res.json();
+            setPropertyUpload(Boolean(data.uploaded));
+          } catch (err) {
+            console.error(err);
+            setPropertyUpload(false);
+          } finally {
+            setUtilityLoading(false);
+          }
+        };
+    
+        fetchAddProperty();
+    }, []);
+
+    //Profile completion
     useEffect(() => {
         const fetchCompletion = async () => {
             try {
-                const res = await fetch("/api/profile/completion", {
+                const res = await fetch("/api/landlordProfile/completion", {
                     credentials: "include",
                 });
     
@@ -107,29 +185,6 @@ function landlordDashboard() {
         fetchCompletion();
     }, []);
 
-        // Landlord
-    useEffect(() => {
-        const fetchLandlord = async () => {
-          try {
-            const res = await fetch("/api/landlord", {
-              method: "GET",
-              credentials: "include",
-            });
-    
-            if (!res.ok) {
-              toast.error("Failed to fetch landlord");
-              return;
-            }
-    
-            const data = await res.json();
-            setLandlord(data);
-          } catch (err) {
-            console.error(err);
-            toast.error("Landlord fetch error");
-          }
-        };
-        fetchLandlord();
-    }, []);
     
     // ✅ fetch subscription + property count once we have landlord email
     useEffect(() => {
@@ -206,7 +261,6 @@ function landlordDashboard() {
     };
 
 
-
     if (profilePercent === 100 && utilityCompletion) {
         return (
           <>
@@ -220,13 +274,14 @@ function landlordDashboard() {
         return <LandlordDashboardFooter />;
     }
     
-    
     return (
         <>
             <div className="flex bg-gray-100">
-               {profilePercent && utilityCompletion && bankCompletion === 100 && (<LandlordDashboardComplete />) }
-                {profilePercent && utilityCompletion && !bankCompletion !== null &&  (
-      
+               {profilePercent ===100 && 
+               utilityCompletion && 
+               bankCompletion ? (
+               <LandlordDashboardComplete />
+            ) : (       
                 <div className="flex min-h-screen bg-gray-100">
                     <LandlordDashboardSidebar />
                     <div className="flex-1">
@@ -234,7 +289,12 @@ function landlordDashboard() {
                         {/* Top Nav Section*/}
                         <div className="landlordDashboardWelcomeMessage mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
                             <h1 className="font-bold md:text-5xl text-2xl pl-7">
-                                Welcome, {landlord?.firstName + " " + landlord?.lastName || "Landlord"}!
+                                Welcome, 
+                                {
+                                    landlord
+                                    ?`${landlord.firstName} ${landlord?.lastName }` 
+                                    : "Landlord"
+                                }!
                             </h1>
                             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
                                 We are thrilled that you have chosen to list
@@ -260,7 +320,7 @@ function landlordDashboard() {
                 </div>
             )}
             </div>
-              <LandlordDashboardFooter />
+            <LandlordDashboardFooter />
         </>
     );
 }

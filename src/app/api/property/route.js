@@ -29,16 +29,17 @@ export async function POST(req) {
       propertyType,
       bed,
       bath,
+      savedHomes,
+      unitsAvailable,
+      rating,
       status,
       listedBy,
       buildingAmenities,
       propertyAmenities,
       neighbourhoodPostcode,
       nearbyPlaces,
-      savedHomes,
-      unitsAvailable,
-      rating,
-      isVerified,
+      agent,
+      isVerified,    
     } = body;
     
     if (!previewPic || !Img1 || !Img2 || !Img3) {
@@ -94,6 +95,7 @@ export async function POST(req) {
       propertyAmenities,
       neighbourhoodPostcode,
       nearbyPlaces,
+      agent,
       savedHomes: savedHomes ?? [],
      
       isVerified,

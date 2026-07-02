@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import Tenant from "@/app/api/models/tenantModel";
 import Landlord from "@/app/api/models/landlordModel";
 import { getUserFromCookies } from "@/app/lib/auth/getUserFromCookies";
+import Property from "@/app/api/models/propertyModel"
 
 export async function POST(req) {
   try {
@@ -20,6 +21,7 @@ export async function POST(req) {
 
     const formData = await req.formData();
     const file = formData.get("utilityBill");
+    const propertyId = formData.get("propertyId");
 
     if (!file) {
       return NextResponse.json(
@@ -41,21 +43,27 @@ export async function POST(req) {
     });
 
     // Save URL
-    if (user.role === "tenant") {
-      await Tenant.findByIdAndUpdate(user.id, {
-        utilityBillUrl: result.secure_url,
-      });
-    } else if (user.role === "landlord") {
-      await Landlord.findByIdAndUpdate(user.landlord, {
-        utilityBillUrl: result.secure_url,
-      });
-    } else {
-      return NextResponse.json(
-        { error: "Invalid user role" },
-        { status: 400 }
-      );
-    }
+    // Save the utility bill on the property and verify it
+const updatedProperty = await Property.findByIdAndUpdate(
+  propertyId,
+  {
+    utilityBillUrl: result.secure_url,
+    verified: true,
+  },
+  { new: true }
+);
 
+if (!updatedProperty) {
+  return NextResponse.json(
+    { error: "Property not found" },
+    { status: 404 }
+  );
+}
+
+return NextResponse.json({
+  message: "File uploaded successfully",
+  property: updatedProperty,
+});
     return NextResponse.json({
       message: "File uploaded successfully",
       url: result.secure_url,

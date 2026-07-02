@@ -30,6 +30,7 @@ export const createProperty = async (data) => {
     propertyAmenities,
     neighbourhoodPostcode,
     nearbyPlaces,
+    agent,
     isVerified,
   } = data;
 
@@ -65,7 +66,7 @@ export const createProperty = async (data) => {
 
   try {
     const newProperty = await Property.create({
-      landlord: landlord._id, // was landlord._Id — JS is case-sensitive, correct key is _id
+      landlord: landlord._id,
       previewPic,
       Img1,
       Img2,
@@ -92,6 +93,7 @@ export const createProperty = async (data) => {
       nearbyPlaces,
       savedHomes,
       rating: rating || 0,
+      agent,
       isVerified: isVerified ?? true,
     });
 
@@ -106,9 +108,7 @@ export const createProperty = async (data) => {
   }
 };
 
-
-
-    //verify address
+//verify address
 //     try {
 //         const { OkHi } = await import("okhi");
 //         const okhi = new OkHi({key: process.env.OKHI_API_KEY});

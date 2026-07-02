@@ -11,6 +11,7 @@ import {
   deleteLandlord,
 } from "../controllers/landlord.controller.js";
 import Landlord from "@/app/api/models/landlordModel.js"
+import jwt from "jsonwebtoken"
 
 // CREATE LANDLORD
 export async function POST(req) {
@@ -19,16 +20,60 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    const { userId, referralCode } = body;
+    const {userId, firstName, lastName, email, password, survey, terms, referralCode} = body;
 
+    if (!userId || !firstName || !lastName || !email || !password || !terms) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    //Check if landlord Email Exists in DB
+    const existingLandlord = await Landlord.findOne({ email: trimmedEmail });
+        
+    if (existingLandlord) {
+      return NextResponse.json(
+        { message: "Email already exists in Database, Please sign in" }, 
+        { status: 400 }
+      );
+    }
+    
     // Apply referral (optional; only if valid and not self-referred)
     await validateAndAssignReferral(userId, referralCode);
 
-    const result = await signupLandlord(body);
-    
-    return NextResponse.json(result, 
-      { status: result.status || 201 }
+    //create New Landlord
+     const newLandlord = await Landlord.create({
+       user: userId, 
+       firstName, 
+       lastName, 
+       email: trimmedEmail, 
+       password, 
+       survey,
+       terms,
+       isVerified: false,
+       role: "landlord",
+       isSelected: false
+     });
+ 
+    return NextResponse.json(
+      { 
+        success: true,
+        landlord: {
+        _id: newLandlord._id,
+        firstName: newLandlord.firstName,
+        lastName: newLandlord.lastName,
+        email: newLandlord.email,
+        isVerified: newLandlord.isVerified,
+        isSelected: newLandlord.isSelected
+        }, 
+      message: "Landlord created successfully!"
+      }, 
+      {status: 201}
     );
+     
   } catch (error) {
     console.error("Landlord creation error:", error);
     return NextResponse.json(
@@ -52,6 +97,8 @@ export async function GET(request) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const landlord = await Landlord.findById(decoded.id).select("-password");
+
+    console.log(decoded);
 
     if (!landlord) {
       return NextResponse.json({ message: "Landlord not found" }, { status: 404 });

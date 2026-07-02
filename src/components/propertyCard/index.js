@@ -1,5 +1,4 @@
 import React from "react";
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import StarRating from "../starRating/starRating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,63 +22,57 @@ export default function PropertyCard({
     bath,
     numberOfBath,
     propertyType,
-}) 
+}) {
 
-{
-    const [property, setProperty] = useState(null);
-
-    //Property
-    useEffect(() => {
     const handleSaveProperty = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         e.stopPropagation();
 
-        try{
+        try {
             const res = await fetch("/api/property", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                propertyId: _id
-            }),
-        });
-        const data = await res.json();
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    propertyId: _id,
+                }),
+            });
 
-        if(!res.ok) {
-            throw new Error(data.error);
-        }
-        alert("Property saved successfully!")
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error);
+            }
+
+            alert("Property saved successfully!");
         } catch (error) {
             console.error(error);
         }
     };
 
     return (
-        
         <Link href={`/propertyCardExpanded?id=${_id}`}>
-            <div
-                className="w-full rounded-xl overflow-hidden shadow-md 
-                bg-white hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
+            <div className="w-full rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
+
                 {/* IMAGE */}
                 <div className="relative w-full h-64">
                     <Image
-                        src={property?.previewPic || null}
+                        src={previewPic}
                         alt={`property: ${title || desc || "property"}`}
                         fill
                         className="object-cover rounded-t-xl"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        priority={true}
+                        priority
                         draggable={false}
                     />
 
                     {savedHomes && (
-                        <div 
-                            className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
+                        <div className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
                             <FontAwesomeIcon
-                                onClick={handleSaveProperty}
                                 icon={faCircleCheck}
+                                onClick={handleSaveProperty}
                                 className="text-white text-2xl md:text-4xl cursor-pointer"
                             />
                         </div>
@@ -99,9 +92,7 @@ export default function PropertyCard({
                     <h3 className="text-lg font-semibold mt-2 mb-2">
                         ₦
                         {price
-                            ? Number(
-                                  String(price).replace(/[^0-9.]/g, ""),
-                              ).toLocaleString()
+                            ? Number(String(price).replace(/[^0-9.]/g, "")).toLocaleString()
                             : "N/A"}{" "}
                         / yr
                     </h3>
@@ -124,10 +115,7 @@ export default function PropertyCard({
                                 <StarRating rating={rating} />
                             </div>
                             <p className="text-sm text-gray-500 mb-2">
-                                {rating}{" "}
-                                <span className="text-blue-700">
-                                    ({category})
-                                </span>
+                                {rating} <span className="text-blue-700">({category})</span>
                             </p>
                         </>
                     )}
@@ -136,9 +124,11 @@ export default function PropertyCard({
                         <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
                             {bed || numberOfBed || "N/A"}
                         </span>
+
                         <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
                             {propertyType || "N/A"}
                         </span>
+
                         <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
                             {bath || numberOfBath || "N/A"}
                         </span>
@@ -146,5 +136,5 @@ export default function PropertyCard({
                 </div>
             </div>
         </Link>
-    )}
-)}
+    );
+}

@@ -1,6 +1,5 @@
 const PROFILE_REQUIRED_FIELDS = {
   tenant: ["firstName", "lastName", "email", "phone"],
-  landlord: ["firstName", "lastName", "email", "phone"],
 };
 
 const PROFILE_SECTIONS = {

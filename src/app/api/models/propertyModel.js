@@ -28,7 +28,7 @@ const propertySchema = new mongoose.Schema(
       "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara",
       "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
     ],
-    lowercase: true,
+    lowercase: false,
     required: true 
     },
 
@@ -80,27 +80,31 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
+    rating: { type: Number, min: 0, max: 5, default: 0 },
+
+    status: {
+      type: String,
+      enum: ["Vacant","Rented", "Sold"],
+      default: "Vacant",
+      required: true
+    },
+    
+    listedBy: { type: String, required: true },
+
     buildingAmenities: { type: [String], default: [] },
     propertyAmenities: { type: [String], default: [] },
     neighbourhoodPostcode: { type: String, default: "00000" },
     nearbyPlaces: { type: [String], default: [] },
-   
-    status: {
-      type: String,
-      enum: ["vacant","rented", "sold"],
-      default: "vacant"
-    },
-
-    rating: { type: Number, min: 0, max: 5, default: 0 },
-    listedBy: { type: String, required: true },
     agent: { type: String, requied: false },
+
+    isVerified: { type: Boolean, default: false },
 
 
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
     admin: [{ type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin" }],
     savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
-    isVerified: { type: Boolean, default: true },
+    utilityBill: {type: mongoose.Schema.Types.ObjectId,ref: "UtilityBill",default: null,},
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
     addressVerification: [{type: mongoose.Schema.Types.ObjectId, ref: "AddressVerification"}],
     payment: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]

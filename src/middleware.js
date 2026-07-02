@@ -64,7 +64,8 @@ export async function middleware(req) {
     "/shortlets",
     "/propertyCardExpanded",
     "/terms",
-    "/xStories"
+    "/xStories",
+    // "/auth/logout",
   ];
 
   const PUBLIC_API_ROUTES = [
@@ -106,6 +107,9 @@ export async function middleware(req) {
     "/api/terms",
     "/api/privacy",
     "/api/xStories",
+
+    "/api/auth/logout",
+    "/api/auth/reset-password",
   ];
 
   const PROTECTED_ROUTES = [
@@ -143,9 +147,7 @@ export async function middleware(req) {
     "/savedHomes",
     "/admin/users",
    
-    "/auth",
     "/auth/me",
-    "/auth/logout",
     "/settings",
     "/tenantDisputeForm",
     "/verification",
@@ -176,9 +178,7 @@ export async function middleware(req) {
     "/api/savedHomes",
     "/api/admin/users",
     "/api/propertyCardExpanded",
-    "/api/auth",
     "/api/auth/me",
-    "/api/auth/logout",
     "/api/settings",
     "/api/tenantDisputeForm",
     "/api/verification",
@@ -194,6 +194,13 @@ export async function middleware(req) {
   ];
 
   // ======================
+  // ✅ Allow public APIs
+  // ======================
+  if (PUBLIC_API_ROUTES.some(route => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  // ======================
   // 🔒 Protect API routes first
   // ======================
   if (PROTECTED_API_ROUTES.some(route => pathname.startsWith(route))) {
@@ -202,13 +209,6 @@ export async function middleware(req) {
     }
   }
 
-
-  // ======================
-  // ✅ Allow public APIs
-  // ======================
-  if (PUBLIC_API_ROUTES.some(route => pathname.startsWith(route))) {
-    return NextResponse.next();
-  }
 
   // ======================
   // ✅ Allow public pages

@@ -59,35 +59,16 @@ export async function GET(request) {
 const buildKycUpdate = (payload, role, actor) => {
   const documentImage =
     payload.documentImage || payload.previewPic || payload.avatar;
-  const companyAddress = Array.isArray(payload.companyAddress)
-    ? payload.companyAddress
-    : payload.companyAddress
-      ? payload.companyAddress
-          .split(",")
-          .map((item) => item.trim())
-          .filter(Boolean)
-      : undefined;
-  const numberOfChildren =
-    payload.numberOfChildren !== undefined && payload.numberOfChildren !== ""
-      ? Number(payload.numberOfChildren)
-      : undefined;
+ 
 
   const base = {
-    previewPic: documentImage,
+    previewPic: payload.previewPic || payload.avatar,
+    documentImage: payload.documentImage,
     phone: payload.phone,
     documentType: payload.documentType,
     idNumber: payload.idNumber,
     gender: payload.gender,
     age: payload.age,
-    occupation: payload.occupation,
-    maritalStatus: payload.maritalStatus,
-    spouseName: payload.spouseName,
-    noOfChildren: numberOfChildren,
-    religion: payload.religion,
-    companyName: payload.companyName,
-    companyAddress,
-    companyPhone: payload.companyPhone,
-    companyEmail: payload.companyEmail,
     city: payload.city,
     state: payload.state,
     country: payload.country,
@@ -100,12 +81,7 @@ const buildKycUpdate = (payload, role, actor) => {
     base.user = actor.user;
     base.landlord = actor._id;
     base.landlordDashboard = actor.landlordDashboard;
-  } else {
-    base.currentAddress = payload.currentAddress;
-    base.user = actor.user;
-    base.tenant = actor._id;
-    base.tenantDashboard = actor.tenantDashboard;
-  }
+  } 
 
   Object.keys(base).forEach((key) => {
     if (base[key] === undefined) {

@@ -17,29 +17,33 @@ function TenantDashboard() {
   const [tenant, setTenant] = useState(null);
 
 
-  // ✅ get logged in landlord
-  // useEffect(() => {
-  //   const getMe = async () => {
-  //     try {
-  //       const res = await fetch("/api/auth/me", {
-  //         method: "GET",
-  //         cache: "no-store",
-  //       });
-      
-  //       const data = await res.json();
-      
-  //       if (!res.ok) return;
-      
-  //       // adjust depending on your response shape
-  //       const email = data?.user?.email || data?.email;
-  //         setTenantEmail(email || null);
-  //       } catch (err) {
-  //       console.error("Auth me error:", err);
-  //     }
-  //   };
-  // })
+  const [tenantEmail, setTenantEmail] = useState(null);
 
-    // Tenant
+  // ✅ get logged in Tenant
+  useEffect(() => {
+    const getMe = async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          cache: "no-store",
+        });
+    
+        const data = await res.json();
+    
+        if (!res.ok) return;
+    
+        // adjust depending on your response shape
+        const email = data?.user?.email || data?.email;
+          setTenantEmail(email || null);
+      } catch (err) {
+        console.error("Auth me error:", err);
+      }
+    };
+    getMe();
+
+  }, []);
+      
+  // Tenant
   useEffect(() => {
     const fetchTenant = async () => {
       try {
@@ -93,7 +97,7 @@ function TenantDashboard() {
   useEffect(() => {
     const fetchCompletion = async () => {
       try {
-        const res = await fetch("/api/profile/completion", {
+        const res = await fetch("/api/tenantProfile/completion", {
           credentials: "include",
         });
 

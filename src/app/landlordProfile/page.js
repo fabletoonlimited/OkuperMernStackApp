@@ -20,16 +20,6 @@ const emptyProfile = {
     status: "",
     gender: "",
     age: "",
-    occupation: "",
-    specifyOccupation: "",
-    maritalStatus: "",
-    spouseName: "",
-    noOfChildren: "",
-    religion: "",
-    companyName: "",
-    companyAddress: "",
-    companyPhone: "",
-    companyEmail: "",
     currentAddress: "",
     city: "",
     state: "",
@@ -42,7 +32,6 @@ const steps = [
     { key: "basic", title: "Basic Info" },
     { key: "identity", title: "Identity" },
     { key: "personal", title: "Personal" },
-    { key: "work", title: "Work" },
     { key: "address", title: "Address" },
 ];
 
@@ -57,33 +46,7 @@ const options = {
         { value: "Male", label: "Male" },
         { value: "Female", label: "Female" },
     ],
-    maritalStatus: [
-        { value: "", label: "Select marital status" },
-        { value: "Single", label: "Single" },
-        { value: "Married", label: "Married" },
-        { value: "Divorced", label: "Divorced" },
-        { value: "Widowed", label: "Widowed" },
-    ],
-    religion: [
-        { value: "", label: "Select religion" },
-        { value: "Christianity", label: "Christianity" },
-        { value: "Islam", label: "Islam" },
-        { value: "Traditionalist", label: "Traditionalist" },
-        { value: "Other", label: "Other" },
-    ],
-    occupation: [
-        { value: "", label: "Select occupation" },
-        { value: "selfEmployed", label: "Self employed" },
-        { value: "employed", label: "Employed" },
-        { value: "govtWorker", label: "Govt worker" },
-        { value: "student", label: "Student" },
-        { value: "expatriate", label: "Expatriate" },
-        { value: "politician", label: "Politician" },
-        { value: "clergyman", label: "Clergyman" },
-        { value: "imam", label: "Imam" },
-        { value: "business", label: "Business" },
-        { value: "other", label: "Other" },
-    ],
+
     stateOfOrigin: [
         { value: "", label: "Select state of origin" },
         { value: "Abia", label: "Abia" },
@@ -126,8 +89,7 @@ const options = {
     ],
 };
 
-const inputClass =
-    "w-full rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-800 shadow-sm focus:border-blue-800 focus:outline-none";
+const inputClass = "w-full rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-800 shadow-sm focus:border-blue-800 focus:outline-none";
 const labelClass = "text-sm font-semibold text-blue-950";
 
 const ProfilePage = () => {
@@ -151,31 +113,25 @@ const ProfilePage = () => {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
-                const res = await fetch("/api/profile", {
+                const res = await fetch("/api/landlordProfile", {
                     credentials: "include",
                 });
 
                 if (!res.ok) {
-                    toast.error("Failed to load profile");
+                    toast.error("Failed to load landlord profile");
                     return;
                 }
 
                 const data = await res.json();
-                const profile = data.profile || {};
+                const profile = data.landlordProfile || {};
+
                 setRole(data.role || null);
 
                 setFormData({
-                    ...emptyProfile,
-                    ...profile,
-                    companyAddress: Array.isArray(profile.companyAddress)
-                        ? profile.companyAddress.join(", ")
-                        : profile.companyAddress || "",
-                    noOfChildren:
-                        profile.noOfChildren !== undefined &&
-                        profile.noOfChildren !== null
-                            ? String(profile.noOfChildren)
-                            : "",
+                ...emptyProfile,
+                ...profile,
                 });
+
             } catch (err) {
                 console.error("Profile fetch error:", err);
                 toast.error("Failed to load profile");
@@ -192,13 +148,11 @@ const ProfilePage = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    useEffect(() => {
-    if (formData.maritalStatus !== "Married") {
-        setFormData(prev => ({ ...prev, spouseName: "" }));
-    }
-}, [formData.maritalStatus]);
 
     const handleUpload = async (e, field) => {
+        //  console.log("UPLOAD START");
+        // e.preventDefault();
+        // e.stopPropagation();
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -208,7 +162,7 @@ const ProfilePage = () => {
             const payload = new FormData();
             payload.append("file", file);
 
-            const res = await fetch("/api/profile/upload", {
+            const res = await fetch("/api/landlordProfile/upload", {
                 method: "POST",
                 credentials: "include",
                 body: payload,
@@ -226,8 +180,33 @@ const ProfilePage = () => {
                 [field]: data.url,
             }));
 
-            toast.success(`${field} uploaded`);
-            console.log("Upload Response:", data);
+            // toast.success("Profile successfully updated")
+            
+            // toast.success(`${field} uploaded`);
+            //   switch (formData.category) {
+                    // case "Rent":
+                    //   router.push("/rent");
+                    //   break;
+                      
+                    // case "Buy":
+                    //   router.push("/buy");
+                    //   break;
+            
+                    // case "Sell":
+                    //   router.push("/sell");
+                    //   break;
+            
+                    // case "Shortlet":
+                    //   router.push("/shortlet");
+                    //   break;
+                    
+                    // default:
+                    //   router.push("/allProperties");
+                //   }
+            // console.log("Upload Response:", data);
+
+            
+  console.log("UPLOAD FINISH");
         } catch (err) {
             console.error("Upload error:", err);
             toast.error("Upload failed");
@@ -240,7 +219,7 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Submit Caled");
+        console.log("Submit Called");
         
         if (!formData.firstName || !formData.lastName) {
                 toast.error("Please complete required fields");
@@ -251,6 +230,11 @@ const ProfilePage = () => {
 
         if (!formData.previewPic) {
             toast.error("please upload a diplay picture");
+            return;
+        }
+
+        if (!formData.gender) {
+            toast.error("please add your gender");
             return;
         }
 
@@ -265,7 +249,7 @@ const ProfilePage = () => {
 
         try {
             setSaving(true);
-            const res = await fetch("/api/profile", {
+            const res = await fetch("/api/landlordProfile", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -282,8 +266,8 @@ const ProfilePage = () => {
 
             router.push( 
                 role === "landlord"
-                ? "/landlordDashboardCompleted"
-                : "/tenantDashboardCompleted",
+                ? "/landlordDashboard"
+                : "/tenantDashboard",
             );
 
         } catch (err) {
@@ -459,143 +443,12 @@ const ProfilePage = () => {
                             onChange={handleChange}
                         />
                     </div>
-                    <div>
-                        <label className={labelClass}>Occupation</label>
-                        <select
-                            className={inputClass}
-                            name="occupation"
-                            value={formData.occupation}
-                            onChange={handleChange}>
-                            {options.occupation.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className={labelClass}>Religion</label>
-                        <select
-                            className={inputClass}
-                            name="religion"
-                            value={formData.religion}
-                            onChange={handleChange}>
-                            {options.religion.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className={labelClass}>Marital status</label>
-                        <select
-                            className={inputClass}
-                            name="maritalStatus"
-                            value={formData.maritalStatus}
-                            onChange={handleChange}>
-                            {options.maritalStatus.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                     {formData.maritalStatus === "Married" ? (
-                        <>
-                            <div>
-                                <label className={labelClass}>
-                                    Spouse name
-                                </label>
-                                <input
-                                    className={inputClass}
-                                    name="spouseName"
-                                    placeholder="Spouse name"
-                                    value={formData.spouseName}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div>
-                                <label className={labelClass}>
-                                    Number of children
-                                </label>
-                                <input
-                                    className={inputClass}
-                                    name="noOfChildren"
-                                    placeholder="Number of children"
-                                    value={formData.noOfChildren}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <div>
-                            <label className={labelClass}>
-                                Number of children
-                            </label>
-                            <input
-                                className={inputClass}
-                                name="noOfChildren"
-                                placeholder="Number of children"
-                                value={formData.noOfChildren}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    )}
                 </div>
             );
         }
-                
+
 
         if (stepIndex === 3) {
-            return (
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                        <label className={labelClass}>Company name</label>
-                        <input
-                            className={inputClass}
-                            name="companyName"
-                            placeholder="Company name"
-                            value={formData.companyName}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div>
-                        <label className={labelClass}>Company phone</label>
-                        <input
-                            className={inputClass}
-                            name="companyPhone"
-                            placeholder="Company phone"
-                            value={formData.companyPhone}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div>
-                        <label className={labelClass}>Company email</label>
-                        <input
-                            className={inputClass}
-                            name="companyEmail"
-                            placeholder="Company email"
-                            value={formData.companyEmail}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div className="md:col-span-2">
-                        <label className={labelClass}>Company address</label>
-                        <input
-                            className={inputClass}
-                            name="companyAddress"
-                            placeholder="Company address"
-                            value={formData.companyAddress}
-                            onChange={handleChange}
-                        />
-                    </div>
-                </div>
-            );
-        }
-
-
-        if (stepIndex === 4) {
             return (
                 <div className="grid gap-4 md:grid-cols-2">
                     <div>

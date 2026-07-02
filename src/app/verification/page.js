@@ -1,7 +1,7 @@
 import React from 'react'
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
-import ProfilePage from '../profile/page';
+import ProfilePage from '../tenantProfile/page';
 const verication = () => {
   return (
       <div>
