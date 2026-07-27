@@ -1,11 +1,9 @@
 "use client"
-
 import React, { useState, useEffect } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar/index.js";
 import LandlordDashboardCard from "../../components/landlordDashboardCard/index.js";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter/index.js";
 import LandlordDashboardComplete from "../landlordDashboardComplete/page.js";
-import SubscriptionModal2 from "../../components/subscriptionModal2";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -33,7 +31,7 @@ function landlordDashboard() {
     useEffect(() => {
         const getMe = async () => {
             try {
-                const res = await fetch("/api/auth/me", {
+                const res = await fetch("/api/user/me", {
                     method: "GET",
                     cache: "no-store",
                 });
@@ -77,7 +75,6 @@ function landlordDashboard() {
         fetchLandlord();
     }, []);
         
-
     // Utility
     useEffect(() => {
         const fetchCompleteUtility = async () => {
@@ -248,7 +245,7 @@ function landlordDashboard() {
     
         try {
             // if not subscribed and already uploaded 1 property -> block
-            if (!isSubscribed && propertyCount >= 1) {
+            if (!isSubscribed && propertyCount >= 2) {
                 setIsOpen(true);
                 return;
             }

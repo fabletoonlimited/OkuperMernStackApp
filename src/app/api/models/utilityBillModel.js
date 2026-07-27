@@ -29,5 +29,4 @@ const utilityBillSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.UtilityBill ||
-  mongoose.model("UtilityBill", utilityBillSchema);
+export default mongoose.models.UtilityBill || mongoose.model("UtilityBill", utilityBillSchema);

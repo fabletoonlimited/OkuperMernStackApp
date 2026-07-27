@@ -3,15 +3,15 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import SubscriptionModal2 from "../../components/subscriptionModal2";
+import SubscriptionModal1 from "../../components/subscriptionModal1";
+
 import { useRouter } from "next/navigation";
-import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
-// import { FaExclamationCircle, FaStar } from "react-icnons/fa";
-import PropertyCard from "@/components/propertyCard";
 
 const index = () => {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
   const [checking, setChecking] = useState(false);
 
   const [profilePercent, setProfilePercent] = useState(100);
@@ -20,6 +20,7 @@ const index = () => {
   const [utilityCompletion, setUtilityCompletion] = useState(false);
 
   const [loadingListing, setLoadingListing] = useState(true);
+  const [uploadedListing, setUploadedListing] = useState(true);
 
   const [subscribed, setIsSubscribed] = useState(false);
 
@@ -37,7 +38,7 @@ const index = () => {
   useEffect(() => {
     const getMe = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch("/api/user/me", {
           method: "GET",
           cache: "no-store",
         });
@@ -197,59 +198,45 @@ const index = () => {
   useEffect(() => {
     if (!landlordEmail) return;
 
-    const fetchSubscriptionAndProperties = async () => {
-      try {
-        // 1) subscription
-        const subRes = await fetch("/api/landlordSubscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "check",
-            email: landlordEmail,
-            cardNo: "0000",
-            cvv2: "000",
-            expDate: "00/00",
-          }),
-        });
+    // If landlord already has a property, treat as subscribed
+    if (propertyCount >= 1) {
+      setIsSubscribed(true);
+      return;
+    }
 
-        const subData = await subRes.json();
+  const fetchSubscriptionAndProperties = async () => {
+    try {
+      const subRes = await fetch("/api/landlordSubscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "check",
+          email: landlordEmail,
+          cardNo: "0000000000000000",
+          cvv2: "000",
+          expDate: "00/00",
+        }),
+      });
 
-          if (!subRes.ok) {
-          setIsSubscribed(false);
-          return;
-        }
-        if (subRes.ok) {
-          setIsSubscribed(subData?.subscribed === true);
-        }
+      const subData = await subRes.json();
 
-        // 2) properties
-        // const propRes = await fetch("/api/property", {
-        //   method: "GET",
-        //   cache: "no-store",
-        // });
-
-        // const propData = await propRes.json();
-
-        // if (propRes.ok) {
-        //   const all = propData?.properties || [];
-
-        //   // only count properties uploaded by this landlord
-        //   const mine = all.filter(
-        //     (p) =>
-        //       p?.landlord?.email === landlordEmail ||
-        //       p?.landlordEmail === landlordEmail,
-        //   );
-
-        //   setPropertyCount(mine.length);
-        // }
-      } catch (err) {
-        console.error("Fetch subscription/properties error:", err);
+      if (!subRes.ok) {
+        setIsSubscribed(false);
+        setIsOpen(true);
+        return;
       }
-    };
 
-    fetchSubscriptionAndProperties();
-  }, [landlordEmail]);
+      setIsSubscribed(subData?.subscribed === true);
+    } catch (err) {
+      console.error("Fetch subscription error:", err);
+      setIsSubscribed(false);
+    }
+  };
 
+  fetchSubscriptionAndProperties();
+}, [landlordEmail, propertyCount]);
   
   // ✅ this is what controls upload access
   const handleUploadClick = async (e) => {
@@ -266,7 +253,7 @@ const index = () => {
       }
 
       // allowed
-      router.push("/propertyListingLanding");
+      // router.push("/subscriptionModal1");
     } finally {
       setChecking(false);
     }
@@ -274,35 +261,45 @@ const index = () => {
 
   return (
     <>
+      {/* Dashboard Card */}
       <div className="md:mt-10 p-4 md:px-12">
+        
         <div className="landlordDashboardCard grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="space-y-2 rounded-lg bg-white p-6 shadow-md">
+          
+          {profilePercent === 87 && (
+
+          <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
             <h4 className="text-blue-950 font-bold mb-3">Your Profile</h4>
               <p>
                 {profilePercent === null
                   ? "Your profile information is loading"
-                  : `Your profile information is ${profilePercent}% complete`
+                  : `Your information is ${profilePercent}% complete. Please complete your profile to enjoy full benefits.`
                 }
               </p>
 
               <Link href="/landlordVerification">
                 <div className="flex justify-center">
-                  <button className="bg-blue-900 cursor-pointer rounded-xl px-6 py-2 w-full text-white text-sm mt-6 hover:bg-blue-800 transition">
-                    {profilePercent === 100 ? "Uploaded" : "Update Your profile"}
+                  <button 
+                  className="bg-blue-900 cursor-pointer hover:rounded-full px-6 py-2 w-full text-white text-sm mt-6 hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={profilePercent === 87}
+                  >
+                    {profilePercent === 87 ? "Uploaded" : "Update Your profile"}
+                    
                   </button>
                 </div>
               </Link>
           </div>
+          )}
 
             {/* Listings */}
-            {profilePercent !== 100 && (
-              <div className="space-y-2 rounded-lg bg-white p-6 shadow-md">
+            {profilePercent === 87 && (
+              <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
                 <h4 className="text-blue-950 font-bold mb-3">Listings</h4>
 
                 <p>
-                  { loadingListing
-                    ? "Add your property listings to showcase it to tenants"
-                    : "You have used up your free one property upload. Subcribe to upload more"
+                  { propertyCount >= 1
+                    ? "You have used up your free one property upload. Subscribe to upload more properties."
+                    : "Add your one free property listing to begin showcasing it to prospective tenants."
                   }
                 </p>
 
@@ -310,8 +307,8 @@ const index = () => {
                   
                   <button
                     onClick={handleUploadClick}
-                    className="bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-6 py-2 w-full text-white text-sm mt-6 cursor-pointer hover:bg-blue-800 transition"
-                    disabled={loadingListing || propertyCount >=1}
+                    className="bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed hover:rounded-full px-6 py-2 w-full text-white text-sm mt-6 cursor-pointer hover:bg-blue-800 transition"
+                    disabled={loadingListing === true || propertyCount >= 1}
                   >
                     {loadingListing
                       ? "Loading..."
@@ -322,45 +319,27 @@ const index = () => {
                   </button>
                 </div>
 
-                <SubscriptionModal2
+                <SubscriptionModal1
                   isOpen={isOpen}
                   onClose={() => setIsOpen(false)}
+                  onContinue={() => {
+                    setIsOpen(false);
+                    setIsOpen2(true);
+                  }}
                 />
+
+                <SubscriptionModal2
+                  isOpen={isOpen2}
+                  onClose={() => setIsOpen2(false)}
+                />
+                
               </div>
+
             )}
 
-            {/* Address Verification
-            {profilePercent !== 100 && (
-              <div className="space-y-2 rounded-lg bg-white p-6 shadow-md">
-                <h4 className="text-blue-950 font-bold mb-3">
-                  Address Verification
-                </h4>
-
-                <p>
-                  Verify your listing by providing the required documentation
-                </p>
-
-                <Link href="/utilityBillUploadPage">
-                    <div className="flex justify-center">
-                        <button
-                            className="md:p-8 md:m-0 mt-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={loadingUtility || uploadedUtility}
-                            >
-                            {loadingUtility
-                                ? "Checking..."
-                                : uploadedUtility
-                                ? "Uploaded"
-                                : "Upload"
-                            }
-                        </button>
-                    </div>
-                </Link>
-              </div>
-            )} */}
-
             {/* Account Details */}
-            {profilePercent !== 100 && (
-              <div className="space-y-2 rounded-lg bg-white p-6 shadow-md">
+            {profilePercent === 87 && (
+              <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
                 <h4 className="text-blue-950 font-bold mb-3">
                   Account Details
                 </h4>
@@ -371,7 +350,7 @@ const index = () => {
 
                 <Link href="/">
                   <div className="flex justify-center">
-                    <button className="bg-blue-900 cursor-pointer rounded-xl px-6 py-2 w-full text-white text-sm mt-6 hover:bg-blue-800 transition">
+                    <button className="bg-blue-900 cursor-pointer hover:rounded-full px-6 py-2 w-full text-white text-sm mt-6 hover:bg-blue-800 transition">
                       Add Account
                     </button>
                   </div>
@@ -380,8 +359,8 @@ const index = () => {
             )}
 
             {/* Subscription */}
-            {profilePercent !== 100 && (
-              <div className="space-y-2 rounded-lg bg-white p-6 shadow-md">
+            {profilePercent === 87 && (
+              <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
                 <h4 className="text-blue-950 font-bold mb-3">Subscribe</h4>
 
                 <p>
@@ -392,7 +371,7 @@ const index = () => {
                 <Link href="#">
                   <div className="flex justify-center ">
                     <button 
-                        className="bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-6 py-2 w-full text-white text-sm mt-6"
+                        className="bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 w-full text-white text-sm mt-6"
                     >
                       Coming soon
                     </button>

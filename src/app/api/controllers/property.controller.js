@@ -1,7 +1,9 @@
 import Property from "../models/propertyModel.js";
 import Landlord from "../models/landlordModel.js"
 
+
 export const createProperty = async (data) => {
+  console.log("DATA RECEIVED:", data);
   let {
     // user,
     landlordId,
@@ -66,7 +68,7 @@ export const createProperty = async (data) => {
 
   try {
     const newProperty = await Property.create({
-      landlord: landlord._id,
+      landlord: landlordId,
       previewPic,
       Img1,
       Img2,

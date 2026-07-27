@@ -122,11 +122,23 @@ function Nav() {
                                     onClick={() => setShowDropdown((prev) => !prev)}
                                     className="flex items-center gap-2 cursor-pointer"
                                 >
-                                    <FontAwesomeIcon icon={faUserCircle} size="lg" />
+                                    <FontAwesomeIcon
+                                        className="text-blue-950 hover:text-gray-700 transition-colors duration-200 ease-in-out"
+                                        icon={faUserCircle} size="lg"
+                                        // onClick={() => {
+                                        //     if (userRole === "tenant") {
+                                        //         router.push("/tenantDashboard");
+                                        //     } else {
+                                        //         router.push("/landlordDashboard");
+                                        //     }
+                                        //     setShowDropdown(false);
+                                        //     }
+                                        // }
+                                    />
                                 </div>
 
                                 {showDropdown && (
-                                    <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
+                                    <div className="absolute md:right-0 left mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
                                         <button
                                             onClick={() => {
                                             if (userRole === "tenant") {

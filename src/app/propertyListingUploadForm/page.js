@@ -16,7 +16,7 @@ const router = useRouter();
 useEffect(() => {
     const checkAuth = async () => {
         try {
-            const res = await fetch("/api/auth/me", 
+            const res = await fetch("/api/user/me", 
                 { credentials: "include" });
             setIsAuthenticated(res.ok);
         } catch {
@@ -54,11 +54,18 @@ useEffect(() => {
   // Fetch the logged-in landlord's ID from the JWT cookie on mount
   useEffect(() => {
     const fetchLandlordId = async () => {
+                console.log("Sending landlordId:", landlordId);
+        
+        console.log({
+          ...formData,
+          landlordId,
+        });
       try {
-        const res = await fetch("/api/user/me", 
+        const res = await fetch("/api/auth/me", 
           { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
+          console.log("ME RESPONSE:", data);
           setLandlordId(data.actorId || null);
         }
       } catch (err) {
@@ -69,7 +76,7 @@ useEffect(() => {
   }, []);
 
   const [formData, setFormData] = useState({
-    landlord: landlordId || "",
+    landlord: landlordId,
     previewPic: "",
     Img1: "",
     Img2: "",

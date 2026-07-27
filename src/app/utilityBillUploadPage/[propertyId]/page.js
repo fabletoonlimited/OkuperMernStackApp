@@ -96,7 +96,7 @@ const page = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/auth/me", 
+        const res = await fetch("/api/user/me", 
           { credentials: "include" });
             setIsAuthenticated(res.ok);
       } catch {

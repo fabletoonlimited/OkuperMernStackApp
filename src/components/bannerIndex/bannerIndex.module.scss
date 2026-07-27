@@ -32,6 +32,22 @@
   min-width: 50%;
 }
 
+@keyframes fadeInLandlord {
+  from {
+    opacity: 20%;
+  }
+  to {
+    opacity: 100%;
+  }
+}
+
+.animate-fadeInLandlord {
+  opacity: 1;
+  animation: animate-fadeInLandlord 2.0s ease-out forwards;
+  animation-delay: 2.0s;
+}
+
+
 @keyframes slideX {
   from {
     transform: translateX(50%);
@@ -55,7 +71,6 @@
 .animate-fadeIn {
   animation: fadeIn 0.8s ease-out forwards;
 }
-
 
 
 /* MOBILE RESPONSIVENESS */

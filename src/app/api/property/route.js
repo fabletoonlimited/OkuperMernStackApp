@@ -1,6 +1,7 @@
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import Property from "../models/propertyModel.js";
+import UtilityBill from "../models/utilityBillModel.js";
 import { createProperty } from "../controllers/property.controller.js";
 import mongoose from "mongoose";
 
@@ -8,38 +9,12 @@ import mongoose from "mongoose";
 export async function POST(req) {
   try {
     await dbConnect();
-
     const body = await req.json();
-
     let {
       // user,
-      landlordId,
-      previewPic,
-      Img1,
-      Img2,
-      Img3,
-      Img4,
-      Img5,
-      Img6,
-      title,
-      address,
-      state,
-      price,
-      category,
-      propertyType,
-      bed,
-      bath,
-      savedHomes,
-      unitsAvailable,
-      rating,
-      status,
-      listedBy,
-      buildingAmenities,
-      propertyAmenities,
-      neighbourhoodPostcode,
-      nearbyPlaces,
-      agent,
-      isVerified,    
+      landlordId, previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, state, price, 
+      category, propertyType, bed, bath, savedHomes, unitsAvailable, rating, status, listedBy, 
+      buildingAmenities, propertyAmenities, neighbourhoodPostcode, nearbyPlaces,agent, isVerified 
     } = body;
     
     if (!previewPic || !Img1 || !Img2 || !Img3) {
@@ -49,8 +24,8 @@ export async function POST(req) {
     }
     if (!title || !address || !state || !price || !category || !unitsAvailable || !bed || !bath || !listedBy || !buildingAmenities || !propertyAmenities || !neighbourhoodPostcode || !nearbyPlaces || !status) {
       return NextResponse.json(
-        { message: "Missing required fields" }, 
-        { status: 400 });
+      { message: "Missing required fields" }, 
+      { status: 400 });
     }
     
 
@@ -71,7 +46,7 @@ export async function POST(req) {
 
     const newProperty = await createProperty({
       // user,
-      landlordId, // was "landlord: landlordId" — controller expects key "landlordId" not "landlord"
+      landlordId,
       previewPic,
       Img1,
       Img2,
@@ -120,7 +95,6 @@ export async function POST(req) {
   }
 }
 
-
 // GET PROPERTIES
 export async function GET(request) {
   try {
@@ -131,7 +105,9 @@ export async function GET(request) {
     const landlordId = searchParams.get("landlordId");
 
     if (id) {
-      const property = await Property.findById(id);
+    const property = await Property.findById(id)
+      .populate("landlord", "name email phone profilePic")
+      .populate("utilityBill")       
       if (!property) 
         return NextResponse.json({ message: "Property not found" }, 
         { status: 404 });

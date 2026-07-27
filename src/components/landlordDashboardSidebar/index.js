@@ -5,6 +5,8 @@ import { Menu, X } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {useRouter} from "next/navigation";
+import { FaHome, FaMoneyBillWave, FaEye, FaClock, FaExclamationCircle, FaStar, FaHeart, FaEnvelope } from "react-icons/fa";
+// import { FaExclamationCircle, FaStar } from "react-icnons/fa";
 
 const index = () => {
   const router = useRouter();
@@ -82,33 +84,33 @@ const index = () => {
           />
         </Link>
 
-        <ul className="m-8 -mt-2 justify-between w-30 flex flex-col space-y-6 cursor-pointer">
+        <ul className="m-8 -mt-2 justify-between w-36 flex flex-col space-y-6 cursor-pointer">
           <Link href="/landlordDashboard">
-            <li className="hover:text-yellow-500">Dashboard</li>
+            <li className="hover:text-yellow-500 flex items-center justify-between">Dashboard <FaHome /></li>
           </Link>
 
           <Link href="/helpCenter">
-            <li className="hover:text-yellow-500"> Help Center </li>
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Help Center <FaExclamationCircle /></li>
           </Link>
 
           <Link href="/savedHomes">
-            <li className="hover:text-yellow-500"> Saved Homes </li>
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Saved Homes <FaHeart /></li>
           </Link>
 
           <Link href="/landlordDashboardInbox">
-            <li className="hover:text-yellow-500">Messages</li>
+            <li className="hover:text-yellow-500 flex items-center justify-between">Messages <FaEnvelope /></li>
           </Link>
 
           <Link href="/propertyListingLanding">
-            <li className="hover:text-yellow-500"> Listings </li>
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Listings <FaMoneyBillWave /></li>
           </Link>
 
           <Link href="/verification">
-            <li className="hover:text-yellow-500"> Verification </li>
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Verification <FaEye /></li>
           </Link>
 
           <Link href="/homeInterest">
-            <li className="hover:text-yellow-500"> Home Interests </li>
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Home Interests <FaStar /></li>
           </Link>
 
           <Link
@@ -132,7 +134,7 @@ const index = () => {
                 toast.error("An error occurred during logout");
               }
             }}>
-              <li className="hover:text-yellow-500"> Logout </li>
+              <li className="hover:text-yellow-500 flex items-center justify-between"> Logout <FaClock /></li>
           </Link>
 
           <li className="mt-2 text-sm text-white/80">

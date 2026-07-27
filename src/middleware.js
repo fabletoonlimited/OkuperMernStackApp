@@ -38,7 +38,7 @@ export async function middleware(req) {
   };
 
   // 🚫 Block signup pages ONLY for authenticated users
-  if (SIGNUP_ROUTES.some(route => pathname.startsWith(route))) {
+  if (SIGNUP_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
     if (isAuthenticated) {
       const redirectTo = DASHBOARD_REDIRECT[user.role] || "/";
       return NextResponse.redirect(new URL(redirectTo, req.url));
@@ -62,9 +62,11 @@ export async function middleware(req) {
     "/report",
     "/sell",
     "/shortlets",
-    "/propertyCardExpanded",
     "/terms",
     "/xStories",
+    "/property",
+    "/propertyCardExpanded",
+    "/favorites",
     // "/auth/logout",
   ];
 
@@ -103,10 +105,12 @@ export async function middleware(req) {
     "/api/shortlets",
     "/api/report",
     "/api/policy",
+    "/api/propertyCardExpanded",
     "/api/propertyInterest",
     "/api/terms",
     "/api/privacy",
     "/api/xStories",
+    "/api/property",
 
     "/api/auth/logout",
     "/api/auth/reset-password",
@@ -118,35 +122,27 @@ export async function middleware(req) {
     "/landlordDashboardInbox",
     "/landlord/properties",
     "/landlord/messages",
-    "/landlordVerification",
+    "/landlordAddressVerification",
     "/landlordSubscription",
     "/landlord/profile",
     "/landlord/disputes",
     "/landlord/subscription",
     "/landlord/payment",
-   
-
     "/tenantDashboard",
     "/tenantDashboardCompleted",
     "/tenantDashboardInbox",
     "/tenant/properties",
     "/tenant/messages",
-    "/tenantVerification",
+    "/tenantAddressVerification",
     "/tenant/profile",
     "/tenant/disputes",
     "/tenant/payment",
-
     "/utilityBillUploadPage",
-
-    "/property",
     "/propertyRequestForm",
     "/propertyListingLanding",
     "/propertyListingUploadForm",
-    "/propertyCardExpanded",
-    
     "/savedHomes",
     "/admin/users",
-   
     "/auth/me",
     "/settings",
     "/tenantDisputeForm",
@@ -154,27 +150,15 @@ export async function middleware(req) {
   ];
 
   const PROTECTED_API_ROUTES = [
+    // "/api/profile",
     "/api/landlordAddressVerification",
     "/api/landlordSubscription",
     "/api/message",
-    "/api/profile",
-    "/api/property",
     "/api/propertyRequestForm",
     "/api/tenantVerification",
-    // "/api/tenantDashboard",
-    // "/api/tenantDashboardCompleted",
-    // "/api/tenantDashboardInbox",
-    // "/api/tenant/properties",
-    // "/api/tenant/messages",
-    // "/api/tenant/profile",
     "/api/landlord/profile",
     "/api/propertyListingLanding",
     "/api/propertyListingUploadForm",
-    // "/api/landlordDashboard",
-    // "/api/landlordDashboardCompleted",
-    // "/api/landlordDashboardInbox",
-    // "/api/landlord/properties",
-    // "/api/landlord/messages",
     "/api/savedHomes",
     "/api/admin/users",
     "/api/propertyCardExpanded",
@@ -185,35 +169,59 @@ export async function middleware(req) {
     "/api/disputes",
     "/api/verification",
     "/api/payment/Xpress",
-    
     "/api/uploads/utilityBill",
     "/api/subscription",
     "/api/referral",
     "/api/analytics",
     "/api/notifications",
+    "/api/propertyListingLanding",
+    "/api/propertyListingUploadForm",
+    "/api/favorites"
+
+    // "/api/tenantDashboard",
+    // "/api/tenantDashboardCompleted",
+    // "/api/tenantDashboardInbox",
+    // "/api/tenant/properties",
+    // "/api/tenant/messages",
+    // "/api/tenant/profile",
+    // "/api/landlordDashboard",
+    // "/api/landlordDashboardCompleted",
+    // "/api/landlordDashboardInbox",
+    // "/api/landlord/properties",
+    // "/api/landlord/messages",
   ];
 
   // ======================
   // ✅ Allow public APIs
   // ======================
-  if (PUBLIC_API_ROUTES.some(route => pathname.startsWith(route))) {
-    return NextResponse.next();
-  }
+if (
+  PUBLIC_API_ROUTES.some(
+    route => pathname === route || pathname.startsWith(`${route}/`)
+  )
+) {
+  return NextResponse.next();
+}
 
   // ======================
   // 🔒 Protect API routes first
   // ======================
-  if (PROTECTED_API_ROUTES.some(route => pathname.startsWith(route))) {
-    if (!isAuthenticated) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+if (
+  PROTECTED_API_ROUTES.some(
+    route => pathname === route || pathname.startsWith(`${route}/`)
+  )
+) {
+  if (!isAuthenticated) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
-
+}
 
   // ======================
   // ✅ Allow public pages
   // ======================
-  if (PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
+  if (PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
     if (isAuthenticated) {
       if (user.role === "landlord") {
         return NextResponse.redirect(new URL("/landlordDashboard", req.url));

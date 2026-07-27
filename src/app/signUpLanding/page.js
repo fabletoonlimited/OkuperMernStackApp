@@ -17,7 +17,7 @@ const router = useRouter();
   const [selectWhoIsUsingPlatform, setSelectWhoIsUsingPlatform] = useState(null);
   const [showWhoIsUsingPlatform, setShowWhoIsUsingPlatform] = useState(false);
   const [errorWhoIsUsingPlatform, setErrorWhoisUsingPlatform] = useState(null);
-  const hasCheckedAuth = React.useRef(false); // To prevent multiple auth checks
+  const hasCheckedAuth = React.useRef(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -47,7 +47,8 @@ const router = useRouter();
   // Residency dropdown validation
   useEffect(() => {
 
-    if (!selectResidencyStatus || selectResidencyStatus === "selectOne") {
+    if (!selectResidencyStatus || selectResidencyStatus === "selectOne") 
+    {
       setShowResidencyStatus(true);
     } else {
       setShowResidencyStatus(false);

@@ -13,7 +13,7 @@ const Page = () => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-            const res = await fetch("/api/auth/me", {
+            const res = await fetch("/api/user/me", {
                 credentials: "include",
             });
 
@@ -142,25 +142,27 @@ const Page = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 w-full text-xl rounded">
+                        className="bg-blue-950 hover:bg-blue-800 hover:rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 w-full text-xl rounded">
                         {loading ? "Signing In..." : "Sign In"}
                     </button>
                 </form>
 
                 {/* RIGHT SIDE - BANNER */}
-                <div className="w-full md:w-1/2 relative">
                     <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg overflow-hidden">
                         {/* Banner Top Section */}
-                        <div className="p-10 text-center">
-                            <h2 className="text-white text-3xl md:text-5xl font-semibold leading-snug">
-                                Rent & Buy your Homes Directly on Okuper
-                            </h2>
-
-                            <p className="mt-6 text-white text-lg md:text-xl leading-relaxed">
-                                No agents. No hidden fees. Connect directly with
-                                your next home owners on Okuper. Verified people
-                                and real homes.
-                            </p>
+                        <div className={"relative h-40 rounded-2xl shadow-lg bannerBgColor mb-200"}>
+                            <div className={"relative p-10 rounded-t-2xl md:w-155 w-50% bg-[rgba(0,51,153,1)] py-2 md:h-20 leading-relaxed bannerBgColor"}>
+                                <h2 className="font-medium md:text-4xl text-3xl text-white leading-8 md:leading-12 md:pt-15 pt-20 px-2 md:px-2 text-center md:text-center">
+                                    <b>
+                                        Rent & Buy your Homes Directly on Okuper
+                                    </b>
+                                </h2>
+                                <p className="absolute text-sm md:font-medium leading-[1.5] mt-5 md:mt-40 md:text-[20px] text-white text-center px-15 md:px-25 md:text-center">
+                                    No agents. No hidden fees. Connect directly with
+                                    your next home owners on Okuper. Verified people
+                                    and real homes.
+                                </p>
+                            </div>
                         </div>
 
                         {/* Images Section */}
@@ -168,16 +170,16 @@ const Page = () => {
                             <img
                                 src="/BannerSam.png"
                                 alt="Ad Banner Sam"
-                                className="w-full"
+                                className={"bannerLady md:h-auto h-60 md:w-120 w-120 bottom-[-541px] md:bottom-[-654px]"}
+                                style={{ position: "absolute", height: "auto" }}
                             />
                             <img
                                 src="/bannerGirl.png"
                                 alt="Banner Girl"
-                                className="absolute -bottom-10 right-0 w-[80%] md:w-[90%] max-w-none"
+                                className={"rounded-b-2xl -mt-2 md:w-150 w-100% md:h-auto h-60"}
                             />
                         </div>
                     </div>
-                </div>
             </div>
         </>
     );

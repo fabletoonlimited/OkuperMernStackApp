@@ -24,11 +24,11 @@ const TrendingRentIndexCarousel = () => {
 
                 // ✅ Filter only rent
                 const filtered = list.filter(
-                    (property) => property.category === "Rent"
+                    (property) => property.category === "Rent" || property.category === "rent" || property.category === "Sell" || property.category === "sell" || property.category === "Rent/Sell" || property.category === "shortlet" || property.category === "Shortlet"
                 );
 
                 // OPTIONAL: insert ads
-                const mixed = insertAdBanners(filtered);
+                const mixed = insertAdBanners(filtered || list);
 
                 setPropertyItems(mixed);
             } catch (err) {

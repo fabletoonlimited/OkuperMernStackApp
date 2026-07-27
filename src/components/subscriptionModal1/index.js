@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-const index = ({ isOpen, onClose }) => {
+const index = ({ isOpen, onClose, onContinue }) => {
     if (!isOpen) return null;
     
   return (
@@ -28,7 +28,10 @@ const index = ({ isOpen, onClose }) => {
                       profile
                   </p>
                   <div className="rounded-2">
-                      <button className="bg-blue-700 p-4 cursor-pointer">Subscibe Now</button>
+                      <button 
+                      className="bg-blue-700 p-4 cursor-pointer"
+                      onClick={onContinue}
+                      >Subscibe Now</button>
                   </div>
               </div>
           </div>

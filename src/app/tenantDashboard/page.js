@@ -23,7 +23,7 @@ function TenantDashboard() {
   useEffect(() => {
     const getMe = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch("/api/user/me", {
           method: "GET",
           cache: "no-store",
         });

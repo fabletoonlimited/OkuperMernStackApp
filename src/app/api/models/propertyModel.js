@@ -104,7 +104,7 @@ const propertySchema = new mongoose.Schema(
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
     admin: [{ type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin" }],
     savedHomes: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
-    utilityBill: {type: mongoose.Schema.Types.ObjectId,ref: "UtilityBill",default: null,},
+    utilityBill: [{type: mongoose.Schema.Types.ObjectId,ref: "UtilityBill", default: null}],
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
     addressVerification: [{type: mongoose.Schema.Types.ObjectId, ref: "AddressVerification"}],
     payment: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]

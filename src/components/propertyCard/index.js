@@ -1,9 +1,12 @@
-import React from "react";
+"use client"
+
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link"
 import StarRating from "../starRating/starRating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
+
 
 export default function PropertyCard({
     _id,
@@ -22,34 +25,34 @@ export default function PropertyCard({
     bath,
     numberOfBath,
     propertyType,
-}) {
+}) 
+{
+    const [property, setProperty] = useState(null);
+
+    useEffect (() => {
+        const fetchProperty = async() => {
+            try { 
+                const res = await fetch(`/api/property?id=${_id}`, {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (!res.ok) throw new Error("Failed to fetch property");
+
+            const data = await res.json();
+            setProperty(data)
+
+        } catch (error) {
+            console.error(error);
+        }}
+        if (_id) {
+            fetchProperty();
+        }
+    }, [_id]);
 
     const handleSaveProperty = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        try {
-            const res = await fetch("/api/property", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    propertyId: _id,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error);
-            }
-
-            alert("Property saved successfully!");
-        } catch (error) {
-            console.error(error);
-        }
     };
 
     return (
@@ -59,7 +62,7 @@ export default function PropertyCard({
                 {/* IMAGE */}
                 <div className="relative w-full h-64">
                     <Image
-                        src={previewPic}
+                        src={property?.previewPic || previewPic}
                         alt={`property: ${title || desc || "property"}`}
                         fill
                         className="object-cover rounded-t-xl"
@@ -68,7 +71,7 @@ export default function PropertyCard({
                         draggable={false}
                     />
 
-                    {savedHomes && (
+                    {property?.savedHomes && (
                         <div className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
                             <FontAwesomeIcon
                                 icon={faCircleCheck}
@@ -78,10 +81,10 @@ export default function PropertyCard({
                         </div>
                     )}
 
-                    {typeof unitsAvailable === "number" && (
+                    {typeof property?.unitsAvailable === "number" && (
                         <div className="absolute top-2 left-2 bg-blue-600/75 text-white text-xs px-2 py-1 rounded-xl">
-                            {unitsAvailable > 0
-                                ? `${unitsAvailable} unit${unitsAvailable > 1 ? "s" : ""} available`
+                            {property?.unitsAvailable > 0
+                                ? `${property?.unitsAvailable} unit${property?.unitsAvailable > 1 ? "s" : ""} available`
                                 : "No units available"}
                         </div>
                     )}
@@ -90,47 +93,46 @@ export default function PropertyCard({
                 {/* INFO */}
                 <div className="p-4 text-center">
                     <h3 className="text-lg font-semibold mt-2 mb-2">
-                        ₦
-                        {price
-                            ? Number(String(price).replace(/[^0-9.]/g, "")).toLocaleString()
+                        ₦{property?.price
+                            ? Number(String(property?.price).replace(/[^0-9.]/g, "")).toLocaleString()
                             : "N/A"}{" "}
                         / yr
                     </h3>
 
                     <p className="text-sm text-gray-800 mt-2">
-                        {title || desc || "No description provided"}
+                        {property?.title || property?.desc || "No description provided"}
                     </p>
 
                     <p className="text-sm font-medium text-blue-700 mt-1 mb-2">
-                        {address || location || "Unknown location"}
+                        {property?.address || property?.location || "Unknown location"}
                     </p>
 
                     <p className="text-md font-bold text-blue-950">
-                        For {category || "Unspecified"}
+                        For {property?.category || "Unspecified"}
                     </p>
 
-                    {rating && (
+                    {property?.rating && (
                         <>
                             <div className="ratings mt-3 mb-2 justify-items-center">
-                                <StarRating rating={rating} />
+                                <StarRating rating={property?.rating} />
                             </div>
                             <p className="text-sm text-gray-500 mb-2">
-                                {rating} <span className="text-blue-700">({category})</span>
+                                {property?.rating} <span className="text-blue-700">({property?.category})</span>
                             </p>
                         </>
                     )}
 
                     <div className="flex flex-wrap justify-around items-center mt-2 mb-4 gap-2">
                         <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
-                            {bed || numberOfBed || "N/A"}
+                            {property?.bed || property?.numberOfBed || "N/A"}
                         </span>
 
                         <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
-                            {propertyType || "N/A"}
+                            {property?.propertyType || "N/A"}
                         </span>
 
                         <span className="text-sm bg-blue-950 text-white px-4 py-2 rounded">
-                            {bath || numberOfBath || "N/A"}
+                            {property?.bath || property?.numberOfBath || "N/A"}
                         </span>
                     </div>
                 </div>

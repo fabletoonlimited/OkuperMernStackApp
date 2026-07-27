@@ -16,6 +16,24 @@ function Banner() {
 const [isAuthenticated, setIsAuthenticated] = useState(false);
 const [loading, setLoading] = useState(false);
 const [userRole, setUserRole] = useState("");
+const [showLandlord, setShowLandlord] = useState(false);
+const [showSecondText, setShowSecondText] = useState(false);
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setShowLandlord(true);
+  }, 7000); 
+
+  return () => clearTimeout(timer);
+}, []);
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setShowSecondText(true);
+  }, 7000); 
+
+  return () => clearTimeout(timer);
+}, []);
 
 
 const router = useRouter();
@@ -85,13 +103,25 @@ const router = useRouter();
             </div>
 
             {/* Model Landlord */}
-            <div className="absolute -bottom-105 left-[33%] z-30 hidden md:block animate-slideXLandlord hover:scale-105 duration-300 transition">
+            {!showLandlord && (
+            <div className="absolute bottom-45 left-[33%] z-30 hidden md:block animate-slideXTenant opacity-20 transition duration-0">
                 <img
-                    src={BASE_URL + "/modelLandlord_jmsizc"}
-                    alt="bannerModelLandlord"
-                    className="h-[1800px] w-auto object-contain"
+                src={BASE_URL + "/bannerboy_eygggt"}
+                alt="Tenant"
+                className="h-[537px] w-auto object-contain"
                 />
             </div>
+            )}
+
+            {showLandlord && (
+            <div className="absolute -bottom-109 right-[38%] z-30 hidden md:block animate-fadeInLandlord opacity-100 transition duration-7000">
+                <img
+                src={BASE_URL + "/modelLandlord_jmsizc"}
+                alt="Landlord"
+                className="h-[1800px] w-auto object-contain"
+                />
+            </div>
+            )}
             
 
             <div className="relative w-full min-h-[470px] md:h-[480px] animate-fadeIn">
@@ -132,6 +162,8 @@ const router = useRouter();
                         width={60}
                         height={65}
                     />
+
+                {!showSecondText && (
                     <div className="flex flex-col gap-4">
                         <h1 className="text-4xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start justify-items-start tanantText">
                         We got you covered
@@ -142,6 +174,20 @@ const router = useRouter();
                     </h3>
 
                     </div> 
+
+                )}
+
+                {showSecondText && (
+                    <div className="flex flex-col gap-4">
+                        <h1 className="text-4xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start justify-items-start tanantText">
+                        We Understand Your Frustration
+                    </h1>
+                    <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light mt-4 px-4 md:px-0 text-justify md:text-justify">
+                        Tired of dealing with unreliable and unverified tenants and accruing maintenance costs?
+                    </h3>
+
+                    </div> 
+                )}
 
                     {/* Buttons */}
                     <div className="mt-15 md:mt-6 flex flex-col md:flex-row gap-5 md:gap-5 w-full md:w-auto">

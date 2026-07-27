@@ -5,6 +5,7 @@ import Tenant from "@/app/api/models/tenantModel";
 import Landlord from "@/app/api/models/landlordModel";
 import { getUserFromCookies } from "@/app/lib/auth/getUserFromCookies";
 import Property from "@/app/api/models/propertyModel"
+import UtilityBill from "@/app/api/models/utilityBillModel";
 
 export async function POST(req) {
   try {
@@ -42,16 +43,26 @@ export async function POST(req) {
       resource_type: "auto",
     });
 
-    // Save URL
-    // Save the utility bill on the property and verify it
-const updatedProperty = await Property.findByIdAndUpdate(
-  propertyId,
-  {
-    utilityBillUrl: result.secure_url,
-    verified: true,
-  },
-  { new: true }
-);
+    // Create a new utility bill document
+    const newUtilityBill = await UtilityBill.create({
+      fileUrl: result.secure_url,
+      property: propertyId,
+      uploadedBy: user.id,
+      uploadedByModel: user.role === "tenant" ? "Tenant" : "Landlord",
+    });
+
+    await newUtilityBill.save();
+
+    // Save URL utility bill on the property and verify it
+    const updatedProperty = await Property.findByIdAndUpdate(
+      propertyId,
+      {
+        $push: 
+        { utilityBill: newUtilityBill._id }, 
+        verified: true 
+      },
+      { new: true }
+    );
 
 if (!updatedProperty) {
   return NextResponse.json(
@@ -64,10 +75,6 @@ return NextResponse.json({
   message: "File uploaded successfully",
   property: updatedProperty,
 });
-    return NextResponse.json({
-      message: "File uploaded successfully",
-      url: result.secure_url,
-    });
   } catch (error) {
     console.error(error);
 
@@ -97,15 +104,13 @@ export async function GET() {
 
     if (user.role === "tenant") {
       const tenant = await Tenant.findById(user.id);
-
       console.log("Tenant utility bill:", tenant?.utilityBillUrl);
-
       utilityBillUrl = tenant?.utilityBillUrl;
+
     } else if (user.role === "landlord") {
+
       const landlord = await Landlord.findById(user.id);
-
       console.log("Landlord utility bill:", landlord?.utilityBillUrl);
-
       utilityBillUrl = landlord?.utilityBillUrl;
     } else {
       return NextResponse.json(

@@ -11,7 +11,7 @@ const Page = () => {
     // Check auth
     useEffect(() => {
         const checkAuth = async () => {
-            const res = await fetch("/api/auth/me", {
+            const res = await fetch("/api/user/me", {
                 credentials: "include",
             });
 

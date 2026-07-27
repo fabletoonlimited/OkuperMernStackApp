@@ -8,13 +8,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-// import propertyData from "../../data/property"; // replaced by real API fetch
 import TrendingRentIndexCarousel from "../../components/trendingRentIndexCarousel";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import Footer from "../../components/footer";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import StarRating from "@/components/starRating/starRating";
-// import property from "../../data/property"; // replaced by real API fetch
 import { toast, ToastContainer } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,16 +20,43 @@ import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
 import { FaExclamationCircle, FaStar } from "react-icons/fa";
 import PropertyCard from "@/components/propertyCard";
 import tenantDashboard from "../tenantDashboard/page";
-import { Scale } from "lucide-react";
 
 const Index = () => {
     
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const searchParams = useSearchParams();
+    const propertyId = searchParams.get("id");
+    const [property, setProperty] = useState(null);
+
+    const [hoverLeft, setHoverLeft] = useState(false);
+    const [hoverRight, setHoverRight] = useState(false);
+
+    const [propertyLoading, setPropertyLoading] = useState(true);
+    const [sendingMessage, setSendingMessage] = useState(false);
+    const [messageSent, setMessageSent] = useState(false);
+    const [rating, setRating] = useState(0);
+
     const router = useRouter();
+
+    useEffect(() => {
+        const postRating = async () => {
+        try {
+            const res = await fetch("api/rating", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            }); 
+            setRating(res.ok ? 1 : 0);
+        } catch (error) {
+            setRating(0);
+        }}
+        postRating();
+    }, []);
+
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const res = await fetch("/api/auth/me", 
+                const res = await fetch("/api/user/me", 
                     { credentials: "include" });
                 setIsAuthenticated(res.ok);
             } catch {
@@ -48,30 +73,27 @@ const Index = () => {
             router.push("/tenantDashboardInbox");
         };
 
-        //Check if Landlord is verified
-        const [isVerified, setIsVerified] = useState(false);
+    //Check if Landlord is verified
+    const [isVerified, setIsVerified] = useState(false);
         
         useEffect(() => {
             const checkVerification = async () => {
-                try {
-                    const res = await fetch ("/api/landlord",
-                        {credentials: "include"})
-                    setIsVerified(res.ok);
-                } catch {
+            try {
+                const res = await fetch (`/api/property?id=${propertyId}`,
+                    {credentials: "include"});
+                if (!res.ok) {
                     setIsVerified(false);
+                    return;
                 }
-            };
-                checkVerification();
-        },  []);
+                const data = await res.json();
+                setIsVerified(data.isVerified);
+            } catch {
+                setIsVerified(false);
+            }
+        };
+        checkVerification();
+    },  []);
 
-    const searchParams = useSearchParams();
-    const propertyId = searchParams.get("id");
-
-    const [hoverLeft, setHoverLeft] = useState(false);
-    const [hoverRight, setHoverRight] = useState(false);
-    const [property, setProperty] = useState(null);
-    const [propertyLoading, setPropertyLoading] = useState(true);
-    const [sendingMessage, setSendingMessage] = useState(false);
 
     // Separate refs for each carousel
     const trendingRef = useRef(null);
@@ -99,8 +121,7 @@ const Index = () => {
             try {
                 const res = await fetch(`/api/property?id=${propertyId}`);
                 if (!res.ok) {
-                    toast.error("Failed to load property");
-                    return;
+                    toast.error("Failed to fetch property");
                 }
                 const data = await res.json();
                 setProperty(data);
@@ -135,30 +156,28 @@ const Index = () => {
     };
 
     useEffect(() => {
-         if (saveProperty) {
+        if (saveProperty) {
             const saveToFavorites = async () => {
                 try {
                     const res = await fetch("/api/favorites", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         credentials: "include",
-                        body: JSON.stringify({ propertyId: property._id }),
+                        body: JSON.stringify({ 
+                            propertyId: property._id, 
+                        }),
                     });
-                    if (!res.ok) {
-                        if (res.status === 401 || res.status === 403) {
-                            toast.error("Please login as a tenant to save favorites");
-                            router.push("/signInTenant");
-                            return;
-                        }
-                        toast.error("Failed to save property");
-                    } else {
-                        toast.success("Property saved to favorites!");
-                    }
-                } catch (error) {
-                    console.error("Save favorite error:", error);
-                    toast.error("Server error");
-                }
-            };
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.message || "Please sign in or register first.");
+                return;
+            }
+                toast.success("Property saved to favorites!");
+            } catch (error) {
+                console.error("Error saving to favorites:", error);
+                toast.error("Failed to save property to favorites");
+            }};
             saveToFavorites();
         }
     }, [saveProperty, property, router]);
@@ -251,8 +270,8 @@ const Index = () => {
                     {/* Close Button */}
                     <button
                         onClick={() => setSelectedImage(null)}
-                        className="absolute top-8 left-8 z-50 bg-gray-200 hover:bg-gray-300 rounded-full p-2 transition duration-300 ease-in-out shadow-lg">
-                        <span className="text-xl text-black">←</span>
+                        className="absolute top-8 left-8 z-50 bg-gray-200 cursor-pointer hover:bg-gray-400 rounded-full p-2 transition duration-300 ease-in-out shadow-lg">
+                        <span className="text-xl text-black">x</span>
                     </button>
 
                     <div
@@ -373,7 +392,7 @@ const Index = () => {
                             {property?.price ? `₦${Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
                         </span>
                         <p className="text-lg md:mt-1 mt-2 text-blue-900">
-                            Price is base rent and doesn't require agency fees.
+                            Price displayed is not inclusive of Landlords legal fee & Okuper's 5% service charge.
                         </p>
 
                         <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
@@ -417,7 +436,7 @@ const Index = () => {
                             <div className="h-24 w-full flex items-center">
                                 <StarRating
                                     className="scale-150 "
-                                    propertyId={property?.rating}
+                                    propertyId={rating}
                                 />
                             </div>
                         </div>
@@ -442,8 +461,31 @@ const Index = () => {
                                     {property?.listedBy || "Landlord"}
                                 </h3>
                                 <div className="flex items-center gap-2">
+
                                     {
-                                        isVerified ? (
+                                        isVerified === false
+                                        ? 
+                                        (
+
+                                              <div className="flex items-center gap-2">
+                                                 <span className="text-red-600 font-light">
+                                                    Unverified
+                                                </span>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                    style={{
+                                                        fontSize: "10px",
+                                                        background: "white",
+                                                        borderRadius: "50%",
+                                                        padding: "2px",
+                                                        color: "red",
+                                                    }}
+                                                />   
+                                            </div>
+                                        ) 
+                                        : 
+                                        (
+
                                             <div className="flex items-center gap-2">
                                              <span className="text-green-600 font-light">
                                                     Verified
@@ -459,23 +501,7 @@ const Index = () => {
                                                     }}
                                                 />
                                             </div>
-                                        ) : (
-
-                                            <div className="flex items-center gap-2">
-                                                 <span className="text-red-600 font-light">
-                                                    Unverified
-                                                </span>
-                                                <FontAwesomeIcon
-                                                    icon={faCircleInfo}
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        background: "white",
-                                                        borderRadius: "50%",
-                                                        padding: "2px",
-                                                        color: "red",
-                                                    }}
-                                                />   
-                                            </div>
+                            
                                         )
                                     }               
                                 </div>
@@ -685,7 +711,7 @@ const Index = () => {
                                         isVerified ? (
                                             <div className="flex items-center gap-2">
                                              <span className="text-green-600 font-light">
-                                                    Verified
+                                                    isVerified
                                                 </span>
                                                 <FontAwesomeIcon
                                                     icon={faCircleInfo}

@@ -38,7 +38,7 @@ export async function GET(req) {
       userId = landlord.user;
       role = "landlord";
     } else {
-      const tenant = await Tenant.findById(actorId).select("user");
+      const tenant = await Tenant.findById(actorId)
       if (tenant) {
         userId = tenant.user;
         role = "tenant";

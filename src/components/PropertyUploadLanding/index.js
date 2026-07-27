@@ -2,10 +2,20 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Subscript } from "lucide-react";
+import SubscriptModal from "../subscriptionModal1";
 
 const Index = () => {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState([]);
+  const [propertyCount, setPropertyCount] = useState(0);
+  const [subscribed, setIsSubscribed] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
 
   useEffect(() => {
     setLoading(false);
@@ -15,13 +25,18 @@ const Index = () => {
 
   const [landlordId, setLandlordId] = useState(null);
 
+
   useEffect(() => {
     const getMe = async () => {
-      const res = await fetch("/api/auth/me", { cache: "no-store" });
-      const data = await res.json();
+      const res = await fetch("/api/user/me", {
+        cache: "no-store",
+        credentials: "include",
+      });
 
+      const data = await res.json();
+        console.log("USER ME:", data);
       if (res.ok) {
-        setLandlordId(data?.user?._id || data?.landlord?._id || data?._id);
+    setLandlordId(data.actorId);
       }
     };
 
@@ -43,10 +58,14 @@ const Index = () => {
         const data = await res.json();
         if (!res.ok) return;
 
-        console.log("MY PROPERTIES:", data)
+        console.log("LANDLORD ID:", landlordId);
+        console.log("MY PROPERTIES:", data);
+        console.log("IS ARRAY:", Array.isArray(data));
 
         const list = Array.isArray(data) ? data : data?.properties;
-        setProperties(list || []);
+        setProperties(list);
+
+        setPropertyCount(list.length);
       } catch (err) {
         console.error(err);
       }
@@ -58,9 +77,22 @@ const Index = () => {
   // create 3 slots
   const slots = [0, 1, 2];
 
+ const handlePropertyCount = (property) => {
+    if (!subscribed && propertyCount >= 1 && !property) {
+        setIsOpen(true);
+        return;
+    }
+
+    if (property) {
+        router.push(`/propertyDetails?id=${property._id}`);
+    } else {
+        router.push("/propertyListingUploadForm");
+    }
+};
+
   return (
     <div className="bg-white md:w-[1300px] md:h-[2098px] h-210 m-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 md:px-50">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:px-50 md:py-20 px-10 py-10 gap-8">
         {slots.map((slotIndex) => {
           const property = properties[slotIndex] || null;
           const previewUrl = property?.previewPic || null;
@@ -92,17 +124,21 @@ const Index = () => {
                     )}
                   </div>
 
-                  <Link href={href}>
-                    <button className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded cursor-pointer font-medium">
-                      {buttonText}
+                    <button 
+                      onClick={() => handlePropertyCount(property)}
+                      className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-medium"
+                      disabled={loading || !!property}
+                    >   
+                      {property ? "Uploaded" : "Start uploading"}   
                     </button>
-                  </Link>
+          
                 </>
               )}
             </div>
           );
         })}
       </div>
+      <SubscriptModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </div>
   );
 };
