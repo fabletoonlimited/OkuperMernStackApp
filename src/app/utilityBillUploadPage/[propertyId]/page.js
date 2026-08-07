@@ -10,6 +10,7 @@ import { useParams } from "next/navigation"
 
 const page = () => {
   const { propertyId } = useParams();
+  console.log("PROPERTY ID:", propertyId);
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter()
@@ -36,7 +37,9 @@ const page = () => {
   }, []);
 
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!file) {
       toast.error("Please select a file.");
         return;
@@ -44,6 +47,7 @@ const page = () => {
       setUploading(true)
       
     try {
+      console.log("propertyId:", propertyId);
       const formData = new FormData()
       formData.append('utilityBill', file);
       formData.append("propertyId", propertyId)
@@ -55,13 +59,12 @@ const page = () => {
 
       const uploadResult = await res.json();
 
-      if (res.ok) {
-        const imageUrl = uploadResult.url;
-        console.log("File uploaded successfully:", imageUrl);
+      console.log(uploadResult)
 
+      if (res.ok) {
         toast.success("File uploaded successfully!");
 
- switch (uploadResult.property.category) {
+    switch (uploadResult.property.category) {
     case "Rent":
       router.push("/rent");
       break;
@@ -80,13 +83,12 @@ const page = () => {
 
     default:
       router.push("/allProperties");
- }
+    }
       } else {
-        console.error("Upload failed:", uploadResult);
-        toast.error("Failed to upload file. Please try again.");
+        toast.error(uploadResult.error);
       }
     } catch (error) {
-      console.error('Error uploading file:', error)
+      console.error(error)
       toast.error("An error occured while uploading")
     } finally {
       setUploading(false)
@@ -140,16 +142,15 @@ const page = () => {
             required 
           />
            <CloudUpload className="text-gray-300" />
-        
-        </form>
-          <button 
-            type="button"
-            onClick={handleSubmit}
+           <button 
+            type="submit"
             disabled={uploading}
             className=" bg-blue-900 cursor-pointer text-white px-50 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center gap-2"
           >
-            Upload
+            {uploading ? "Uploading..." : "Upload"}
           </button>
+        </form>
+       
       <ToastContainer />
     </div>
   )

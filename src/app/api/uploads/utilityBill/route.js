@@ -8,6 +8,7 @@ import Property from "@/app/api/models/propertyModel"
 import UtilityBill from "@/app/api/models/utilityBillModel";
 
 export async function POST(req) {
+    console.log("POST /api/uploads/utilityBill HIT");
   try {
     await dbConnect();
 
@@ -22,7 +23,6 @@ export async function POST(req) {
 
     const formData = await req.formData();
     const file = formData.get("utilityBill");
-    const propertyId = formData.get("propertyId");
 
     if (!file) {
       return NextResponse.json(
@@ -30,6 +30,9 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    const propertyId = formData.get("propertyId");
+console.log("Received propertyId:", propertyId);
 
     // Convert file to Base64
     const bytes = await file.arrayBuffer();
@@ -51,18 +54,17 @@ export async function POST(req) {
       uploadedByModel: user.role === "tenant" ? "Tenant" : "Landlord",
     });
 
-    await newUtilityBill.save();
-
-    // Save URL utility bill on the property and verify it
-    const updatedProperty = await Property.findByIdAndUpdate(
-      propertyId,
-      {
-        $push: 
-        { utilityBill: newUtilityBill._id }, 
-        verified: true 
-      },
-      { new: true }
-    );
+  // Save URL utility bill on the property and verify it
+  const updatedProperty = await Property.findByIdAndUpdate(
+  propertyId,
+  {
+    $set: {
+      utilityBill: newUtilityBill._id,
+      verified:true
+    },
+  },
+  { new: true }
+);
 
 if (!updatedProperty) {
   return NextResponse.json(
@@ -73,6 +75,7 @@ if (!updatedProperty) {
 
 return NextResponse.json({
   message: "File uploaded successfully",
+  url: result.secure_url,
   property: updatedProperty,
 });
   } catch (error) {
@@ -98,33 +101,35 @@ export async function GET() {
       );
     }
 
-    console.log("Role:", user.role);
-
-    let utilityBillUrl = null;
-
     if (user.role === "tenant") {
       const tenant = await Tenant.findById(user.id);
-      console.log("Tenant utility bill:", tenant?.utilityBillUrl);
-      utilityBillUrl = tenant?.utilityBillUrl;
 
-    } else if (user.role === "landlord") {
-
-      const landlord = await Landlord.findById(user.id);
-      console.log("Landlord utility bill:", landlord?.utilityBillUrl);
-      utilityBillUrl = landlord?.utilityBillUrl;
-    } else {
-      return NextResponse.json(
-        { error: "Invalid user role" },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        uploaded: !!tenant?.utilityBillUrl,
+        url: tenant?.utilityBillUrl || null,
+      });
     }
 
-    console.log("Final utilityBillUrl:", utilityBillUrl);
+    if (user.role === "landlord") {
+      const property = await Property.findOne({
+        landlord: user.id,
+      }).populate("utilityBill");
+      
+      const hasUtility = property?.utilityBill?.length > 0;
 
-    return NextResponse.json({
-      uploaded: !!utilityBillUrl,
-      url: utilityBillUrl,
-    });
+      console.log("UTILITY CHECK PROPERTY:", property);
+      console.log("UTILITY BILL VALUE:", property?.utilityBill);
+
+      return NextResponse.json({
+        uploaded: hasUtility,
+        url: hasUtility ?  property?.utilityBill[0].fileUrl : null,
+      });
+    }
+
+    return NextResponse.json(
+      { error: "Invalid user role" },
+      { status: 400 }
+    );
   } catch (error) {
     console.error(error);
 

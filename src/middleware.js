@@ -130,6 +130,7 @@ export async function middleware(req) {
     "/landlord/payment",
     "/tenantDashboard",
     "/tenantDashboardCompleted",
+    "/landlordAccountForm",
     "/tenantDashboardInbox",
     "/tenant/properties",
     "/tenant/messages",
@@ -176,6 +177,7 @@ export async function middleware(req) {
     "/api/notifications",
     "/api/propertyListingLanding",
     "/api/propertyListingUploadForm",
+    "/api/landlordAccountForm",
     "/api/favorites"
 
     // "/api/tenantDashboard",

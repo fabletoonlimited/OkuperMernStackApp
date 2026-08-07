@@ -96,34 +96,20 @@ const page = () => {
       {/* <ToastContainer position="top-center" autoClose={3000} /> */}
 
       {/*SignIn Form*/}
-      <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">
-        <form onSubmit={handleSignInSubmit}>
-          <div
-            className="landlordSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              maxWidth: "556px",
-              height: "auto",
-              maxHeight: "100%",
-              border: "1px solid #ccc",
-              padding: "20px",
-              borderRadius: "5px",
-              paddingLeft: "35px",
-              paddingRight: "50px",
-              marginTop: "20px",
-              marginLeft: "50px",
-              paddingBottom: "80px",
-            }}
-          >
-            {/*Email*/}
+      <div className="flex flex-col md:flex-row justify-between items-start gap-10 px-10 mt-10 mb-20">
+
+        {/*Email*/}
+        <div className="w-full md:w-1/2 max-w-lg">
+          <form onSubmit={handleSignInSubmit}
+            className="border border-gray-300 p-8 rounded-lg">
+
             <p style={{ paddingTop: 20, marginBottom: 30 }}>Email Address</p>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
+              className="border-2 border-gray-300 p-3 rounded w-full"
             />
 
             {/*Password*/}
@@ -133,82 +119,80 @@ const page = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
+              className="border-2 border-gray-300 p-3 rounded w-full"
             />
 
             <p style={{ paddingTop: 30, marginBottom: 30 }}>
               Forgot password?
               <Link href="/forgotPassword">
-                <span className="cursor-pointer hover:text-blue-600">
+                  <span className="ml-2 cursor-pointer text-blue-600 hover:underline">
                   {" "}
                   Click here
                 </span>
               </Link>
             </p>
-          </div>
 
+        
           {/*SignIn Btn*/}
-          <div className="tenantSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
             <button
               type="submit"
               disabled={loading}
-              className="tenantSignInBtn bg-blue-950 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
-            >
+                className="bg-blue-950 hover:bg-blue-800 hover:rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-4 w-full text-xl rounded">
               {loading ? "Signing In..." : "Sign In"}
             </button>
-          </div>
+        
+
         </form>
-        <span style={{ paddingLeft: 45, marginBottom: 30 }}>
+
+
+        <div className="pl-0 mt-5">
           Don't have an account?{" "}
           <Link href="/signUpTenant">
             <span className="cursor-pointer hover:text-blue-600">
               Sign Up here
             </span>
           </Link>
-        </span>
+        </div>
+      </div>
+
      
 
-        {/*Banner Section*/}
-        <div className="bannerSection md:flex md:justify-right md:items-right mt-10 md:-mt-186 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
-          {/* RIGHT SECTION */}
-          <div
-            className={
-              "relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170"
-            }
-          >
-            <div
-              className={
-                "relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor "
-              }
-            >
-              <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-center">
-                <b>Rent & Buy your Homes Directly on Okuper</b>
-              </h2>
-            </div>
+ 
+                {/* RIGHT SIDE - BANNER */}
+                    <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg mt-10 md:-mt-22">
+                        
+                        {/* Banner Top Section */}
+                        <div className={"relative h-50 rounded-2xl mb-15 md:mb-22"}>
+                            <div className={"relative rounded-t-2xl md:w-155 w-50% py-2 md:h-20 leading-relaxed"}>
+                                <h2 className="font-medium md:text-4xl text-3xl text-white leading-10 md:leading-12 md:pt-15 pt-10 px-15 md:px-20 text-center md:text-center">
+                                    <b>
+                                        Rent, Buy & Lease your Homes Directly on Okuper
+                                    </b>
+                                </h2>
+                                <p className="absolute text-sm md:font-medium leading-[1.2] mt-7 md:mt-7 md:text-[20px] text-white px-15 md:px-20 md:text-center text-center">
+                                    No agents. No hidden fees.<br></br>Connect directly with
+                                    your next home owners on Okuper. Verified people
+                                    and real homes.
+                                </p>
+                            </div>
+                        </div>
 
-            <p className="absolute md:font-medium leading-[1.5] -mt-10 md:text-[20px] text-white text-center px-5 md:px-20 text-xl md:text-center">
-              No agents. No hidden fees. Connect directly with your next home
-              owners on Okuper. Verified people and real homes.
-            </p>
-
-            {/* RIGHT BANNER IMAGES */}
-            <img
-              src="/bannerGirl.png"
-              alt="bannerGirl"
-              className={
-                "bannerGirl md:h-auto h-60 md:w-110 w-50 bottom-[-275px] md:bottom-[-721px]"
-              }
-              style={{ position: "absolute", height: "auto" }}
-            />
-
-            <img
-              src="/BannerSam.png"
-              alt="Ad Banner Sam"
-              className={"rounded-b-2xl"}
-            />
-          </div>
-        </div>
-        {/*End of Banner Section*/}
+                        {/* Images Section */}
+                        <div className="relative bottom-0 md:bottom-0 md:-right-40 -right-25">
+                            {/* <img
+                                src="/BannerSam.png"
+                                alt="Ad Banner Sam"
+                                className={"BannerHouse md:h-auto h-60 md:w-120 w-120 bottom-[-541px] md:bottom-[0px]"}
+                                style={{ position: "absolute", height: "auto" }}
+                            /> */}
+                            <img
+                                src="/bannerGirl.png"
+                                alt="Banner Girl"
+                                className={"bannerLady rounded-b-2xl md:w-70 w-100% md:h-auto h-60"}
+                            />
+                        </div>
+                    </div>
+       {/*End of Banner Section*/}
       </div>
     </>
   );

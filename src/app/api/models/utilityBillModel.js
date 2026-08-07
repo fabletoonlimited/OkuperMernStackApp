@@ -5,7 +5,7 @@ const utilityBillSchema = new mongoose.Schema(
     property: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Property",
-      required: true,
+      required: false,
     },
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,

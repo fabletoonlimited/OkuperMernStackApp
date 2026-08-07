@@ -2,12 +2,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropExpandedNav from "../../components/propExpandedNav";
 import { faBed, faUser } from "@fortawesome/free-solid-svg-icons";
-import { FaBed } from "@fortawesome/free-solid-svg-icons";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import TrendingRentIndexCarousel from "../../components/trendingRentIndexCarousel";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import Footer from "../../components/footer";
@@ -16,10 +13,7 @@ import StarRating from "@/components/starRating/starRating";
 import { toast, ToastContainer } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
-import { FaExclamationCircle, FaStar } from "react-icons/fa";
-import PropertyCard from "@/components/propertyCard";
-import tenantDashboard from "../tenantDashboard/page";
+
 
 const Index = () => {
     
@@ -35,6 +29,7 @@ const Index = () => {
     const [sendingMessage, setSendingMessage] = useState(false);
     const [messageSent, setMessageSent] = useState(false);
     const [rating, setRating] = useState(0);
+    const [mapping, setMapping] = useState(null)
 
     const router = useRouter();
 
@@ -125,6 +120,7 @@ const Index = () => {
                 }
                 const data = await res.json();
                 setProperty(data);
+
             } catch (err) {
                 console.error("Fetch property error:", err);
                 toast.error("Failed to load property");
@@ -134,6 +130,17 @@ const Index = () => {
         };
         fetchProperty();
     }, [propertyId]);
+
+    useEffect(() => {
+    if (!property?.address) return;
+
+    const fullAddress = `${property.address}, ${property.state ?? ""}, Nigeria`;
+
+    setMapping(
+        `https://www.google.com/maps?q=${encodeURIComponent(fullAddress)}&output=embed`
+    );
+}, [property]);
+
 
 
     // Build image list from real property data
@@ -392,7 +399,7 @@ const Index = () => {
                             {property?.price ? `₦${Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
                         </span>
                         <p className="text-lg md:mt-1 mt-2 text-blue-900">
-                            Price displayed is not inclusive of Landlords legal fee & Okuper's 5% service charge.
+                            Price displayed is not inclusive of Landlord's 10% legal fee & Okuper's 5% service charge.
                         </p>
 
                         <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
@@ -572,8 +579,8 @@ const Index = () => {
                 {/* MAP */}
                 <div className="mt-8 w-full max-w-full md:max-w-5xl mx-auto h-[300px] md:h-[400px] rounded-sm overflow-hidden border shadow-sm">
                     <iframe
-                        title="Property location map"
-                        src="https://www.google.com/maps?q=Adelabu%20Surulere%20Lagos&output=embed"
+                        title="propertyLocationMap"
+                        src={mapping}
                         className="w-full h-full border-0"
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
@@ -769,15 +776,18 @@ const Index = () => {
                 </div>
                 {/* TENANCY LAW FOOTER */}
                 <div className="flex flex-col items-center justify-center mt-14 bg-blue-950 p-6 md:p-4 max-w-full md:max-w-6xl mx-4 md:mx-auto">
-                    <p className="text-2xl md:text-4xl text-white text-center mt-5">
-                        Tenancy law
+                    <p className="text-2xl md:text-2xl text-white text-center mt-5">
+                        Read the Tenancy law and know your rights as a Landlord and Tenant. 
                     </p>
+
+                    <Link href="https://lagoshouseofassembly.gov.ng/home/lagos-state-tenancy-and-recovery-of-premises-bill-2025-draftlagos-state/">
+
                     <button
-                        className="px-4 py-3 border-1 rounded-md mt-9 hover:bg-blue-900 hover:scale-95 transition duration-300 ease-in-out
-                        text-white text-sm md:text-lg">
-                        {" "}
+                        className="px-4 py-3 border-1 rounded-md mt-9 hover:bg-blue-900 hover:scale-95 transition duration-300 ease-in-out text-white text-sm md:text-lg cursor-pointer">
                         Read More
                     </button>
+
+                    </Link>
                 </div>
                 {/* Trending Section */}
                 <section className="max-w-7xl mx-auto px-4 md:px-10 py-6 mt-7">

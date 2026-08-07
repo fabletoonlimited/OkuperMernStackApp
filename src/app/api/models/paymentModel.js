@@ -18,7 +18,7 @@ const paymentSchema = new mongoose.Schema(
     },
     currency: {
         type: String,
-        enum: ["NGN", "DA", "Kz", "CFA", "P", "FBu", "FCFA", "Esc", "CF", "DF", 
+        enum: ["DA", "Kz", "CFA", "P", "FBu", "FCFA", "Esc", "CF", "DF", 
             "E£", "Nfk", "L/E", "Br", "D", "GH₵", "FG", "KSh", "L/M", "L$", "LD", 
             "Ar", "MK", "UM", "Rs", "MAD", "MT", "N$", "NGN", "USD", "GBP", "EUR", 
             "FRw", "Db", "Le", "Sh.So", "R", "SSP", "SDG", "TSh", "DT","USh", "ZK", "ZWL"],

@@ -334,17 +334,17 @@ const page = () => {
 
                         {/* ================= RIGHT SIDE ================= */}
                         <div className="w-full lg:w-1/2 flex justify-end">
-                            <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg overflow-hidden">
+                            <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg overflow-hidden ">
                                 {/* Blue Header */}
-                                <div className="bg-[#003399] p-12 w-full text-white text-left">
-                                    <h2 className="text-4xl font-semibold leading-snug">
-                                        Rent & Buy your Homes Directly on Okuper
+                                <div className="bg-[#003399] p-12 w-full md:mt-5 mt-10">
+                                    <h2 className="text-4xl font-semibold md:leading-snug leading-tight text-white text-center">
+                                        Rent, Sell & Lease your Homes Directly on Okuper
                                     </h2>
                                 </div>
 
                                 {/* Middle Text */}
-                                <p className="absolute top-44 text-white text-left text-lg px-12">
-                                    No agents. No hidden fees. Just verified
+                                <p className="absolute top-44 text-white text-center text-lg px-12 md:mt-4 mt-30">
+                                    No agents. No hidden fees.Just verified
                                     people and real homes.
                                 </p>
 

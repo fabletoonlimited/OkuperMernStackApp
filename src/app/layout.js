@@ -33,6 +33,7 @@ export default function RootLayout({ children }) {
     "/landlordDashboard", 
     "/tenantDashboard", 
     "/landlordDashboardInbox", 
+    "landlordAccountForm",
     "/propertyListingLanding",
     "/propertyListingUploadForm", 
     "/propertyCardExpanded",

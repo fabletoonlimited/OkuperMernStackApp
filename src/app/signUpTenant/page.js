@@ -197,7 +197,7 @@ const page = () => {
       </h1>
 
       {/*Already have account - Sign In Link*/}
-      <div className="signInLinkSection ml-12 mt-3">
+      <div className="signInLinkSection ml-83 mt-3">
         <p className="text-lg">
           Already have an account?{" "}
           <Link href="/signInTenant">
@@ -213,7 +213,8 @@ const page = () => {
       {error && <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>}
 
       {/*SignUp Form*/}
-      <div className="signUpLoandingContainer md:flex-col col mt-10 mb-50">
+      
+      <div className="signUpLoandingContainer md:flex-col col mt-10 mb-10">
         <div
           className="tenantSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
           style={{
@@ -300,10 +301,20 @@ const page = () => {
             placeholder="E.g., Social Media, Friend, Advertisement"
             className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
           />
-        </div>
 
-        {/*Terms*/}
-        <div className="termsSection -mt-11 md:mt-10 md:ml-13 ml-13 mr-10 md:mr-0 flex items-center">
+
+          {/*SignUp Btn*/}
+          <button
+            onClick={handleSignUp}
+            className="tenantSignUpBtn bg-blue-950 hover:bg-blue-800 mt-20 text-white p-4 md:w-full w-1/2 border-1px text-2xl text-center cursor-pointer md:mb-0 mb-20"
+          >
+            {" "}
+            Sign Up{" "}
+          </button>
+        </div>
+      </div>
+      {/*Terms*/}
+        <div className="termsSection -mt-11 md:mt-10 md:ml-13 ml-13 mr-10 md:mr-0 flex items-center mb-30">
           <input
             type="checkbox"
             id="agreeTerms"
@@ -325,17 +336,6 @@ const page = () => {
           </span>
         </div>
 
-        {/*SignUp Btn*/}
-        <div className="tenantSignUpBtn mt-10 ml-12 md:ml-12 flex flex-col md:flex-row gap-5">
-          <button
-            onClick={handleSignUp}
-            className="tenantSignUpBtn bg-blue-950 hover:bg-blue-800 text-white p-4 md:w-140 w-75 border-1px text-2xl text-center cursor-pointer md:mb-20 mb-30"
-          >
-            {" "}
-            Sign Up{" "}
-          </button>
-        </div>
-
         {/* OTP Modal */}
         <OtpTenant
           isOpen={showOtpTenant}
@@ -345,7 +345,7 @@ const page = () => {
         />
 
         {/*Banner Section*/}
-        <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-290 ml-10 md:ml-190 md:mb-30 mb-10 md:w-100% w-50% md:mr-10 mr-10">
+        <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-330 ml-10 md:ml-190 md:mb-100 mb-10 md:w-100% w-50% md:mr-10 mr-10">
           {/* RIGHT SECTION */}
           <div
             className={
@@ -384,7 +384,7 @@ const page = () => {
           </div>
         </div>
         {/*End of Banner Section*/}
-      </div>
+    
     </>
   );
 };

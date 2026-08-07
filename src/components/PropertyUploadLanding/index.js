@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Subscript } from "lucide-react";
-import SubscriptModal from "../subscriptionModal1";
+import SubscriptModal from "../subscriptionModalPropertyAlert";
 
 const Index = () => {
   const router = useRouter();
@@ -138,7 +138,7 @@ const Index = () => {
           );
         })}
       </div>
-      <SubscriptModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <SubscriptModal isOpen={isOpen} onClose={() => setIsOpen(null)} />
     </div>
   );
 };

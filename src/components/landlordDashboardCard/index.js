@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import SubscriptionModal2 from "../../components/subscriptionModal2";
-import SubscriptionModal1 from "../../components/subscriptionModal1";
+import SubscriptionModal2 from "../subscriptionModalProfileViewAlert";
+import SubscriptionModal1 from "../subscriptionModalPropertyAlert";
 
 import { useRouter } from "next/navigation";
 
@@ -20,7 +20,7 @@ const index = () => {
   const [utilityCompletion, setUtilityCompletion] = useState(false);
 
   const [loadingListing, setLoadingListing] = useState(true);
-  const [uploadedListing, setUploadedListing] = useState(true);
+  const [uploadedListing, setUploadedListing] = useState(false);
 
   const [subscribed, setIsSubscribed] = useState(false);
 
@@ -110,31 +110,30 @@ const index = () => {
   }, []);
 
 
-  //Bank Completion
-  useEffect(() => {
-    const fetchAddBank = async () => {
-      try {
-        const res = await fetch("/api/accounts/getBanks", {
-          credentials: "include",
-          method: "GET",
-        });
-
-        if (!res.ok) {
-          setBankCompletion(false);
-          return;
-        }
-
-        const data = await res.json();
-
-        setBankCompletion(Boolean(data.getBanks));
-      } catch (err) {
-        console.error(err);
-        setBankCompletion(false);
-      }
-    };
-
-    fetchAddBank();
-  }, []);
+     useEffect(() => {
+          const fetchCompleteBankDetails = async () => {
+            try {
+              const res = await fetch("/api/accounts/bankDetails", {
+                credentials: "include",
+              });
+      
+              if (!res.ok) {
+                setBankCompletion(false);
+                return;
+              }
+      
+              const data = await res.json();
+              setBankCompletion(Boolean(data.bankDetails));
+            } catch (err) {
+              console.error(err);
+              setBankCompletion(false);
+            } finally {
+              setUtilityLoading(false);
+            }
+          };
+      
+          fetchCompleteBankDetails();
+      }, []);
 
   //Add Property listing
   useEffect(() => {
@@ -251,6 +250,7 @@ const index = () => {
         setIsOpen(true);
         return;
       }
+        router.push("/propertyListingUploadForm");
 
       // allowed
       // router.push("/subscriptionModal1");
@@ -337,38 +337,45 @@ const index = () => {
 
             )}
 
-            {/* Account Details */}
-            {profilePercent === 87 && (
-              <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
-                <h4 className="text-blue-950 font-bold mb-3">
-                  Account Details
-                </h4>
+              {/* Account Details */}
+            <div className="space-y-2 rounded-lg bg-white p-6 shadow-md hover:shadow-lg hover:scale-105 transition duration-300">
+              <h4 className="text-blue-950 font-bold text-lg">
+                Bank Account
+              </h4>
 
-                <p>
-                  Add your account details for quick tenant property payment.
-                </p>
+              <p className="text-gray-600">
+                Add your bank account details to receive tenant payments directly.
+              </p>
 
-                <Link href="/">
-                  <div className="flex justify-center">
-                    <button className="bg-blue-900 cursor-pointer hover:rounded-full px-6 py-2 w-full text-white text-sm mt-6 hover:bg-blue-800 transition">
-                      Add Account
-                    </button>
+              <Link href="/landlordAccountForm">
+                <div className="flex justify-center mt-6">
+                  <button
+                    disabled={bankCompletion}
+                    className="bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed hover:rounded-full px-6 py-2 w-full text-white text-sm mt-6 cursor-pointer hover:bg-blue-800 transition"
+                  >
+                    {bankCompletion ? "Account Added" : "Add Bank Account"}
+                  </button>
+                </div>
+              </Link>
+            </div>
+
+              {/*Advert */}
+                <Link href={""}>
+                  <div className="h-30 w-150 bg-amber-500 mt-14 mb-6 ml-70 justify-center items-center px-6">
+                    <p className="justify-center items-center pt-12 pl-10">Video Advert goes here...</p>
                   </div>
                 </Link>
-              </div>
-            )}
-
-            {/* Subscription */}
-            {profilePercent === 87 && (
-              <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
-                <h4 className="text-blue-950 font-bold mb-3">Subscribe</h4>
+          
+              {/* Subscription */}
+                {/* {profilePercent === 87 && (
+                <div className="space-y-2 rounded-lg hover:rounded-none bg-white p-6 shadow-md hover:scale-105 transition-transform duration-300">
+                  <h4 className="text-blue-950 font-bold mb-3">Subscribe</h4>
 
                 <p>
                   Subscribe to our monthly package for you to be able to enjoy
                   full benefits
-                </p>
-
-                <Link href="#">
+                </p> */}
+                {/* <Link href="#">
                   <div className="flex justify-center ">
                     <button 
                         className="bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 w-full text-white text-sm mt-6"
@@ -376,9 +383,9 @@ const index = () => {
                       Coming soon
                     </button>
                   </div>
-                </Link>
-              </div>
-            )}
+                </Link> */}
+              {/* </div> */}
+              {/* )} */}
           </div>
         </div>
     </>

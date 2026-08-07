@@ -103,11 +103,10 @@ function landlordDashboard() {
 
     //Bank Completion
     useEffect(() => {
-        const fetchAddBank = async () => {
+        const fetchCompleteBankDetails = async () => {
           try {
             const res = await fetch("/api/accounts/bankDetails", {
               credentials: "include",
-              method: "GET"
             });
     
             if (!res.ok) {
@@ -116,8 +115,8 @@ function landlordDashboard() {
             }
     
             const data = await res.json();
-            
-            setBankCompletion(Boolean(data.bankDetails));
+            console.log("BANK API RESPONSE:", data);
+            setBankCompletion(Boolean(data.bankDetails))
 
           } catch (err) {
             console.error(err);
@@ -127,7 +126,7 @@ function landlordDashboard() {
           }
         };
     
-        fetchAddBank();
+        fetchCompleteBankDetails();
     }, []);
 
     //Add Property listing
@@ -252,13 +251,22 @@ function landlordDashboard() {
     
             // allowed
             router.push("/propertyListingLanding");
+
+            
         } finally {
             setChecking(false);
         }
     };
+        console.log({
+            profilePercent,
+            utilityCompletion,
+            bankCompletion,
+        });
 
-
-    if (profilePercent === 100 && utilityCompletion) {
+    if (profilePercent === 87 && 
+        utilityCompletion &&
+        bankCompletion
+        ) {
         return (
           <>
             <LandlordDashboardComplete />
@@ -273,12 +281,7 @@ function landlordDashboard() {
     
     return (
         <>
-            <div className="flex bg-gray-100">
-               {profilePercent ===100 && 
-               utilityCompletion && 
-               bankCompletion ? (
-               <LandlordDashboardComplete />
-            ) : (       
+                
                 <div className="flex min-h-screen bg-gray-100">
                     <LandlordDashboardSidebar />
                     <div className="flex-1">
@@ -315,8 +318,8 @@ function landlordDashboard() {
                         </div>
                     </div>
                 </div>
-            )}
-            </div>
+            
+            
             <LandlordDashboardFooter />
         </>
     );

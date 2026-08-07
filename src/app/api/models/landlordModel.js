@@ -37,7 +37,7 @@ const landlordSchema = new mongoose.Schema(
     landlordDashboard: {type: mongoose.Schema.Types.ObjectId, ref: "LandlordDashboard"},
     messages: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property"}],
-    payment: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
     disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
     subscription: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}]
     

@@ -5,57 +5,105 @@ import BankDetails from "@/app/api/models/bankDetailsModel.js";
 
 
 //POST Account detals
+import { NextResponse } from "next/server";
+import dbConnect from "@/app/lib/mongoose";
+import { banks } from "@/app/data/banks";
+import BankDetails from "@/app/api/models/bankDetailsModel.js";
+
 export async function POST(req) {
-  await dbConnect();
-
   try {
-    const {landlordId, accountNo, bank} = await req.json();
+    await dbConnect();
 
-    if (!landlordId) {
+    const { landlord, accountNo, bank } = await req.json();
+
+    if (!landlord) {
       return NextResponse.json(
-        { message: "No Landlord Id provided" },
-        { status: 400 },
-      )
+        { message: "No landlord ID provided" },
+        { status: 400 }
+      );
     }
 
     if (!accountNo) {
       return NextResponse.json(
-        { message: "Please input your account Number" },
-        { status: 400 },
-      )
+        { message: "Please enter your account number" },
+        { status: 400 }
+      );
     }
 
     if (!bank) {
       return NextResponse.json(
-        { message: "Please select your bank details" },
-        { status: 400 },
-      )
+        { message: "Please select a bank" },
+        { status: 400 }
+      );
     }
 
-    const result = await BankDetails.create({
-      landlordId,
-      accountNo,
-      bank
-    });
+    console.log("Saving bank details...");
+console.log("Landlord:", landlord);
+console.log("Account:", accountNo);
+console.log("Bank:", bank);
+
+    const bankDetails = await BankDetails.findOneAndUpdate(
+      { landlord },
+      {
+        accountNo,
+        bank,
+      },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+      }
+    );
 
     return NextResponse.json(
-    { message: "Bank added successfully", 
-      bank: result },
-    { status: 201 });
-    
+      {
+        success: true,
+        message: "Bank details saved successfully",
+        bankDetails,
+      },
+      { status: 200 }
+    );
   } catch (error) {
+    console.error("Bank save error:", error);
+
     return NextResponse.json(
-      { message: error.message || "Server error, something went wrong" },
+      {
+        message: error.message || "Server error",
+      },
       { status: 500 }
-    );  
-  };
-};
+    );
+  }
+}
 
 // GET BANKS
 export async function GET() {
-  await dbConnect();
+  try {
+    await dbConnect();
+
+    return NextResponse.json(
+      {
+        responseCode: "00",
+        responseMessage: "successful",
+        data: banks,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message: error.message || "Server error",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// GET BANKS
+export async function GET() {
 
   try {
+    await dbConnect();
+    
     return NextResponse.json({
       "responseCode":"00",
       "responseMessage": "successful",

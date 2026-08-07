@@ -3,7 +3,7 @@ import { mongoose } from "@/app/lib/mongoose";
 const bankDetailsSchema = new mongoose.Schema ({
   landlord: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "landlord",
+    ref: "Landlord",
     required: true
   },
   accountNo: {

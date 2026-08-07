@@ -107,7 +107,8 @@ const propertySchema = new mongoose.Schema(
     utilityBill: [{type: mongoose.Schema.Types.ObjectId,ref: "UtilityBill", default: null}],
     homeInterest: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest" }],
     addressVerification: [{type: mongoose.Schema.Types.ObjectId, ref: "AddressVerification"}],
-    payment: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}]
+    payments: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    subscription: [{type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}]
   },{ timestamps: true }
 );
 

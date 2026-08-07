@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 
-import Landlord from "../controllers/landlord.controller"
+import Landlord from "@/app/api/models/landlordModel";
+import { initializeSubscription, verifySubscription } from "@/app/lib/services/xPressSubscription";
 import dbConnect from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 
@@ -9,26 +10,53 @@ export async function POST(req) {
         await dbConnect();
 
         const body = await req.json();
+        const { email } = body;
 
-        const {action, email, cardNo, cvv2, expDate} = body;
-
-        if(!action || !email || !cardNo || !cvv2 || !expDate ) {
+        if (!email) {
             return NextResponse.json(
-            { message: "Missing required fields" },
-            { status: 400 }
+                { message: "Email is required" },
+                { status: 400 }
             );
         }
+
         const landlord = await Landlord.findOne({ email });
 
-        return NextResponse.json({
-        subscribed: landlord?.isSubscribed || false,
-        });
-        } catch (error) {
-            console.error("Landlord subscription error:", error);
+        if (!landlord) {
             return NextResponse.json(
-              { message: error.message || "Server error, something went wrong" },
-              { status: 500 }
+                { message: "Landlord not found" },
+                { status: 404 }
             );
         }
-    };
-   
+
+        console.log("LANDLORD:", landlord);
+        console.log("LANDLORD USER:", landlord.user);
+
+        const payment = await initializeSubscription(
+        {
+            email: landlord.email,
+            amount: "5000",
+            currency: "NGN",
+            plan: "basic",
+            user: landlord.user.toString(),
+        });
+
+        return NextResponse.json(payment);
+    } catch (error) {
+        console.error(error);
+
+        return NextResponse.json(
+            {message: error.message || "Server Error"},
+            {status: 500}
+        );
+    }
+}
+
+// export async function POST(req) {
+//   await dbConnect();
+
+//   const { reference } = await req.json();
+
+//   const result = await verifySubscription(reference);
+
+//   return NextResponse.json(result);
+// }

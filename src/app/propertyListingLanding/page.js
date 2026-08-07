@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
 import PropertyUploadLanding from "../../components/PropertyUploadLanding";
-import { useRouter } from "next/navigation";
+import SubscriptModal from "../../components/subscriptionModalPropertyAlert";
+
 
 const Page = () => {
   const router = useRouter();
@@ -12,6 +14,7 @@ const Page = () => {
   // landlord state
   const [landlord, setLandlord] = useState(null);
   const [landlordEmail, setLandlordEmail] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   // ✅ get logged in landlord
   useEffect(() => {
@@ -76,6 +79,48 @@ const Page = () => {
     }));
   };
 
+  const handleSubscribe = async () => {
+    try {
+        const res = await fetch("/api/landlordSubscription", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email: landlordEmail            
+            }),
+        });
+
+        const data = await res.json();
+        window.location.href = data.paymentUrl;
+        
+        if (!res.ok) {
+          toast.error(data.message);
+          return;
+        }
+
+        const width = 500;
+        const height = 750;
+
+        const left = 300;
+        const top = 100;
+
+        const popup = window.open (
+          data.paymentUrl,
+          "XpressPayment",
+          `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+        );
+
+        if (!popup) {
+          toast.error("Popup blocked. Please allow pop-ups and try again.");
+        }
+    } catch (err) {
+        console.error(err);
+        toast.error("Failed to initialize payment.");
+    }
+};
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -117,7 +162,14 @@ const Page = () => {
         {/* Footer */}
         <LandlordDashboardFooter />
       </div>
+
+<SubscriptModal
+    isOpen={isOpen}
+    onClose={() => setIsOpen(false)}
+    onContinue={handleSubscribe}
+/>
     </div>
+    
   );
 };
 
