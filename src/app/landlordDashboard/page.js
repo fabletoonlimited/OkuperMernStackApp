@@ -22,6 +22,7 @@ function landlordDashboard() {
     const [landlord, setLandlord] = useState(null);
     const [propertyCount, setPropertyCount] = useState(0);
     const [propertyUpload, setPropertyUpload] = useState(0);
+    const [loading, setLoading] = useState(false)
 
     
     // landlord state
@@ -252,7 +253,7 @@ function landlordDashboard() {
             // allowed
             router.push("/propertyListingLanding");
 
-            
+
         } finally {
             setChecking(false);
         }
@@ -317,9 +318,7 @@ function landlordDashboard() {
                             <LandlordDashboardCard />
                         </div>
                     </div>
-                </div>
-            
-            
+                </div>  
             <LandlordDashboardFooter />
         </>
     );

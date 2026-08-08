@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
-import ProfilePage from "@/app/landlordProfile/page";
+import LandlordProfilePage from "@/app/landlordProfileForm/page";
 
-const verication = ({params}) => {
+const landlordVerification = ({params}) => {
   
     // landlord state
     const [landlord, setLandlord] = useState(null);
+    const [landlordProfile, setLandlordProfile] = useState(null)
     const [landlordEmail, setLandlordEmail] = useState(null);
     const {propertyId} = params;
 
@@ -36,49 +37,79 @@ const verication = ({params}) => {
     }, []);
 
     // Landlord
-        useEffect(() => {
-            const fetchLandlord = async () => {
-                try {
-                    const res = await fetch("/api/landlord", {
+    useEffect(() => {
+        const fetchLandlord = async () => {
+            try {
+                const res = await fetch("/api/landlord", {
+                method: "GET",
+                credentials: "include",
+                });
+            
+                if (!res.ok) {
+                toast.error("Failed to fetch landlord");
+                return;
+                }
+            
+                const data = await res.json();
+                setLandlord(data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Landlord fetch error");
+            }
+        };
+        fetchLandlord();
+    }, []);
+    
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await fetch("/api/landlordProfile/upload", {
                     method: "GET",
                     credentials: "include",
-                    });
-            
-                    if (!res.ok) {
-                    toast.error("Failed to fetch landlord");
+                });
+    
+                if (!res.ok) {
+                    toast.error("Failed to load landlord profile");
                     return;
-                    }
-            
-                    const data = await res.json();
-                    setLandlord(data);
-                } catch (err) {
-                    console.error(err);
-                    toast.error("Landlord fetch error");
                 }
-            };
-            fetchLandlord();
-        }, []);
+    
+                const data = await res.json();        
+                console.log(data); 
+                setLandlordProfile(data);
+
+            } catch (err) {
+                console.error("Profile fetch error:", err);
+                toast.error("Failed to load profile");
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+            fetchProfile();
+    }, []);
+
   return (
     <div>
       <LandlordDashboardSidebar />
-      <div className="bg-white shadow-md p-10 rounded-md  ">
-        <h1 className="font-bold md:text-5xl text-2xl pl-7">
-          Dear, {}
-          {landlord
-            ? `${landlord.firstName} ${landlord?.lastName}`
-            : "Landlord"}
-          !
-        </h1>
-        <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-          We are thrilled that you have chosen to list your property with
-          Okuper.
-        </p>
-      </div>
+        <div className="bg-white shadow-md p-10 rounded-md  ">
+            <h1 className="font-bold md:text-5xl text-2xl pl-7">
+                Dear, {" "}
+                {
+                    landlord
+                    ? `${landlord.firstName} ${landlord?.lastName}`
+                    : "Landlord"
+                }
+                !
+            </h1>
+            <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
+                We are thrilled that you have chosen to list your property with Okuper.
+            </p>
+        </div>
 
-      <ProfilePage />
+      <LandlordProfilePage landlordProfile={landlordProfile} />
       <LandlordDashboardFooter />
     </div>
   );
 };
 
-export default verication;
+export default landlordVerification;

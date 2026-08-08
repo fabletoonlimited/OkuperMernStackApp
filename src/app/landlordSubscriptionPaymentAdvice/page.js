@@ -8,6 +8,7 @@ import {useState} from "react"
 const Page = () => {
     const [landlord, setLandlord] = useState([])
     const [property, setProperty] = useState([]);
+    
     useEffect(() => {
         const fetchlandlord = async () => {
             try {

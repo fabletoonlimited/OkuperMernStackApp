@@ -399,7 +399,7 @@ const Index = () => {
                             {property?.price ? `₦${Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
                         </span>
                         <p className="text-lg md:mt-1 mt-2 text-blue-900">
-                            Price displayed is not inclusive of Landlord's 10% legal fee & Okuper's 5% service charge.
+                            Price displayed is not inclusive of Landlord's 7% legal fee & Okuper's 3% service charge.
                         </p>
 
                         <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">

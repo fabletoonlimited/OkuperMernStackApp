@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 const index = ({ isOpen, onClose, onContinue }) => {
     const router = useRouter();
 
+    const [subscribing, setSubscribing] = useState(false)
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [landlord, setLandlord] = useState(null);
     const [landlordEmail, setLandlordEmail] = useState("");
@@ -115,9 +116,14 @@ const index = ({ isOpen, onClose, onContinue }) => {
                     </p>
                     <div className="rounded-2 mb-4">
                         <button
-                            className="bg-blue-700 px-16 py-2 cursor-pointer hover:rounded-full"
+                            className="bg-blue-700 px-16 py-2 cursor-pointer hover:rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={subscribing}
                             onClick={async () => {
+                                if (subscribing) return;
+
                                 try {
+                                    setSubscribing(true);
+
                                     const res = await fetch("/api/landlordSubscription", {
                                         method: "POST",
                                         headers: {
@@ -132,23 +138,30 @@ const index = ({ isOpen, onClose, onContinue }) => {
                                     const data = await res.json();
 
                                     if (!res.ok) {
-                                        toast.error(data.message || "Failed to initialize subscription.");
+                                        toast.error(
+                                            data.message || "Failed to initialize subscription."
+                                        );
+                                        setSubscribing(false);
                                         return;
                                     }
 
                                     if (!data.paymentUrl) {
                                         toast.error("No payment URL returned.");
+                                        setSubscribing(false);
                                         return;
                                     }
 
+                                    // Keep button disabled while redirecting to payment gateway
                                     window.location.href = data.paymentUrl;
+
                                 } catch (err) {
                                     console.error(err);
                                     toast.error("Failed to initialize subscription.");
+                                    setSubscribing(false);
                                 }
                             }}
                         >
-                            Subscribe Now
+                            {subscribing ? "Loading..." : "Subscribe Now"}
                         </button>
                   </div>
               </div>

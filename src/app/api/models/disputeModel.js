@@ -29,12 +29,18 @@ const disputeSchema = new mongoose.Schema ({
         type: String,
         enum: ["open", "in_progress", "resolved", "rejected"],
         default: "open"
-    }
+    },
+
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true},
+    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
+    agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent", required: true},
+    
+    
 }, { timestamps: true });
 
     disputeSchema.pre("save", async function (next) {
         if (!this.disputeNo) {
-            this.disputeNo = `OKTenCom-${nanoid(6).toUpperCase()}`;
+            this.disputeNo = `OkDisCom-${nanoid(6).toUpperCase()}`;
         }
         next();
     });

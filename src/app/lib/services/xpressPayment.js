@@ -1,27 +1,38 @@
+import crypto from "crypto";
 import Payment from "@/app/api/models/paymentModel";
 import User from "@/app/api/models/userModel"
 
 
-export const initializePayment = async (data) => {
-  const { reference, email, amount, currency, status, isSplitpayment, splitPaymentReference, user } = data;
+export const initializePayment = async ({
+  email, 
+  amount, 
+  currency,  
+  isSplitPayment,
+  splitPaymentReference,
+  property,
+  user 
+}) => {
 
-  if (!reference || !email || !amount || !currency || !status || !user) 
+  const reference = crypto.randomUUID();
+
+  if (!email || !amount || !currency || !user) 
     {throw new Error("All fields are required")}
 
-  if (isSplitpayment && !splitPaymentReference) 
+  if (isSplitPayment && !splitPaymentReference) 
     {throw new Error("Split payment reference is required")}
 
-  // Prevent duplicate payments
-  const existingPayment = await Payment.findOne({ reference });
-
-  if (existingPayment) 
-    {throw new Error("Payment already exists")}
+  // verify user exists
+  const currentUser = await User.findById(user);
+    if (!currentUser) {
+    throw new Error("User not found");
+  }
 
   const normalizedEmail = email.trim().toLowerCase();
 
   //Calculate total amount for Xpress
-  const serviceCharge = amount * 0.05;
-  const finalPaidAmount = amount = serviceCharge;
+  const serviceCharge = amount * 0.03;
+  const legalFee = amount * 0.07;
+  const finalPaidAmount = amount + legalFee + serviceCharge;
 
   // Initialize payment with Xpress
   const response = await fetch(
@@ -33,8 +44,11 @@ export const initializePayment = async (data) => {
         Authorization: `Bearer ${process.env.NEXT_XPRESS_PUBLIC_KEY}`,
       },
       body: JSON.stringify({
-        data,
-        amount: finalPaidAmount
+        reference,
+        email: normalizedEmail,
+        amount: finalPaidAmount,
+        currency,
+        property
       }),
     }
   );
@@ -42,8 +56,10 @@ export const initializePayment = async (data) => {
   if (!response.ok) {throw new Error("Payment initialization failed")}
 
   const result = await response.json();
+  if (!result.status) {
+  throw new Error(result.message || "Payment initialization failed");
+}
 
-  const currentUser = await User.findById(user);
 
   let payment;
   
@@ -52,10 +68,13 @@ export const initializePayment = async (data) => {
     reference, 
     email: normalizedEmail, 
     amount, 
-    currency, 
-    status, 
-    isSplitpayment, 
+    currency,  
+    legalFee,
+    serviceCharge,
+    finalPaidAmount,
+    isSplitPayment, 
     splitPaymentReference, 
+    property,
     user
     });
   } else {
@@ -63,15 +82,15 @@ export const initializePayment = async (data) => {
     reference, 
     email: normalizedEmail, 
     amount, 
-    currency, 
-    status, 
+    currency,  
+    property,
     user
   });
   }
   return {
     status: result.status,
     transactionId: payment.transactionId,
-    amount: payment.finalPaidAmount,     
+    amount: payment.finalPaidAmount || payment.amount,     
     result,
   };
 };
@@ -95,6 +114,8 @@ export const verifyPayment = async (reference) => {
 
   const result = await response.json();
 
+  if(result.status === "Successful") {
+
   // Update payment after successful verification
   await Payment.findOneAndUpdate(
     { reference },
@@ -103,7 +124,7 @@ export const verifyPayment = async (reference) => {
       transactionId: result.transactionId
     },
     { new: true }
-  );
+  )};
 
   return result;
 };

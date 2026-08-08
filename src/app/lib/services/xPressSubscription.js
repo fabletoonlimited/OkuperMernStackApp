@@ -32,17 +32,6 @@ export const initializeSubscription = async ({
     throw new Error("Duplicate reference");
   }
 
-  // console.log({
-  //   url: `${process.env.NEXT_XPRESS_URL}/Payments/Initialize`,
-  //   body: JSON.stringify({
-  //     // reference,
-  //     Email: normalizedEmail,
-  //     Amount: amount.toString(),
-  //     Currency: currency,
-  //     TransactionId: reference
-  //   }),
-  // });
-
   const body = JSON.stringify({
   Email: normalizedEmail,
   Amount: amount.toString(),

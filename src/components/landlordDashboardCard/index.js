@@ -110,30 +110,31 @@ const index = () => {
   }, []);
 
 
-     useEffect(() => {
-          const fetchCompleteBankDetails = async () => {
-            try {
-              const res = await fetch("/api/accounts/bankDetails", {
-                credentials: "include",
-              });
+  useEffect(() => {
+    const fetchCompleteBankDetails = async () => {
+      try {
+        const res = await fetch("/api/accounts/bankDetails", {
+          credentials: "include",
+        });
       
-              if (!res.ok) {
-                setBankCompletion(false);
-                return;
-              }
+        if (!res.ok) {
+          setBankCompletion(false);
+          return;
+        }
       
-              const data = await res.json();
-              setBankCompletion(Boolean(data.bankDetails));
-            } catch (err) {
-              console.error(err);
-              setBankCompletion(false);
-            } finally {
-              setUtilityLoading(false);
-            }
-          };
+        const data = await res.json();
+          setBankCompletion(Boolean(data.bankDetails));
+        } catch (err) {
+          
+        console.error(err);
+        setBankCompletion(false);
+        } finally {
+          setUtilityLoading(false);
+        }
+      };
       
-          fetchCompleteBankDetails();
-      }, []);
+      fetchCompleteBankDetails();
+  }, []);
 
   //Add Property listing
   useEffect(() => {
@@ -252,7 +253,6 @@ const index = () => {
       }
         router.push("/propertyListingUploadForm");
 
-      // allowed
       // router.push("/subscriptionModal1");
     } finally {
       setChecking(false);

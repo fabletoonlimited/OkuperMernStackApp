@@ -1,8 +1,8 @@
 "use client";
-
 import React from 'react'
 
 const index = ({ isOpen, onClose, onContinue }) => {
+    const [loading, setIsLoading] = useState(null)
     if (!isOpen) return null;
     
   return (

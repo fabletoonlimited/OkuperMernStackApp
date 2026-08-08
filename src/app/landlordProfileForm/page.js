@@ -20,12 +20,11 @@ const emptyProfile = {
     status: "",
     gender: "",
     age: "",
-    currentAddress: "",
+    homeAddress: "",
     city: "",
     state: "",
     country: "",
     zipCode: "",
-    stateOfOrigin: "",
 };
 
 const steps = [
@@ -92,10 +91,9 @@ const options = {
 const inputClass = "w-full rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-800 shadow-sm focus:border-blue-800 focus:outline-none";
 const labelClass = "text-sm font-semibold text-blue-950";
 
-const ProfilePage = () => {
-    
-  const router = useRouter();
-  
+const LandlordProfilePage = ({ landlordProfile }) => {
+    const router = useRouter();
+      
     const [formData, setFormData] = useState(emptyProfile);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -103,46 +101,110 @@ const ProfilePage = () => {
     const [stepIndex, setStepIndex] = useState(0);
     const [role, setRole] = useState(null);
     const [imagePreviews, setImagePreviews] = useState({});
+    const [landlord, setLandlord] = useState(false)
+    const [landlorProfile, setLandlordProfile] = useState(false)
+
+    useEffect(() => {
+        if (!landlordProfile) return;
+
+        setFormData((prev) => ({
+            ...prev,
+            ...landlordProfile,
+        }));
+    }, [landlordProfile]);
+
+    useEffect(() => {
+        const fetchLandlord = async () => {
+            try {
+                const res = await fetch("/api/landlord", {
+                method: "GET",
+                credentials: "include",
+                });
+                
+                if (!res.ok) {
+                toast.error("Failed to fetch landlord");
+                return;
+                }
+                
+                    const data = await res.json();
+                    setLandlord(data);
+                          
+                // Landlord fields
+                setFormData((prev) => ({
+                    ...prev,
+                    firstName: data.firstName || "",
+                    lastName: data.lastName || "",
+                    email: data.email || "",
+                }));
+
+                } catch (err) {
+                    console.error(err);
+                    toast.error("Landlord fetch error");
+                }
+            };
+            fetchLandlord();
+        }, []);
+        
+        useEffect(() => {
+            const fetchProfile = async () => {
+                try {
+                    const res = await fetch("/api/landlordProfile/upload", {
+                        method: "GET",
+                        credentials: "include",
+                    });
+        
+                    if (!res.ok) {
+                        if (res.status === 404) {
+                            setLoading(false);
+                            return
+                        }
+
+                        toast.error("Failed to load landlord profile");
+                        return;
+                    }
+        
+                    const data = await res.json();  
+
+                    console.log(data); 
+
+                setLandlordProfile(data);
+
+                setFormData((prev) => ({
+                    ...prev,
+
+                    previewPic: data.previewPic || "",
+                    phone: data.phone || "",
+                    documentType: data.documentType || "",
+                    idNumber: data.idNumber || "",
+                    status: data.status || "",
+                    gender: data.gender || "",
+                    age: data.age || "",
+                    homeAddress: data.homeAddress || "",
+                    city: data.city || "",
+                    state: data.state || "",
+                    country: data.country || "",
+                    zipCode: data.zipCode || "",
+                    documentType: data.documentType || "",
+                }));
+    
+                } catch (err) {
+                    console.error("Profile fetch error:", err);
+                    toast.error("Failed to load profile");
+                } finally {
+                    setLoading(false);
+                }
+            };
+        
+                fetchProfile();
+        }, []);
+
 
     const progressPercent = useMemo(() => {
         if (!steps.length) return 0;
         return Math.round(((stepIndex + 1) / steps.length) * 100);
     }, [stepIndex]);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                setLoading(true);
-                const res = await fetch("/api/landlordProfile", {
-                    credentials: "include",
-                });
-
-                if (!res.ok) {
-                    toast.error("Failed to load landlord profile");
-                    return;
-                }
-
-                const data = await res.json();
-                const profile = data.landlordProfile || {};
-
-                setRole(data.role || null);
-
-                setFormData({
-                ...emptyProfile,
-                ...profile,
-                });
-
-            } catch (err) {
-                console.error("Profile fetch error:", err);
-                toast.error("Failed to load profile");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProfile();
-    }, []);
-
+   
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -150,9 +212,6 @@ const ProfilePage = () => {
 
 
     const handleUpload = async (e, field) => {
-        //  console.log("UPLOAD START");
-        // e.preventDefault();
-        // e.stopPropagation();
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -180,33 +239,7 @@ const ProfilePage = () => {
                 [field]: data.url,
             }));
 
-            // toast.success("Profile successfully updated")
-            
-            // toast.success(`${field} uploaded`);
-            //   switch (formData.category) {
-                    // case "Rent":
-                    //   router.push("/rent");
-                    //   break;
-                      
-                    // case "Buy":
-                    //   router.push("/buy");
-                    //   break;
-            
-                    // case "Sell":
-                    //   router.push("/sell");
-                    //   break;
-            
-                    // case "Shortlet":
-                    //   router.push("/shortlet");
-                    //   break;
-                    
-                    // default:
-                    //   router.push("/allProperties");
-                //   }
-            // console.log("Upload Response:", data);
-
-            
-  console.log("UPLOAD FINISH");
+        console.log("UPLOAD FINISH");
         } catch (err) {
             console.error("Upload error:", err);
             toast.error("Upload failed");
@@ -238,7 +271,7 @@ const ProfilePage = () => {
             return;
         }
 
-        if (!formData.currentAddress) {
+        if (!formData.homeAddress) {
             toast.error("kindly fill current address");
             return
         }
@@ -289,67 +322,75 @@ const ProfilePage = () => {
                                 type="file"
                                 accept="image/*,application/pdf"
                                 onChange={(e) => handleUpload(e, "previewPic")}
+                                src={""}
                                 className="text-sm"
                             />
-
-                        
+                            
                             <div className="text-xs text-gray-600">
-                                {uploading
+                                {
+                                    uploading
                                     ? "Uploading document..."
                                     : formData.previewPic
-                                      ? "Document uploaded successfully"
-                                      : "Upload a clear image or PDF of your ID"}
+                                    ? "Document uploaded successfully"
+                                    : "Upload a clear image or PDF of your ID"
+                                }
                             </div>
+
                             {formData.previewPic && (
                                 <a
-                                    href={formData.previewPic}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-xs font-semibold text-blue-900 underline">
-                                    View uploaded document
+                                href={formData.previewPic}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs font-semibold text-blue-900 underline">
+                                View uploaded document
                                 </a>
                             )}  
                         </div>
                     </label>
+
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className={labelClass}>First name</label>
                             <input
-                                className={inputClass}
+                                type="text"
                                 name="firstName"
                                 placeholder="First name"
-                                value={formData.firstName}
+                                value={formData.firstName || ""}
                                 onChange={handleChange}
+                                className={inputClass}
                             />
                         </div>
                         <div>
                             <label className={labelClass}>Last name</label>
                             <input
-                                className={inputClass}
+                                type="text"
                                 name="lastName"
                                 placeholder="Last name"
-                                value={formData.lastName}
+                                value={formData.lastName || ""}
                                 onChange={handleChange}
+                                className={inputClass}
                             />
                         </div>
                         <div>
                             <label className={labelClass}>Email</label>
                             <input
-                                className={inputClass}
+                                type="text"
                                 name="email"
                                 placeholder="Email"
-                                value={formData.email}
+                                value={formData.email || ""}
                                 onChange={handleChange}
+                                className={inputClass}
                             />
                         </div>
                         <div>
                             <label className={labelClass}>Phone</label>
                             <input
-                                className={inputClass}
+                                type="text"
                                 name="phone"
                                 placeholder="Phone"
-                                value={formData.phone}
+                                value={formData.phone || ""}
                                 onChange={handleChange}
+                                className={inputClass}
                             />
                         </div>
                     </div>
@@ -378,11 +419,12 @@ const ProfilePage = () => {
                     <div>
                         <label className={labelClass}>ID number</label>
                         <input
-                            className={inputClass}
+                            type="text"
                             name="idNumber"
                             placeholder="ID number"
-                            value={formData.idNumber}
+                            value={formData.idNumber || ""}
                             onChange={handleChange}
+                            className={inputClass}
                         />
                     </div>
                     <div className="md:col-span-2">
@@ -391,19 +433,19 @@ const ProfilePage = () => {
                             <input
                                 type="file"
                                 accept="image/*,application/pdf"
-                                onChange={(e) => handleUpload(e, "documentImage")}
+                                onChange={(e) => handleUpload(e, "documentType")}
                                 className="text-sm"
                             />
                             <div className="text-xs text-gray-600">
                                 {uploading
                                     ? "Uploading document..."
-                                    : formData.documentImage
-                                      ? "Document uploaded successfully"
-                                      : "Upload a clear image or PDF of your ID"}
+                                    : formData.documentType
+                                    ? "Document uploaded successfully"
+                                    : "Upload a clear image or PDF of your ID"}
                             </div>
-                            {formData.documentImage && (
+                            {formData.documentType && (
                                 <a
-                                    href={formData.documentImage}
+                                    href={formData.documentType}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="text-xs font-semibold text-blue-900 underline">
@@ -436,11 +478,12 @@ const ProfilePage = () => {
                     <div>
                         <label className={labelClass}>Age</label>
                         <input
-                            className={inputClass}
+                            type="text"
                             name="age"
                             placeholder="Age"
                             value={formData.age}
                             onChange={handleChange}
+                            className={inputClass}
                         />
                     </div>
                 </div>
@@ -454,64 +497,59 @@ const ProfilePage = () => {
                     <div>
                         <label className={labelClass}>Current Address</label>
                         <input
+                            type="text"
                             className={inputClass}
-                            name="currentAddress"
-                            placeholder="Current address"
-                            value={formData.currentAddress}
+                            name="homeAddress"
+                            placeholder="Your own current home address"
+                            value={formData.homeAddress || ""}
                             onChange={handleChange}
                         />
                     </div>
                     <div>
                         <label className={labelClass}>City</label>
                         <input
+                            type="text"
                             className={inputClass}
                             name="city"
                             placeholder="City"
-                            value={formData.city}
+                            value={formData.city || ""}
                             onChange={handleChange}
                         />
                     </div>
                     <div>
                         <label className={labelClass}>State</label>
                         <input
+                            type="text"
                             className={inputClass}
                             name="state"
                             placeholder="State"
-                            value={formData.state}
+                            value={formData.state || ""}
                             onChange={handleChange}
                         />
                     </div>
                     <div>
                         <label className={labelClass}>Country</label>
                         <input
+                            type="text"
                             className={inputClass}
                             name="country"
                             placeholder="Country"
-                            value={formData.country}
+                            value={formData.country || ""}
                             onChange={handleChange}
                         />
                     </div>
                     <div>
                         <label className={labelClass}>Zip code</label>
                         <input
+                            type="text"
                             className={inputClass}
                             name="zipCode"
                             placeholder="Zip code"
-                            value={formData.zipCode}
+                            value={formData.zipCode || ""}
                             onChange={handleChange}
                         />
                     </div>
 
-                    <div>
-                        <label className={labelClass}>State of origin</label>
-                        <input
-                            className={inputClass}
-                            name="stateOfOrigin"
-                            placeholder="State of origin"
-                            value={formData.stateOfOrigin}
-                            onChange={handleChange}
-                        />
-                    </div>
                 </div>
             );
         }
@@ -632,4 +670,4 @@ const ProfilePage = () => {
     );
 };
 
-export default ProfilePage;
+export default LandlordProfilePage;

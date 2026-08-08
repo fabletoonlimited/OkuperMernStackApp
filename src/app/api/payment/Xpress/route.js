@@ -16,7 +16,7 @@ export async function POST(req) {
             isSplitpayment, splitPaymentReference, user 
         } = body;
 
-        if ( !reference || !email || !amount || !currency || !status || !user) {
+        if ( !reference || !email || !amount || !currency || !status || !isSplitpayment || !user) {
         return NextResponse.json(
             { error: "Reference, Email, Amount, Currency and Status are required" },
             { status: 400 }

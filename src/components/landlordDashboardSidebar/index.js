@@ -105,7 +105,7 @@ const index = () => {
             <li className="hover:text-yellow-500 flex items-center justify-between"> Listings <FaMoneyBillWave /></li>
           </Link>
 
-          <Link href="/verification">
+          <Link href="/landlordVerification">
             <li className="hover:text-yellow-500 flex items-center justify-between"> Verification <FaEye /></li>
           </Link>
 

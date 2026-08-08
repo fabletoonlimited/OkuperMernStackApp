@@ -4,33 +4,202 @@ import React, { useState, useEffect } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar/index.js";
 import PropertyCard from "@/components/propertyCard";
 import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
 
 const page = () => {
-    const [profilePercent, setProfilePercent] = useState(100);
-    const [savedHomesCount, setSavedHomesCount] = useState(100);
+    const router = useRouter();
 
-    //Fetch SavedHomes Count
+    const [profilePercent, setProfilePercent] = useState(100);
+    const [loading, setLoading] = useState(false);
+    const [properties, setProperties] = useState([]);
+    const [propertyCount, setPropertyCount] = useState(0);
+    const [landlord, setLandlord] = useState(null);
+    const [landlordProfile, setLandlordProfile] = useState(null)
+    const [tenant, setIsTenant] = useState(null);
+    const [tenantProfile, setTenantProfile] = useState(null)
+    const [dispute, setDispute] = useState([])
+
+
+    // Landlord
     useEffect(() => {
-        const fetchSavedHomesCount = async () => {
+        const fetchLandlord = async () => {
             try {
-                const res = await fetch("/api/savedHomes", {
+                const res = await fetch("/api/landlord", {
+                method: "GET",
+                credentials: "include",
+                });
+            
+                if (!res.ok) {
+                toast.error("Failed to fetch landlord");
+                return;
+                }
+            
+                const data = await res.json();
+                setLandlord(data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Landlord fetch error");
+            }
+        };
+        fetchLandlord();
+    }, []);
+    
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await fetch("/api/landlordProfile/upload", {
+                    method: "GET",
                     credentials: "include",
+                });
+    
+                if (!res.ok) {
+                    toast.error("Failed to load landlord profile");
+                    return;
+                }
+    
+                const data = await res.json();        
+                console.log(data); 
+                setLandlordProfile(data);
+
+            } catch (err) {
+                console.error("Profile fetch error:", err);
+                toast.error("Failed to load profile");
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+            fetchProfile();
+    }, []);
+
+    useEffect(() => {
+        const fetchTenant = async () => {
+            try {
+                const res = await fetch("/api/tenant", {
+                method: "GET",
+                credentials: "include",
+                });
+            
+                if (!res.ok) {
+                toast.error("Failed to fetch tenant");
+                return;
+                }
+            
+                const data = await res.json();
+                setIsTenant(data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Tenant fetch error");
+            }
+        };
+        fetchTenant();
+    }, []);
+
+    useEffect(() => {
+        const fetchTenantProfile = async () => {
+            try {
+                const res = await fetch("/api/tenantProfile/upload", {
+                    method: "GET",
+                    credentials: "include",
+                });
+    
+                if (!res.ok) {
+                    toast.error("Failed to load tenant profile");
+                    return;
+                }
+    
+                const data = await res.json();        
+                console.log(data); 
+                setTenantProfile(data);
+    
+            } catch (err) {
+                console.error("Profile fetch error:", err);
+                toast.error("Failed to load profile");
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchTenantProfile();
+    }, []);
+
+    useEffect(() => {
+        const fetchProperties = async () => {
+            try {
+                const res = await fetch("/api/property", {
+                    credentials: "include",
+                    cache: "no-store",
                 });
 
                 if (!res.ok) {
-                    setSavedHomesCount(null);
+                    setProperties([]);
                     return;
                 }
+
                 const data = await res.json();
-                setSavedHomesCount(
-                    Number.isFinite(data.Number) ? data.Number : 0
-                );
+
+                console.log("PROPERTIES:", data);
+
+                setProperties(Array.isArray(data) ? data : []);
             } catch (err) {
-                console.error("Saved Homes count error:", err);
-                setSavedHomesCount(null);
+                console.error("Property fetch error:", err);
+                setProperties([]);
             }
         };
-        fetchSavedHomesCount()
+
+        fetchProperties();
+    }, []);
+        
+    //Add Property listing
+    useEffect(() => {
+        const fetchAddProperty = async () => {
+          try {
+            const res = await fetch("/api/property", {
+              credentials: "include",
+            });
+    
+            if (!res.ok) {
+              setPropertyUpload(false);
+              return;
+            }
+    
+            const data = await res.json();
+            setPropertyUpload(Boolean(data.uploaded));
+          } catch (err) {
+            console.error(err);
+            setPropertyUpload(false);
+          } finally {
+            setUtilityLoading(false);
+          }
+        };
+    
+        fetchAddProperty();
+    }, []);
+
+
+    useEffect(() => {
+        const fetchDispute = async () => {
+            try {
+                const res = await fetch("/api/dispute", {
+                method: "GET",
+                credentials: "include",
+                });
+            
+                if (!res.ok) {
+                toast.error("Failed to fetch dispute");
+                return;
+                }
+            
+                const data = await res.json();
+                setDispute(data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Dispute fetch error");
+            }
+        };
+        fetchDispute();
     }, []);
 
     useEffect(() => {
@@ -41,17 +210,17 @@ const page = () => {
                 });
 
                 if (!res.ok) {
-                    setProfilePercent(null);
+                    setPropertyCount(0);
                     return;
                 }
 
                 const data = await res.json();
-                setProfilePercent(
+                setPropertyCount(
                     Number.isFinite(data.percent) ? data.percent : 0
                 );
             } catch (err) {
                 console.error("Profile completion error:", err);
-                setProfilePercent(null);
+                setPropertyCount(null);
             }
         };
 
@@ -65,26 +234,31 @@ const page = () => {
                 <LandlordDashboardSidebar/>
 
                 {/* Main Content */}
-                <div className=" flex-1 p-6">
+                <div className=" flex-1 p-6 mt-5">
                         
                     {/* Header */}
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <p className="text-sm text-blue-950">
-                                Mon, 18 2026
+                                {new Date().toLocaleDateString()}
                             </p>
                             <h1 className="text-2xl font-bold">
-                                 Welcome back, Name!
+                                Welcome, 
+                                    {
+                                    landlord
+                                    ?`${landlord.firstName} ${landlord?.lastName }` 
+                                    : "Landlord"
+                                }!
                             </h1>
                             <p className="text-blue-950">
-                                This is your dashboard summary report
+                                This is your new dashboard summary report.
                             </p>
                         </div>
 
                         <img
-                            src="https://i.pravatar.cc/40"
+                            src={landlordProfile?.previewPic}
                             className="w-10 h-10 rounded-full"
-                            alt="profile"
+                            alt="landdlordrofilePic"
                         />
                     </div>
 
@@ -141,7 +315,7 @@ const page = () => {
 
                         {/* Work Required */}
                         <h2 className="text-xl font-semibold mb-4">
-                            Work Required / Rating
+                            My Property Complaints
                         </h2>
 
                         <div className="grid grid-cols-3 px-4 mb-2 text-sm text-gray-500 font-medium">
@@ -151,46 +325,65 @@ const page = () => {
                         </div>
 
                         <div className="space-y-4 mb-8">
-                            {[1, 2, 3, 4].map((item) => (
+
+                        
+                        {dispute.length === 0 ? (
+                            <p className="text-gray-500 text-center py-6">
+                                There are currently no complaints. Future tenant or prospective tenant complaint for your property goes here.
+                            </p>
+                        ) : (
+                        dispute.map((dispute) => (
+    
                                 <div
-                                    key={item}
+                                    key={dispute._id}
                                     className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
                                     <div>
                                         <p className="text-xs text-gray-400">
-                                            OkTenCom - 1234
+                                            {dispute?.disputeNo}
                                         </p>
                                         <p className="font-medium">
-                                            Meter doesn't work
+                                            {dispute?.complaint}
                                         </p>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <img
-                                            src="https://i.pravatar.cc/30"
+                                              src={tenantProfile?.previewPic}
                                             className="w-8 h-8 rounded-full"
                                             alt="resident"
                                         />
-                                        <p className="text-sm">April Naomie</p>
+                                        <p className="text-sm">{tenant?.firstName} {""} {tenant?.lastName}</p>
                                     </div>
 
                                     <div className="text-yellow-500 text-lg">
-                                        ★★
+                                        {dispute?.rating}
                                     </div>
                                 </div>
+                            )
                             ))}
                         </div>
 
+             
+                     
+
                         {/* Listings */}
-                        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-3xl w-full">
-                            <h2 className="text-2xl sm:text-3xl text-blue-950 font-semibold mb-6">
-                                My Listings
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 w-full">
+                            <h2 className="text-xl font-semibold mb-4">
+                                My Property Listings
                             </h2>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 w-full">
-                                <PropertyCard />
-                                <PropertyCard />
-                                <PropertyCard />
-                            </div>
+                            {properties.length === 0 ? (
+                                <p className="text-gray-500 col-span-full text-center py-10">
+                                    You currently have no property listings. Future Property Listings goes here
+                                </p>
+                            ) : (
+                                properties.map((property) => (
+                                    <PropertyCard
+                                        key={property._id}
+                                        {...property}
+                                    />
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

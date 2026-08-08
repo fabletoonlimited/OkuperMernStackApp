@@ -29,9 +29,13 @@ const paymentSchema = new mongoose.Schema(
         enum: ["Pending", "Successful", "Failed"],
         default: "Pending"
     },
-    isSplitpayment: {
+    isSplitPayment: {
         type: Boolean,
         default: false,
+    },
+    legalFee: {
+        type: Number,
+        default: 0,
     },
     serviceCharge: {
         type: Number,
@@ -58,15 +62,38 @@ const paymentSchema = new mongoose.Schema(
   
 }, { timestamps: true });
 
-// Pre-save hook to deduct 5% automatically
-paymentSchema.pre("save", function (next) {
-  if (this.isModified("amount")) {
-    this.serviceCharge = this.amount * 0.05;
-    this.finalPaidAmount = this.amount + this.serviceCharge;
-  }
+// Pre-save hook to deduct 7% automatically
+// paymentSchema.pre("save", function (next) {
+//   if (this.isModified("amount")) {
+//     this.legalFee = this.amount * 0.07;
+//     this.finalPaidAmount = this.amount + this.legalFee;
+//   }
 
-  next();
-});
+//   next();
+// });
+
+// // Pre-save hook to deduct 3% automatically
+// paymentSchema.pre("save", function (next) {
+//   if (this.isModified("amount")) {
+//     this.serviceCharge = this.amount * 0.03;
+//     this.finalPaidAmount = this.amount + this.serviceCharge;
+//   }
+
+//   next();
+// });
+
+// paymentSchema.pre("save", function(next) {
+//     if (this.isModified("amount")) {
+//         this.legalFee = this.amount * 0.07;
+//         this.serviceCharge = this.amount * 0.03;
+//         this.finalPaidAmount =
+//             this.amount +
+//             this.legalFee +
+//             this.serviceCharge;
+//     }
+
+//     next();
+// });
 
 //Pre-save hook for transactionId
 paymentSchema.pre("save", function (next) {
