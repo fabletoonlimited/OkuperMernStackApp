@@ -1,9 +1,9 @@
 
 function storySection () {
     return (
-        <div className="container relative md:w-fit max-w-fit bg-white py-30 pt-100 px-10 md:px-0 mb-10 md:mb-8 z-5 md:bottom-30 bottom-10 -mt-40 md:-mt-40">
-            <h3 className="text-justify md:text-center text-3xl md:text-3xl mb-8 font-black">Connecting verified tenants with home owners</h3>
-            <p className="text-justify md:text-center leading-relaxed md:px-40 px-3 text-lg">The Nigerian rental market has become tainted by the greed of middlemen, who often charge exorbitant commissions and inflate rental prices. This practice has created a barrier to fair, transparent, and affordable housing. At Okuper, we are committed to restoring integrity to the rental process by offering a solution that benefits both tenants and homeowners.</p>
+        <div className="container relative md:w-fit max-w-fit bg-white py-30 md:pt-70 pt-80 px-10 md:px-0 mb-10 md:mb-8 z-5 md:bottom-30 bottom-10 -mt-40 md:-mt-40">
+            <h3 className="md:text-center text-left text-3xl md:text-3xl mb-5 text-blue-950 font-black">Connecting verified tenants with home owners</h3>
+            <p className="text-justify md:text-center leading-relaxed md:px-40 px-3 text-lg text-blue-950">The Nigerian rental market has become tainted by the greed of middlemen, who often charge exorbitant commissions and inflate rental prices. This practice has created a barrier to fair, transparent, and affordable housing for Nigerians and even tourists at large. At Okuper, we are committed to restoring integrity to the property rental and sales process by offering a solution that benefits both tenants and homeowners.</p>
         </div>
     )
 }

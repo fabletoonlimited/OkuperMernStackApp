@@ -76,6 +76,22 @@ const Page = () => {
 
             const data = await response.json();
 
+                // Landlord does not exist
+                if (
+                  response.status === 404 ||
+                  data?.code === "LANDLORD_NOT_FOUND" ||
+                  data?.redirect === "/signUpLanding"
+                ) {
+                  toast.error(
+                    data.message || "This email does not exist. Please sign up."
+                  );
+            
+                  setLoading(false);
+            
+                  router.push("/signUpLanding");
+                  return;
+                }
+
             if (!response.ok) {
                 toast.error(
                     data.message ||
@@ -85,11 +101,30 @@ const Page = () => {
                 setLoading(false);
                 return;
             }
+
+            // Login failed
+                if (!response.ok) {
+                  toast.error(
+                    data.message ||
+                      data.error ||
+                      "Login failed. Please try again."
+                  );
+            
+                  setLoading(false);
+                  return;
+                }
+
             toast.success("Login successful! 🎉");
 
-            setLoading(false);
+            const redirect = localStorage.getItem("redirectAfterLogin");
 
-            router.replace("/landlordDashboard");
+            if (redirect) {
+            localStorage.removeItem("redirectAfterLogin");
+            router.push(redirect);
+            return;
+            }
+
+            router.push("/landlordDashboard");
 
         } catch (error) {
             console.error("Login error:", error);
@@ -99,8 +134,8 @@ const Page = () => {
     };
 
     return (
-        <>
-        <h1 className="font-bold text-4xl mt-16 ml-10">Sign in</h1>
+        <div className="h-auto bg-gray-100">
+        <h1 className="font-bold text-4xl mt-16 ml-10 text-blue-950">Sign in</h1>
 
         <ToastContainer position="top-center" autoClose={3000} />
 
@@ -113,7 +148,7 @@ const Page = () => {
                     className="border border-gray-300 p-8 rounded-lg">
 
                     {/* Email */}
-                    <p className="mb-3 mt-4 text-lg">Email Address</p>
+                    <p className="mb-3 mt-4 text-lg text-blue-950">Email Address</p>
                     <input
                         type="email"
                         value={email}
@@ -123,7 +158,7 @@ const Page = () => {
                     />
 
                     {/* Password */}
-                    <p className="mb-3 mt-8 text-lg">Password</p>
+                    <p className="mb-3 mt-8 text-lg text-blue-950">Password</p>
                     <input
                         type="password"
                         value={password}
@@ -132,7 +167,7 @@ const Page = () => {
                         className="border-2 border-gray-300 p-3 rounded w-full"
                     />
 
-                    <p className="mt-6 mb-6">
+                    <p className="mt-6 mb-6 text-blue-950">
                         Forgot password?
                         <Link href="/forgotPassword">
                             <span className="ml-2 cursor-pointer text-blue-600 hover:underline">
@@ -149,7 +184,7 @@ const Page = () => {
                     </button>
                 </form>
                 
-                <div className="pl-0 mt-5">
+                <div className="pl-0 mt-5 text-blue-950">
                     Don't have an account?{" "}
                     <Link href="/signUpLandlord">
                         <span className="cursor-pointer hover:text-blue-600">
@@ -162,10 +197,10 @@ const Page = () => {
 
 
                 {/* RIGHT SIDE - BANNER */}
-                    <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg mt-10 md:-mt-22">
+                    <div className="relative bg-[rgba(0,51,153,1)] mb-50 rounded-2xl shadow-lg mt-10 md:-mt-22">
                         
                         {/* Banner Top Section */}
-                        <div className={"relative h-50 rounded-2xl mb-15 md:mb-22"}>
+                        <div className={"relative md:h-50 h-65 rounded-2xl mb-15 md:mb-22"}>
                             <div className={"relative rounded-t-2xl md:w-155 w-50% py-2 md:h-20 leading-relaxed"}>
                                 <h2 className="font-medium md:text-4xl text-3xl text-white leading-10 md:leading-12 md:pt-15 pt-10 px-15 md:px-20 text-center md:text-center">
                                     <b>
@@ -197,7 +232,7 @@ const Page = () => {
                     </div>
                     
             </div>
-        </>
+        </div>
     );
 };
 

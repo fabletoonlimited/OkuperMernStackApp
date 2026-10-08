@@ -5,7 +5,7 @@ import LandlordDashboardCard from "../../components/landlordDashboardCard/index.
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter/index.js";
 import LandlordDashboardComplete from "../landlordDashboardComplete/page.js";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 
 function landlordDashboard() {
@@ -14,7 +14,7 @@ function landlordDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const [checking, setChecking] = useState(false);
 
-    const [profilePercent, setProfilePercent] = useState(100);
+    const [profilePercent, setProfilePercent] = useState(null);
     const [bankCompletion, setBankCompletion] = useState(false);
     const [utilityCompletion, setUtilityCompletion] = useState(false);
     const [utilityLoading, setUtilityLoading] = useState(true);
@@ -22,7 +22,6 @@ function landlordDashboard() {
     const [landlord, setLandlord] = useState(null);
     const [propertyCount, setPropertyCount] = useState(0);
     const [propertyUpload, setPropertyUpload] = useState(0);
-    const [loading, setLoading] = useState(false)
 
     
     // landlord state
@@ -253,7 +252,7 @@ function landlordDashboard() {
             // allowed
             router.push("/propertyListingLanding");
 
-
+            
         } finally {
             setChecking(false);
         }
@@ -264,7 +263,7 @@ function landlordDashboard() {
             bankCompletion,
         });
 
-    if (profilePercent === 87 && 
+    if (profilePercent === 100 && 
         utilityCompletion &&
         bankCompletion
         ) {
@@ -276,51 +275,50 @@ function landlordDashboard() {
         );
       }
     
-      if (profilePercent === null || utilityLoading) {
-        return <LandlordDashboardFooter />;
-    }
-    
     return (
-        <>
+    <>
                 
-                <div className="flex min-h-screen bg-gray-100">
-                    <LandlordDashboardSidebar />
-                    <div className="flex-1">
-
-                        {/* Top Nav Section*/}
-                        <div className="landlordDashboardWelcomeMessage mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
-                            <h1 className="font-bold md:text-5xl text-2xl pl-7">
-                                Welcome, 
-                                {
-                                    landlord
-                                    ?`${landlord.firstName} ${landlord?.lastName }` 
-                                    : "Landlord"
-                                }!
-                            </h1>
-                            <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-                                We are thrilled that you have chosen to list
-                                your property with Okuper.
-                            </p>
-                        </div>
+        <div className="h-auto bg-white">
+            <LandlordDashboardSidebar />
+            <ToastContainer />
+                <div className="flex-1">
+                    {/* Top Nav Section*/}
+                    <div className="landlordDashboardWelcomeMessage p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
+                        <h1 className="font-bold md:text-5xl text-xl md:px-10 px-7">
+                            Welcome,{" "}
+                            {
+                                landlord
+                                ?`${landlord.firstName} ${" "} ${landlord?.lastName }` 
+                                : "Landlord"
+                            }!
+                        </h1>
+                        <p className="mt-2 md:text-xl text-md md:px-10 px-7 md:w-auto w-auto text-left">
+                            We are thrilled that you have chosen to list
+                            your property with Okuper.
+                        </p>
+                    </div>
 
                         {/* Dashboard Section*/}
-                        <div className="landlordDashboardNextSteps md:mt-8 md:px-20 px-0">
-                            <h3 className="font-medium md:text-4xl text-2xl pl-7">
+                        <div className="landlordDashboardNextSteps md:mt-10 mt-12 md:px-20 px-0">
+                            <h3 className="font-medium md:text-4xl text-2xl md:px-10 px-7">
                                 Your next steps
                             </h3>
-                            <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
+                            <p className="mt-2 md:text-xl md:px-10 px-9 md:w-auto w-auto text-left">
                                 In other to complete your profile and listing,
                                 there are a few things left to do.
                             </p>
                         </div>
 
-                        <div className="md:px-16 px-0">
-                            <LandlordDashboardCard />
+                        <div className="md:px-18 px-4 mt-8">
+                            <LandlordDashboardCard profilePercent={profilePercent} />
                         </div>
                     </div>
-                </div>  
+                </div>
+            
+            
             <LandlordDashboardFooter />
-        </>
+        <div />
+    </>
     );
 }
 

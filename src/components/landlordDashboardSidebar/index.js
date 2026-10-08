@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {useRouter} from "next/navigation";
-import { FaHome, FaMoneyBillWave, FaEye, FaClock, FaExclamationCircle, FaStar, FaHeart, FaEnvelope } from "react-icons/fa";
+import { FaHome, FaMoneyBillWave, FaUserCheck, FaClock, FaExclamationCircle, FaStar, FaHeart, FaEnvelope, FaCloud } from "react-icons/fa";
 // import { FaExclamationCircle, FaStar } from "react-icnons/fa";
 
 const index = () => {
@@ -89,12 +89,12 @@ const index = () => {
             <li className="hover:text-yellow-500 flex items-center justify-between">Dashboard <FaHome /></li>
           </Link>
 
-          <Link href="/helpCenter">
-            <li className="hover:text-yellow-500 flex items-center justify-between"> Help Center <FaExclamationCircle /></li>
+          <Link href="/help">
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Help Center <FaCloud /></li>
           </Link>
 
-          <Link href="/savedHomes">
-            <li className="hover:text-yellow-500 flex items-center justify-between"> Saved Homes <FaHeart /></li>
+          <Link href="/disputePage">
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Disputes <FaExclamationCircle/></li>
           </Link>
 
           <Link href="/landlordDashboardInbox">
@@ -106,11 +106,11 @@ const index = () => {
           </Link>
 
           <Link href="/landlordVerification">
-            <li className="hover:text-yellow-500 flex items-center justify-between"> Verification <FaEye /></li>
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Verification <FaUserCheck /></li>
           </Link>
 
-          <Link href="/homeInterest">
-            <li className="hover:text-yellow-500 flex items-center justify-between"> Home Interests <FaStar /></li>
+          <Link href="/landlordHomeInterest">
+            <li className="hover:text-yellow-500 flex items-center justify-between"> Home Interests <FaHeart /></li>
           </Link>
 
           <Link

@@ -44,10 +44,20 @@ const tenantSchema = new mongoose.Schema(
         default: "tenant"
     },
 
-    isSelected: {
-        type: Boolean,
-        default: false
-    },
+propertyApplications: [
+    {
+        property: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Property",
+            required: true
+        },
+
+        isSelected: {
+            type: Boolean,
+            default: false
+        }
+    }
+],
 
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     otp: { type: mongoose.Schema.Types.ObjectId, ref: "Otp", required: false },

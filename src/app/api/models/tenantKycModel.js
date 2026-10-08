@@ -2,7 +2,10 @@ import { mongoose } from "@/app/lib/mongoose";
 
 const tenantKycSchema = new mongoose.Schema(
   {
-    previewPic: { type: String, required: true },
+    previewPic: { 
+      type: String, 
+      required: true 
+    },
 
     firstName: {
       type: String,

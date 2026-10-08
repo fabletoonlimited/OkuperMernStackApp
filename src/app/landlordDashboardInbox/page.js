@@ -421,7 +421,7 @@ function LandlordInbox() {
     getOtherParticipantForConversation(conversation);
 
   const otherParticipant = profileDetails || getOtherParticipant();
-  const profilePic = otherParticipant?.profilePic || otherParticipant?.avatar;
+  const profilePic = otherParticipant?.previewPic || otherParticipant?.avatar;
 
   useEffect(() => {
     if (!selectedConversation) {
@@ -496,8 +496,8 @@ function LandlordInbox() {
 
                 {/* Compose button — pending owner confirmation of purpose (see Figma) */}
                 <button
-                  onClick={() => setOpenCompose(true)}
-                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 rounded"
+                  onClick={() => setOpenCompose(false)}
+                  className="bg-gray-400 text-white px-6 py-2 cursor-not-allowed rounded"
                 >
                   Compose
                 </button>
@@ -505,7 +505,7 @@ function LandlordInbox() {
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
                   {profilePic && (
                     <CldImage
-                      src={profilePic}
+                      src={previewPic}
                       width={60}
                       height={60}
                       crop="fill"
@@ -518,12 +518,12 @@ function LandlordInbox() {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setShowProfile((prev) => !prev)}
-                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700"
+                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 cursor-pointer"
                 >
                   {showProfile ? "Back" : "Show Profile"}
                 </button>
 
-                <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700">
+                <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700 cursor-pointer">
                   <FontAwesomeIcon icon={faFlag} />
                 </div>
               </div>
@@ -604,7 +604,7 @@ function LandlordInbox() {
                                 conv.status === "accepted"   ? "bg-blue-600"  :
                                 conv.status === "completed"  ? "bg-green-600" :
                                 conv.status === "rejected"   ? "bg-red-500"   :
-                                                               "bg-gray-400"
+                                                                "bg-gray-400"
                               }`}
                               style={{ fontSize: "9px" }}
                             >
@@ -804,6 +804,12 @@ function LandlordInbox() {
                           <strong>Zip Code: </strong>
                           <span className="font-light">
                             {otherParticipant?.zipCode || "N/A"}
+                          </span>
+                        </p>
+                        <p className="text-center">
+                          <strong>State of Origin: </strong>
+                          <span className="font-light">
+                            {otherParticipant?.stateOfOrigin || "N/A"}
                           </span>
                         </p>
                       </div>

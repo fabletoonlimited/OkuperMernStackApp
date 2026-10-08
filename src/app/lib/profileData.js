@@ -8,46 +8,43 @@ const buildProfile = (role, actor, kyc) => {
 
   const currentAddress =
     role === "landlord"
-      ? kyc?.currentHomeAddress
+      ? kyc?.homeAddress
       : kyc?.currentAddress;
 
   return {
     _id: actor?._id,
     role,
-    firstName: actor?.firstName,
-    lastName: actor?.lastName,
+
+    // Basic information
+    firstName: actor?.firstName || "",
+    lastName: actor?.lastName || "",
     name,
-    email: actor?.email,
+    email: actor?.email || "",
 
-    phone: kyc?.phone,
-    documentType: kyc?.documentType,
-    idNumber: kyc?.idNumber,
-    documentImage: kyc?.documentImage,
+    // KYC information
+    phone: kyc?.phone || "",
+    documentType: kyc?.documentType || "",
+    idNumber: kyc?.idNumber || "",
+    documentImage: kyc?.documentImage || "",
+    status: kyc?.status || "pending",
+    gender: kyc?.gender || "",
+    age: kyc?.age || "",
+    occupation: kyc?.occupation || "",
+    specifyOccupation: kyc?.specifyOccupation || [],
+    maritalStatus: kyc?.maritalStatus || "",
+    religion: kyc?.religion || "",
 
-    gender: kyc?.gender,
-    age: kyc?.age,
+    // Address
+    currentAddress: currentAddress || "",
+    city: kyc?.city || "",
+    state: kyc?.state || "",
+    country: kyc?.country || "",
+    zipCode: kyc?.zipCode || "",
 
-    occupation: kyc?.occupation,
-    maritalStatus: kyc?.maritalStatus,
-    spouseName: kyc?.spouseName,
-    numberOfChildren: kyc?.noOfChildren,
-    religion: kyc?.religion,
-
-    companyName: kyc?.companyName,
-    companyAddress: kyc?.companyAddress,
-    companyPhone: kyc?.companyPhone,
-    companyEmail: kyc?.companyEmail,
-
-    currentAddress,
-    city: kyc?.city,
-    state: kyc?.state,
-    country: kyc?.country,
-    zipCode: kyc?.zipCode,
-    stateOfOrigin: kyc?.stateOfOrigin,
-
-    profilePic: kyc?.previewPic,
-    avatar: kyc?.previewPic,
-    previewPic: kyc?.previewPic,
+    // Profile image
+    profilePic: kyc?.previewPic || "",
+    avatar: kyc?.previewPic || "",
+    previewPic: kyc?.previewPic || "",
   };
 };
 

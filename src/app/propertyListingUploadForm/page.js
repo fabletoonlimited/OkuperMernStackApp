@@ -54,7 +54,7 @@ useEffect(() => {
   // Fetch the logged-in landlord's ID from the JWT cookie on mount
   useEffect(() => {
     const fetchLandlordId = async () => {
-                console.log("Sending landlordId:", landlordId);
+        console.log("Sending landlordId:", landlordId);
         
         console.log({
           ...formData,
@@ -329,8 +329,8 @@ useEffect(() => {
       }
       toast.success("Property uploaded successfully");
 
-      console.log(data);
-console.log(data.property?._id);
+        console.log(data);
+        console.log(data.property?._id);
 
       setTimeout(() => {
         router.push(`/utilityBillUploadPage/${data.property._id}`);

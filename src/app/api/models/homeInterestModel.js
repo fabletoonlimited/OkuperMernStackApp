@@ -1,13 +1,12 @@
 import { mongoose } from "@/app/lib/mongoose";
 
-//Home interest Schem
+//Home interest Schema
 const homeInterestSchema = new mongoose.Schema({
   firstName: {type: String, required: true},
   lastName: {type: String, required: true},
   email: {
     type: String,
     required: true,
-    unique: true,
     lowercase: true,
     trim: true
   },

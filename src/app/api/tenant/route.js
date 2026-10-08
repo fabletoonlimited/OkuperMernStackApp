@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 import Tenant from "../models/tenantModel.js";
 import { validateAndAssignReferral } from "@/app/lib/referralUtils.js";
 import jwt from "jsonwebtoken";
-// import Tenant from "../controllers/tenant.controller";
 
 // CREATE TENANT
 export async function POST(req) {
@@ -13,10 +12,26 @@ export async function POST(req) {
     await dbConnect();
 
     const body = await req.json();
-    
-    const {userId, firstName, lastName, email, password, survey, terms, referralCode} = body;
 
-    if (!userId || !firstName || !lastName || !email || !password || !terms) {
+    const {
+      userId,
+      firstName,
+      lastName,
+      email,
+      password,
+      survey,
+      terms,
+      referralCode,
+    } = body;
+
+    if (
+      !userId ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !terms
+    ) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -25,59 +40,71 @@ export async function POST(req) {
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    //Check if tenant Email Exists in DB
-    const existingTenant = await Tenant.findOne({ email: trimmedEmail });
-    
+    // Check if tenant already exists
+    const existingTenant = await Tenant.findOne({
+      email: trimmedEmail,
+    });
+
     if (existingTenant) {
       return NextResponse.json(
-        { message: "Email already exists in Database, Please sign in" }, 
-        { status: 400 }
+        {
+          success: false,
+          exists: true,
+          redirect: "/signInTenant",
+          message:
+            "Email already exists in Database, Please sign in",
+        },
+        { status: 409 }
       );
     }
 
-    // Apply referral (optional; only if valid and not self-referred)
-    await validateAndAssignReferral(userId, referralCode);
-
-    //create New Tenant
-    const newTenant = await Tenant.create({
-      user: userId, 
-      firstName, 
-      lastName, 
-      email: trimmedEmail, 
-      password, 
-      survey,
+    // Create new tenant
+    const tenant = await Tenant.create({
+      user: userId,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: trimmedEmail,
+      password,
+      survey: survey || "",
       terms,
-      isVerified: false,
-      role: "tenant",
-      isSelected: false
     });
 
-    return NextResponse.json(
-      { 
-        success: true,
-        tenant: {
-          _id: newTenant._id,
-          firstName: newTenant.firstName,
-          lastName: newTenant.lastName,
-          email: newTenant.email,
-          isVerified: newTenant.isVerified,
-          isSelected: newTenant.isSelected
-        }, 
-        message: "Tenant created successfully!"
-      }, 
-      {status: 201}
-    );
+    // Handle referral code if one was supplied
+    if (referralCode?.trim()) {
+      await validateAndAssignReferral(
+        referralCode.trim(),
+        tenant._id
+      );
+    }
 
-  } catch (error) {
-    console.error("Tenant creation error:", error);
     return NextResponse.json(
-      { message: error.message || "Server error, something went wrong" },
+      {
+        success: true,
+        message: "Tenant created successfully",
+        tenant: {
+          _id: tenant._id,
+          user: tenant.user,
+          firstName: tenant.firstName,
+          lastName: tenant.lastName,
+          email: tenant.email,
+          isVerified: tenant.isVerified,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message:
+          error.message ||
+          "Server error, something went wrong",
+      },
       { status: 500 }
     );
   }
 }
 
-// GET TENANT(S)
+// GET TENANT
 export async function GET(request) {
   await dbConnect();
 
@@ -85,21 +112,41 @@ export async function GET(request) {
     const token = request.cookies.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
 
-    const tenant = await Tenant.findById(decoded.id).select("-password");
+    const tenant = await Tenant.findById(decoded.id)
+      .select("-password")
+      .populate("property");
 
     if (!tenant) {
-      return NextResponse.json({ message: "Tenant not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Tenant not found" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json(tenant, { status: 200 });
-
+    return NextResponse.json(
+      tenant,
+      { status: 200 }
+    );
   } catch (err) {
-    return NextResponse.json({ message: err.message }, { status: 500 });
+    return NextResponse.json(
+      {
+        message:
+          err.message ||
+          "Failed to fetch tenant",
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -107,24 +154,33 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     await dbConnect();
+
     const body = await request.json();
 
     const { email, _id, ...updateData } = body;
 
     if (!_id && !email) {
       return NextResponse.json(
-        { message: "Tenant ID or email is required" },
+        {
+          message: "Tenant ID or email is required",
+        },
         { status: 400 }
       );
     }
 
-    const query = _id ? { _id } : { email };
-    
-    const updatedTenant = await Tenant.findOneAndUpdate(
-      query,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    ).select("-password");
+    const query = _id
+      ? { _id }
+      : { email: email.trim().toLowerCase() };
+
+    const updatedTenant =
+      await Tenant.findOneAndUpdate(
+        query,
+        { $set: updateData },
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).select("-password");
 
     if (!updatedTenant) {
       return NextResponse.json(
@@ -134,18 +190,19 @@ export async function PUT(request) {
     }
 
     return NextResponse.json(
-      { 
-        success: true, 
+      {
+        success: true,
         tenant: updatedTenant,
-        message: "Tenant updated successfully" 
-      }, 
+        message: "Tenant updated successfully",
+      },
       { status: 200 }
     );
-
   } catch (error) {
-    console.error("❌ API ERROR:", error);
     return NextResponse.json(
-      { message: error.message || "Server error" },
+      {
+        message:
+          error.message || "Server error",
+      },
       { status: 500 }
     );
   }
@@ -156,9 +213,10 @@ export async function DELETE(request) {
   await dbConnect();
 
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    const { searchParams } =
+      new URL(request.url);
 
+    const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json(
@@ -167,7 +225,8 @@ export async function DELETE(request) {
       );
     }
 
-    const deletedTenant = await Tenant.findByIdAndDelete(id);
+    const deletedTenant =
+      await Tenant.findByIdAndDelete(id);
 
     if (!deletedTenant) {
       return NextResponse.json(
@@ -177,10 +236,12 @@ export async function DELETE(request) {
     }
 
     return NextResponse.json(
-      { success: true, message: "Tenant deleted successfully" }, 
+      {
+        success: true,
+        message: "Tenant deleted successfully",
+      },
       { status: 200 }
     );
-
   } catch (err) {
     return NextResponse.json(
       { message: err.message },

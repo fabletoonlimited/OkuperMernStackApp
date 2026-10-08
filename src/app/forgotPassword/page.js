@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
@@ -33,10 +34,14 @@ const Page = () => {
     }
 
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: requestEmail.trim().toLowerCase() }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: requestEmail.trim().toLowerCase(),
+        }),
       });
 
       const data = await response.json();
@@ -100,8 +105,9 @@ const Page = () => {
       }
 
       toast.success("Password reset successful! Redirecting to sign in...");
+
       setTimeout(() => {
-        router.push("/signInLandlord");
+          router.push("/signUpLanding")
       }, 2000);
     } catch (error) {
       console.error("Reset password error:", error);
@@ -237,7 +243,13 @@ const Page = () => {
             </p>
             <Link href="/signInLandlord">
               <span className="text-blue-600 underline cursor-pointer">
-                Back to Sign In
+                Back to Sign In Landlord
+              </span>
+            </Link>
+
+              <Link href="/signInTenant">
+              <span className="text-blue-600 underline cursor-pointer">
+                Back to Sign In Tenant
               </span>
             </Link>
           </div>

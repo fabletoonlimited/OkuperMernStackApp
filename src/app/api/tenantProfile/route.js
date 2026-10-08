@@ -90,6 +90,7 @@ const buildKycUpdate = (payload, role, actor) => {
     companyAddress,
     companyPhone: payload.companyPhone,
     companyEmail: payload.companyEmail,
+    currentAddress: payload.currentAddress,
     city: payload.city,
     state: payload.state,
     country: payload.country,
@@ -98,7 +99,7 @@ const buildKycUpdate = (payload, role, actor) => {
   };
 
   if (role === "landlord") {
-    base.currentHomeAddress = payload.currentAddress;
+    base.homeAddress = payload.currentAddress;
     base.user = actor.user;
     base.landlord = actor._id;
     base.landlordDashboard = actor.landlordDashboard;

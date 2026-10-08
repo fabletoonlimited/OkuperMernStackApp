@@ -13,6 +13,7 @@ export default function LayoutClient({ children }) {
         "/landlordDashboard",
         "/tenantDashboard",
         "/landlordDashboardInbox",
+        "/tenantDashboardInbox",
         "/propertyListingLanding",
         "/propertyListingUploadForm",
         "/propertyCardExpanded",
@@ -20,6 +21,11 @@ export default function LayoutClient({ children }) {
         "/contact",
         "/savedHomes",
         "/landlordDashboardComplete",
+        "/tenantDashboardComplete",
+        "/landlordDashboardProfile",
+        "/tenantDashboardProfile",
+        "/landlordDashboardProfileEdit",
+        "/tenantSavedHomes",
     ];
 
     const shouldHideLayout = noLayoutRoutes.includes(pathname);

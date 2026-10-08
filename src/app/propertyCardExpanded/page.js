@@ -19,8 +19,8 @@ const Index = () => {
     
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const searchParams = useSearchParams();
-    const propertyId = searchParams.get("id");
-    const [property, setProperty] = useState(null);
+    const propertyId = searchParams.get("propertyId");
+    console.log("PROPERTY ID:", propertyId);    const [property, setProperty] = useState(null);
 
     const [hoverLeft, setHoverLeft] = useState(false);
     const [hoverRight, setHoverRight] = useState(false);
@@ -32,21 +32,6 @@ const Index = () => {
     const [mapping, setMapping] = useState(null)
 
     const router = useRouter();
-
-    useEffect(() => {
-        const postRating = async () => {
-        try {
-            const res = await fetch("api/rating", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-            }); 
-            setRating(res.ok ? 1 : 0);
-        } catch (error) {
-            setRating(0);
-        }}
-        postRating();
-    }, []);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -105,43 +90,51 @@ const Index = () => {
         }
     };
 
-    
    // Fetch real property from API
-    useEffect(() => {
-        if (!propertyId) {
-            setPropertyLoading(false);
-            return;
-        }
-        const fetchProperty = async () => {
-            try {
-                const res = await fetch(`/api/property?id=${propertyId}`);
-                if (!res.ok) {
-                    toast.error("Failed to fetch property");
-                }
-                const data = await res.json();
-                setProperty(data);
+useEffect(() => {
+    console.log("Fetching property with ID:", propertyId);
 
-            } catch (err) {
-                console.error("Fetch property error:", err);
-                toast.error("Failed to load property");
-            } finally {
-                setPropertyLoading(false);
+    if (!propertyId) {
+        console.log("NO PROPERTY ID — FETCH CANCELLED");
+        setPropertyLoading(false);
+        return;
+    }
+
+    const fetchProperty = async () => {
+        try {
+            const url = `/api/property?id=${propertyId}`;
+
+            console.log("REQUEST URL:", url);
+
+            const res = await fetch(url, {
+                method: "GET",
+                credentials: "include",
+            });
+
+            console.log("RESPONSE STATUS:", res.status);
+
+            const data = await res.json();
+
+            console.log("PROPERTY RESPONSE:", data);
+
+            if (!res.ok) {
+                toast.error(data.message || "Failed to fetch property");
+                return;
             }
-        };
-        fetchProperty();
-    }, [propertyId]);
 
-    useEffect(() => {
-    if (!property?.address) return;
+            setProperty(data);
 
-    const fullAddress = `${property.address}, ${property.state ?? ""}, Nigeria`;
+        } catch (err) {
+            console.error("Fetch property error:", err);
+            toast.error("Failed to load property");
+        } finally {
+            setPropertyLoading(false);
+        }
+    };
 
-    setMapping(
-        `https://www.google.com/maps?q=${encodeURIComponent(fullAddress)}&output=embed`
-    );
-}, [property]);
+    fetchProperty();
 
-
+}, [propertyId]);
 
     // Build image list from real property data
     const images = property
@@ -223,33 +216,33 @@ const Index = () => {
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({
-                    receiverId: property.landlord,
-                    receiverType: "Landlord",
-                    propertyId: property._id,
-                    content: formData.message,
+                receiverId: property.landlord?._id || property.landlord,                    receiverType: "Landlord",
+                propertyId: property._id,
+                content: formData.message,
                 }),
             });
 
             const data = await res.json();
 
-            if (!res.ok) {
-                if (res.status === 401 || res.status === 403) {
-
-                    //storing redirect path
-                    localStorage.setItem("redirectAfterLogin", "/tenantDashboardInbox");
+                if (res.status === 401) {
+                    localStorage.setItem(
+                        "redirectAfterLogin",
+                        `/propertyCardExpanded?propertyId=${propertyId}`
+                    );
 
                     toast.error("Please login as a tenant to send a message");
                     router.push("/signInTenant");
                     return;
                 }
-                toast.error(data.error || "Failed to send message");
-                return;
-            }
-            if (res.ok) {
-                if (res.status === 200 || res.status === 201)
-                    router.push("/tenantDashboardInbox")
-                return
-            }
+            
+                if (!res.ok) {
+                    toast.error(
+                        data.error ||
+                        data.message ||
+                        "Failed to send message"
+                    );                
+                    return;
+                }
 
             toast.success("Message sent to landlord successfully!");
 
@@ -269,6 +262,8 @@ const Index = () => {
 
     return (
         <div className="w-auto">
+            <PropExpandedNav propertyId={propertyId} />
+
             {/* IMAGE MODAL */}
             {selectedImage && (
                 <div
@@ -295,7 +290,6 @@ const Index = () => {
             )}
 
             <ToastContainer />
-            <PropExpandedNav />
             <div>
                 <div>
                     <div>
@@ -442,8 +436,9 @@ const Index = () => {
                             
                             <div className="h-24 w-full flex items-center">
                                 <StarRating
-                                    className="scale-150 "
-                                    propertyId={rating}
+                                    className={`text-2xl scale-150 md:scale-100 ${
+                                    rating > 0 ? "text-yellow-400" : "text-gray-300"  
+                                    }`}          
                                 />
                             </div>
                         </div>

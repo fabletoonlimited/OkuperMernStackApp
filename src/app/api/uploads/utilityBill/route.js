@@ -1,14 +1,12 @@
 import dbConnect from "@/app/lib/mongoose";
 import cloudinary from "@/app/lib/cloudinary";
 import { NextResponse } from "next/server";
-import Tenant from "@/app/api/models/tenantModel";
-import Landlord from "@/app/api/models/landlordModel";
 import { getUserFromCookies } from "@/app/lib/auth/getUserFromCookies";
-import Property from "@/app/api/models/propertyModel"
+import Property from "@/app/api/models/propertyModel";
 import UtilityBill from "@/app/api/models/utilityBillModel";
+import Tenant from "@/app/api/models/tenantModel";
 
 export async function POST(req) {
-    console.log("POST /api/uploads/utilityBill HIT");
   try {
     await dbConnect();
 
@@ -31,58 +29,110 @@ export async function POST(req) {
       );
     }
 
-    const propertyId = formData.get("propertyId");
-console.log("Received propertyId:", propertyId);
+    // =====================================================
+    // LANDLORD
+    // =====================================================
 
-    // Convert file to Base64
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    if (user.role === "landlord") {
+      const propertyId = formData.get("propertyId");
 
-    const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+      if (!propertyId) {
+        return NextResponse.json(
+          { error: "Missing Property ID for Landlord" },
+          { status: 400 }
+        );
+      }
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(dataUrl, {
-      folder: "okuper/utilityBills",
-      resource_type: "auto",
-    });
+      // IMPORTANT:
+      // Make sure this property actually belongs to
+      // the currently logged-in landlord.
+      const property = await Property.findOne({
+        _id: propertyId,
+        landlord: user.id,
+      });
 
-    // Create a new utility bill document
-    const newUtilityBill = await UtilityBill.create({
-      fileUrl: result.secure_url,
-      property: propertyId,
-      uploadedBy: user.id,
-      uploadedByModel: user.role === "tenant" ? "Tenant" : "Landlord",
-    });
+      if (!property) {
+        return NextResponse.json(
+          { error: "Property not found or does not belong to this landlord" },
+          { status: 404 }
+        );
+      }
 
-  // Save URL utility bill on the property and verify it
-  const updatedProperty = await Property.findByIdAndUpdate(
-  propertyId,
-  {
-    $set: {
-      utilityBill: newUtilityBill._id,
-      verified:true
-    },
-  },
-  { new: true }
-);
+      // Convert file to Base64
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
 
-if (!updatedProperty) {
-  return NextResponse.json(
-    { error: "Property not found" },
-    { status: 404 }
-  );
-}
+      const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-return NextResponse.json({
-  message: "File uploaded successfully",
-  url: result.secure_url,
-  property: updatedProperty,
-});
-  } catch (error) {
-    console.error(error);
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(dataUrl, {
+        folder: "okuper/utilityBills",
+        resource_type: "auto",
+      });
+
+      // Create utility bill specifically for this landlord/property
+      const newUtilityBill = await UtilityBill.create({
+        fileUrl: result.secure_url,
+        property: property._id,
+        uploadedBy: user.id,
+        uploadedByModel: "Landlord",
+      });
+
+      // Your Property schema uses utilityBill as an array
+      property.utilityBill = [newUtilityBill._id];
+
+      await property.save();
+
+      return NextResponse.json(
+        {
+          message: "Landlord utility bill uploaded successfully",
+          url: result.secure_url,
+          utilityBillId: newUtilityBill._id,
+          property: property,
+        },
+        { status: 201 }
+      );
+    }
+
+    // =====================================================
+    // TENANT
+    // =====================================================
+
+    if (user.role === "tenant") {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+
+      const result = await cloudinary.uploader.upload(dataUrl, {
+        folder: "okuper/utilityBills",
+        resource_type: "auto",
+      });
+
+      const newUtilityBill = await UtilityBill.create({
+        fileUrl: result.secure_url,
+        uploadedBy: user.id,
+        uploadedByModel: "Tenant",
+      });
+
+      return NextResponse.json(
+        {
+          message: "Tenant utility bill uploaded successfully",
+          url: result.secure_url,
+          utilityBillId: newUtilityBill._id,
+        },
+        { status: 201 }
+      );
+    }
 
     return NextResponse.json(
-      { error: error.message },
+      { error: "Invalid user role" },
+      { status: 400 }
+    );
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: error.message || "Utility bill upload failed" },
       { status: 500 }
     );
   }
@@ -101,28 +151,48 @@ export async function GET() {
       );
     }
 
+    // =====================================================
+    // TENANT
+    // =====================================================
+
     if (user.role === "tenant") {
-      const tenant = await Tenant.findById(user.id);
+      const utilityBill = await UtilityBill.findOne({
+        uploadedBy: user.id,
+        uploadedByModel: "Tenant",
+      }).sort({ createdAt: -1 });
 
       return NextResponse.json({
-        uploaded: !!tenant?.utilityBillUrl,
-        url: tenant?.utilityBillUrl || null,
+        uploaded: !!utilityBill,
+        url: utilityBill?.fileUrl || null,
       });
     }
 
+    // =====================================================
+    // LANDLORD
+    // =====================================================
+
     if (user.role === "landlord") {
-      const property = await Property.findOne({
+      // Get ONLY properties belonging to this landlord
+      const properties = await Property.find({
         landlord: user.id,
       }).populate("utilityBill");
-      
-      const hasUtility = property?.utilityBill?.length > 0;
 
-      console.log("UTILITY CHECK PROPERTY:", property);
-      console.log("UTILITY BILL VALUE:", property?.utilityBill);
+      // Find a utility bill belonging to one of this landlord's properties
+      const propertyWithUtilityBill = properties.find(
+        (property) =>
+          Array.isArray(property.utilityBill) &&
+          property.utilityBill.length > 0
+      );
+
+      const utilityBill =
+        propertyWithUtilityBill?.utilityBill?.[
+          propertyWithUtilityBill.utilityBill.length - 1
+        ];
 
       return NextResponse.json({
-        uploaded: hasUtility,
-        url: hasUtility ?  property?.utilityBill[0].fileUrl : null,
+        uploaded: !!utilityBill,
+        url: utilityBill?.fileUrl || null,
+        propertyId: propertyWithUtilityBill?._id || null,
       });
     }
 
@@ -130,11 +200,10 @@ export async function GET() {
       { error: "Invalid user role" },
       { status: 400 }
     );
-  } catch (error) {
-    console.error(error);
 
+  } catch (error) {
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || "Failed to fetch utility bill" },
       { status: 500 }
     );
   }

@@ -10,7 +10,7 @@ import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import ComposeModal from "../../components/composeModal";
 import Image from "next/image";
 
-function TenantMessages() {
+function UserMessages() {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -78,7 +78,7 @@ function TenantMessages() {
 
     const fetchMessages = async () => {
       try {
-        const res = await fetch(`/api/message/${selectedConversation._id}`, {
+        const res = await fetch(`/api/message?conversationId=${selectedConversation._id}`, {
           credentials: "include",
         });
 
@@ -88,11 +88,12 @@ function TenantMessages() {
         }
 
         const data = await res.json();
+
         setMessages(data.messages || []);
         setShowProfile(false);
 
         // Mark messages as read
-        await fetch(`/api/message/${selectedConversation._id}/read`, {
+        await fetch(`/api/message/?conversationId=${selectedConversation._id}/read`, {
           method: "PATCH",
           credentials: "include",
         });
@@ -199,10 +200,10 @@ function TenantMessages() {
     if (!participant?._id) return;
 
     let isActive = true;
-    const fetchProfile = async () => {
+    const fetchTenantProfile = async () => {
       try {
         setProfileLoading(true);
-        const res = await fetch(`/api/profile?actorId=${participant._id}`, {
+        const res = await fetch(`/api/tenantprofile?actorId=${participant._id}`, {
           credentials: "include",
         });
 
@@ -213,7 +214,7 @@ function TenantMessages() {
           setProfileDetails(data.profile || null);
         }
       } catch (err) {
-        console.error("Fetch profile error:", err);
+        console.error("Fetch tenant profile error:", err);
       } finally {
         if (isActive) {
           setProfileLoading(false);
@@ -221,7 +222,7 @@ function TenantMessages() {
       }
     };
 
-    fetchProfile();
+    fetchTenantProfile();
     return () => {
       isActive = false;
     };
@@ -245,23 +246,23 @@ function TenantMessages() {
                 >
                   My messages
                 </h5>
-
+{/* 
                 <button
                   onClick={() => setOpenCompose(true)}
-                  className="text-blue-800 hover:underline mt-14"
+                  className="text-blue-800 bg-gray-300 hover:underline mt-14 cursor-not-allowed"
                   style={{ fontSize: "12px" }}
                 >
                   Compose
-                </button>
+                </button> */}
 
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
-                  {profilePic && (
+                  {previewPic && (
                     <CldImage
-                      src={profilePic}
+                      src={previewPic}
                       width={60}
                       height={60}
                       crop="fill"
-                      alt="profile"
+                      alt="previewPic"
                     />
                   )}
                 </div>
@@ -270,14 +271,35 @@ function TenantMessages() {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setShowProfile((prev) => !prev)}
-                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700"
+                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 cursor-pointer rounded-md"
                 >
                   {showProfile ? "Back" : "Show Profile"}
                 </button>
-
-                <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700">
-                  <FontAwesomeIcon icon={faFlag} />
+                  
+                <div className="cursor-pointer border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700">
+                  {/* Report button fix add the const Report and import dispute */}
+                  <button
+                    onClick={() => {
+                      if (!otherParticipant) {
+                        toast.error("No participant selected");
+                        return;
+                      }
+                      setReport(true);
+                        setReportedUserId(otherParticipant._id);
+                    }}
+                    className="hover:text-blue-900 cursor-pointer"
+                  >
+                    <FontAwesomeIcon icon={faFlag} />
+                  </button>
                 </div>
+              </div>
+            </div>
+            
+              <div className="flex flex-1">
+                <button>
+                  <FontAwesomeIcon icon={faFlag} />
+                </button>
+              </div>
               </div>
             </div>
 
@@ -303,9 +325,9 @@ function TenantMessages() {
                         }`}
                       >
                         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                          {(other?.avatar || other?.profilePic) && (
+                          {(other?.avatar || other?.previewPic) && (
                             <Image
-                              src={other.avatar || other.profilePic}
+                              src={other.avatar || other.previewPic}
                               alt="avatar"
                               width={48}
                               height={48}
@@ -503,6 +525,13 @@ function TenantMessages() {
                             {otherParticipant?.zipCode || "N/A"}
                           </span>
                         </p>
+
+                        <p className="text-center">
+                          <strong>State of Origin: </strong>
+                          <span className="font-light">
+                            {otherParticipant?.stateOfOrigin || "N/A"}
+                          </span>
+                        </p>
                       </div>
                     </div>
                   )
@@ -599,10 +628,9 @@ function TenantMessages() {
               />
             )}
           </div>
-        </div>
-      </div>
     </div>
+    
   );
 }
 
-export default TenantMessages;
+export default UserMessages;

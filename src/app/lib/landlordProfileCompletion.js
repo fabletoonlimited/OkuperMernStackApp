@@ -1,12 +1,30 @@
-const PROFILE_REQUIRED_FIELDS = {
-  landlord: ["firstName", "lastName", "email", "phone"],
-};
-
 const PROFILE_SECTIONS = {
-  basic: ["firstName", "lastName", "email", "phone"],
-  identity: ["documentType", "idNumber", "documentImage"],
-  personal: ["gender", "age"],
-  address: ["currentAddress", "city", "state", "country", "zipCode"],
+  basic: [
+    "firstName",
+    "lastName",
+    "email",
+    "phone",
+  ],
+
+  identity: [
+    "documentType",
+    "idNumber",
+    "documentImage",
+  ],
+
+  personal: [
+    "previewPic",
+    "gender",
+    "age",
+    "stateOfOrigin",
+  ],
+
+  address: [
+    "currentAddress",
+    "city",
+    "state",
+    "country",
+  ],
 };
 
 const isPresent = (value) => {
@@ -34,27 +52,31 @@ const isPresent = (value) => {
 };
 
 export const computeProfileCompletion = (profile, role) => {
-  const normalizedRole = role === "landlord" ? "landlord" : "tenant";
-  const baseFields = PROFILE_REQUIRED_FIELDS[normalizedRole] || [];
+  if (role !== "landlord") {
+    return {
+      percent: 0,
+      missingFields: [],
+    };
+  }
 
   const sectionKeys = Object.keys(PROFILE_SECTIONS);
-  const sectionWeight = sectionKeys.length ? 100 / sectionKeys.length : 0;
 
-  const percent = sectionKeys.reduce((total, key) => {
-    const sectionFields = PROFILE_SECTIONS[key] || [];
-    if (sectionFields.length === 0) return total;
+  const allFields = sectionKeys.flatMap(
+    (key) => PROFILE_SECTIONS[key]
+  );
 
-    const filledCount = sectionFields.filter((field) =>
-      isPresent(profile?.[field]),
-    ).length;
+  const missingFields = allFields.filter(
+    (field) => !isPresent(profile?.[field])
+  );
 
-    const sectionScore = (filledCount / sectionFields.length) * sectionWeight;
-    return total + sectionScore;
-  }, 0);
+  const completedFields = allFields.length - missingFields.length;
 
-  const allFields = sectionKeys.flatMap((key) => PROFILE_SECTIONS[key] || []);
-  const fields = allFields.length ? allFields : baseFields;
-  const missingFields = fields.filter((field) => !isPresent(profile?.[field]));
+  const percent = Math.round(
+    (completedFields / allFields.length) * 100
+  );
 
-  return { percent: Math.round(percent), missingFields };
+  return {
+    percent,
+    missingFields,
+  };
 };

@@ -4,10 +4,11 @@ import Link from 'next/link';
 
 const Index = () => {
   return (
-   <div className="flex flex-col items-center md:flex-row md:justify-between md:gap-6 px-4 md:px-40 py-8 mb-10">
+   <div className="md:flex row place-items-center justify-center md:justify-between gap-6 px-4 md:px-40 mb-20">
+    
     {/* Buy */}
     <div 
-    className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center mb-8 md:mb-0 pointer-cursor hover:shadow-xl hover:scale-105 transition duration-300">
+    className="bg-white p-8 rounded-lg shadow-lg h-full md:w-100 w-80 text-center mb-15 md:mb-0 pointer-cursor hover:shadow-2xl hover:scale-105 transition duration-300">
       <Image 
         height={190}
         width={190}
@@ -27,7 +28,7 @@ const Index = () => {
     </div>
 
     {/* Rent */}
-    <div className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center mb-8 md:mb-0 pointer-cursor hover:shadow-xl transition hover:scale-105 duration-300">
+    <div className="bg-white p-8 rounded-lg shadow-lg h-full min-h-96 md:w-100 w-80 text-center mb-15 md:mb-0 pointer-cursor hover:shadow-2xl transition hover:scale-105 duration-300">
       <Image 
         height={170}
         width={170}
@@ -47,7 +48,7 @@ const Index = () => {
     </div>
 
     {/* Short Let */}
-    <div className="bg-white p-8 rounded-lg shadow-lg h-full max-w-80 min-h-96 w-72 md:w-1/3 text-center pointer-cursor hover:shadow-xl transition hover:scale-105 duration-300">
+    <div className="bg-white p-8 rounded-lg shadow-lg h-full min-h-96 md:w-100 w-80 text-center pointer-cursor hover:shadow-2xl transition hover:scale-105 duration-300">
       <Image 
         height={200}
         width={200}

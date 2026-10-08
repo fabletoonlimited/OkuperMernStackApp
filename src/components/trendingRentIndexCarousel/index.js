@@ -50,12 +50,12 @@ const TrendingRentIndexCarousel = () => {
     if (slicedProperties.length === 0) return null;
 
     return (
-        <div className="flex gap-4 w-fit mx-auto overflow-x-auto h-auto py-8 mb-20 px-2">
+        <div className="flex gap-4 w-full mx-auto overflow-x-auto h-auto py-8 px-5">
             {slicedProperties.map((item, index) =>
                 item.isAd ? (
                     <div
                         key={item._id || `ad-${index}`}
-                        className="w-80 flex-shrink-0"
+                        className="w-100 flex-shrink-0"
                     >
                         <AdBanner
                             desc={item.desc}
@@ -66,7 +66,7 @@ const TrendingRentIndexCarousel = () => {
                 ) : (
                     <div
                         key={item._id}
-                        className="w-80 flex-shrink-0"
+                        className="w-100"
                     >
                         <PropertyCard {...item} />
                     </div>

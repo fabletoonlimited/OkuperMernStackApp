@@ -59,16 +59,18 @@ export async function middleware(req) {
     "/policy",
     "/privacy",
     "/rent",
-    "/report",
     "/sell",
     "/shortlets",
     "/terms",
     "/xStories",
+  ];
+
+  const ALWAYS_PUBLIC_ROUTES = [
     "/property",
     "/propertyCardExpanded",
+    "/report",
     "/favorites",
-    // "/auth/logout",
-  ];
+];
 
   const PUBLIC_API_ROUTES = [
     "/api/script",
@@ -192,6 +194,19 @@ export async function middleware(req) {
     // "/api/landlord/properties",
     // "/api/landlord/messages",
   ];
+
+  // ======================
+  // 🌍 Always public pages
+  // ======================
+  if (
+      ALWAYS_PUBLIC_ROUTES.some(
+          route =>
+              pathname === route ||
+              pathname.startsWith(`${route}/`)
+      )
+  ) {
+      return NextResponse.next();
+  }
 
   // ======================
   // ✅ Allow public APIs

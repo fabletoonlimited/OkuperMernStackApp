@@ -130,8 +130,7 @@ const inputClass =
     "w-full rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-800 shadow-sm focus:border-blue-800 focus:outline-none";
 const labelClass = "text-sm font-semibold text-blue-950";
 
-const ProfilePage = () => {
-    
+const TenantProfilePage = () => {
   const router = useRouter();
   
     const [formData, setFormData] = useState(emptyProfile);
@@ -141,41 +140,122 @@ const ProfilePage = () => {
     const [stepIndex, setStepIndex] = useState(0);
     const [role, setRole] = useState(null);
     const [imagePreviews, setImagePreviews] = useState({});
+    const [tenant, setTenant] = useState(null);
+    const [tenantProfile, setTenantProfile] = useState(null);
 
-    const progressPercent = useMemo(() => {
-        if (!steps.length) return 0;
-        return Math.round(((stepIndex + 1) / steps.length) * 100);
-    }, [stepIndex]);
+    useEffect(() => {
+    const fetchRole = async () => {
+        try {
+            const res = await fetch("/api/auth/me", {
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setRole(data.role?.toLowerCase());
+            }
+        } catch (error) {
+            console.error("Role fetch error:", error);
+        }
+    };
+        fetchRole();
+    }, []);
+
+
+    useEffect(() => {
+        const fetchTenant = async () => {
+            try {
+                const res = await fetch("/api/tenant", {
+                method: "GET",
+                credentials: "include",
+                });
+                
+                if (!res.ok) {
+                toast.error("Failed to fetch tenant");
+                return;
+                }
+                
+                    const data = await res.json();
+                    setTenant(data);
+
+                    setFormData((prev) => ({
+                        ...prev,
+                        firstName: data?.firstName || "",
+                        lastName: data?.lastName || "",
+                        email: data?.email || "",
+                        phone: data?.phone || "",
+                    }));
+                          
+                } catch (err) {
+                    console.error(err);
+                    toast.error("Tenant fetch error");
+                }
+            };
+        fetchTenant();
+    }, []);
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
                 const res = await fetch("/api/tenantProfile", {
+                    method: "GET",
                     credentials: "include",
+                    cache: "no-store",
                 });
-
+                
+                const result = await res.json();
+                
+                console.log("TENANT PROFILE RESPONSE", result);
+            
                 if (!res.ok) {
-                    toast.error("Failed to load profile");
+                    toast.error(
+                        result.message ||
+                        result.error ||
+                        "Failed to load profile"
+                    );
                     return;
                 }
+               
+                const data = result?.profile || result?.tenantProfile || result;
+                console.log("TENANT PROFILE DATA", data);
 
-                const data = await res.json();
-                const profile = data.tenantProfile || {};
-                setRole(data.role || null);
+                // setTenantProfile(data);
+                setFormData((prev) => ({
+                    ...prev,
+                    previewPic: data?.previewPic || "",
+                    firstName: data?.firstName || "",
+                    lastName: data?.lastName || "",
+                    email: data?.email || "",
+                    phone: data?.phone || "",
+                    documentType: data?.documentType || "",
+                    idNumber: data?.idNumber || "",
+                    documentImage: data?.documentImage || "",
+                    status: data?.status || "",
+                    gender: data?.gender || "",
+                    age: data?.age || "",
+                    occupation: data?.occupation || "",
+                    specifyOccupation: data?.specifyOccupation || "",
+                    maritalStatus: data?.maritalStatus || "",
+                    spouseName: data?.spouseName || "",
+                    noOfChildren: data?.noOfChildren || "",
+                    religion: data?.religion || "",
+                    companyName: data?.companyName || "",
+                    companyAddress: data?.companyAddress || "",
+                    companyPhone: data?.companyPhone || "",
+                    companyEmail: data?.companyEmail || "",
+                    currentAddress: data?.currentAddress || "",
+                    city: data?.city || "",
+                    state: data?.state || "",
+                    country: data?.country || "",
+                    zipCode: data?.zipCode || "",
+                    stateOfOrigin: data?.stateOfOrigin || "",
+                }));
 
-                setFormData({
-                    ...emptyProfile,
-                    ...profile,
-                    companyAddress: Array.isArray(profile.companyAddress)
-                        ? profile.companyAddress.join(", ")
-                        : profile.companyAddress || "",
-                    noOfChildren:
-                        profile.noOfChildren !== undefined &&
-                        profile.noOfChildren !== null
-                            ? String(profile.noOfChildren)
-                            : "",
-                });
+                setTenantProfile(data);
+
             } catch (err) {
                 console.error("Profile fetch error:", err);
                 toast.error("Failed to load profile");
@@ -186,6 +266,12 @@ const ProfilePage = () => {
 
         fetchProfile();
     }, []);
+
+    const progressPercent = useMemo(() => {
+        if (!steps.length) return 0;
+        return Math.round(((stepIndex + 1) / steps.length) * 100);
+    }, [stepIndex]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -226,7 +312,7 @@ const ProfilePage = () => {
                 [field]: data.url,
             }));
 
-            toast.success(`${field} uploaded`);
+            toast.success(`${field} uploaded successfully`);
             console.log("Upload Response:", data);
         } catch (err) {
             console.error("Upload error:", err);
@@ -240,7 +326,7 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Submit Caled");
+        console.log("Submit Called");
         
         if (!formData.firstName || !formData.lastName) {
                 toast.error("Please complete required fields");
@@ -281,9 +367,9 @@ const ProfilePage = () => {
             toast.success("Profile updated successfully");
 
             router.push( 
-                role === "landlord"
-                ? "/landlordDashboardCompleted"
-                : "/tenantDashboardCompleted",
+                role === "tenant"
+                ? "/tenantDashboard"
+                : "/landlordDashboard",
             );
 
         } catch (err) {
@@ -303,7 +389,7 @@ const ProfilePage = () => {
                         <div className="mt-2 flex flex-col hover:bg-blue-100 hover:cursor-pointer gap-3 rounded-lg border border-dashed border-blue-200 bg-blue-50 p-4">
                             <input
                                 type="file"
-                                accept="image/*,application/pdf"
+                                accept="image/*"
                                 onChange={(e) => handleUpload(e, "previewPic")}
                                 className="text-sm"
                             />
@@ -313,8 +399,8 @@ const ProfilePage = () => {
                                 {uploading
                                     ? "Uploading document..."
                                     : formData.previewPic
-                                      ? "Document uploaded successfully"
-                                      : "Upload a clear image or PDF of your ID"}
+                                      ? "Profile picture uploaded successfully"
+                                      : "Upload a clear image of your ID"}
                             </div>
                             {formData.previewPic && (
                                 <a
@@ -394,11 +480,12 @@ const ProfilePage = () => {
                     <div>
                         <label className={labelClass}>ID number</label>
                         <input
-                            className={inputClass}
+                            type="text"
                             name="idNumber"
                             placeholder="ID number"
                             value={formData.idNumber}
                             onChange={handleChange}
+                            className={inputClass}
                         />
                     </div>
                     <div className="md:col-span-2">
@@ -779,4 +866,4 @@ const ProfilePage = () => {
     );
 };
 
-export default ProfilePage;
+export default TenantProfilePage;

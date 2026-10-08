@@ -5,11 +5,11 @@ import Landlord from "../models/landlordModel.js";
 import Property from "../models/propertyModel.js";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import jwt from "jsonwebtoken";
 import dbConnect from "@/app/lib/mongoose";
+import HomeInterest from "../models/homeInterestModel.js";
 import { emitToConversation, emitReadReceipt, emitTyping } from "@/app/lib/sseStore.js";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 // Batch-fetch users from both Tenant and Landlord models in parallel.
 // Returns a map of { [id string]: populated user object }
@@ -54,10 +54,10 @@ async function getUserFromToken() {
       return null;
     }
 
-    const verified = await jwtVerify(token, JWT_SECRET);
-    return verified.payload;
-  } catch (err) {
-    console.error("Token verification failed:", err);
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+
+    return verified;
+  } catch {
     return null;
   }
 }
@@ -66,69 +66,73 @@ async function getUserFromToken() {
 export const getConversations = async (req) => {
   try {
     await dbConnect();
+
     const payload = await getUserFromToken();
 
     if (!payload || !payload.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const userId = payload.id;
 
-    // Find all conversations where user is a participant
     const conversations = await Conversation.find({
       participants: userId,
     })
       .populate({
         path: "property",
-        select: "title address price",
+        select: "_id title address price previewPic",
       })
       .populate({
         path: "lastMessage",
-        select: "content sender createdAt",
+        select:
+          "_id content sender senderType receiver receiverType createdAt",
       })
       .sort({ updatedAt: -1 })
       .lean();
 
-    const conversationIds = conversations.map((c) => c._id);
+    const participantIds = conversations.flatMap(
+      (conversation) => conversation.participants
+    );
 
-    // Run participant population and unread count aggregation in parallel
-    const [userMap, unreadAgg] = await Promise.all([
-      batchPopulateUsers(conversations.flatMap((c) => c.participants)),
-      Message.aggregate([
-        {
-          $match: {
-            receiver: new mongoose.Types.ObjectId(userId),
-            isRead: false,
-            conversationId: { $in: conversationIds },
-          },
-        },
-        {
-          $group: {
-            _id: "$conversationId",
-            count: { $sum: 1 },
-          },
-        },
-      ]),
-    ]);
+    const userMap = await batchPopulateUsers(participantIds);
 
-    // Build unread map: { conversationId -> count }
-    const unreadMap = {};
-    for (const { _id, count } of unreadAgg) {
-      unreadMap[_id.toString()] = count;
-    }
+    const formattedConversations = conversations.map(
+      (conversation) => {
+        const participants = conversation.participants
+          .map((id) => userMap[id.toString()] || null)
+          .filter(Boolean);
 
-    for (let conv of conversations) {
-      conv.participants = conv.participants
-        .map((id) => userMap[id.toString()] || null)
-        .filter(Boolean);
-      if (!conv.status) conv.status = "active";
-      conv.unreadCount = unreadMap[conv._id.toString()] || 0;
-    }
+        const otherParticipant = participants.find(
+          (participant) =>
+            participant._id.toString() !== userId.toString()
+        );
 
-    return NextResponse.json({ success: true, conversations }, { status: 200 });
+        return {
+          ...conversation,
+          participants,
+          otherParticipant: otherParticipant || null,
+        };
+      }
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        conversations: formattedConversations,
+      },
+      { status: 200 }
+    );
   } catch (err) {
-    console.error("Get conversations error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      {
+        error:
+          err.message || "Failed to fetch conversations",
+      },
+      { status: 500 }
+    );
   }
 };
 
@@ -195,38 +199,67 @@ export const getConversationMessages = async (req, conversationId) => {
 export const sendMessage = async (req) => {
   try {
     await dbConnect();
+
     const payload = await getUserFromToken();
 
     if (!payload || !payload.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const body = await req.json();
-    const { receiverId, receiverType, propertyId, content, fileUrl, fileType } = body;
+
+    const {
+      receiverId,
+      receiverType,
+      propertyId,
+      content,
+      fileUrl,
+      fileType,
+    } = body;
 
     if (!content?.trim() && !fileUrl) {
-      return NextResponse.json({ error: "Message must have content or a file" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message must have content or a file" },
+        { status: 400 }
+      );
     }
+
     if (content && content.trim().length > 1000) {
-      return NextResponse.json({ error: "Message cannot exceed 1000 characters" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message cannot exceed 1000 characters" },
+        { status: 400 }
+      );
     }
 
     const senderId = payload.id;
 
-    // Run all lookups in parallel — sender detection, receiver validation, property check, conversation check
-    const [isTenant, isLandlord, receiver, property, existingConversation] = await Promise.all([
+    const [
+      isTenant,
+      isLandlord,
+      receiver,
+      property,
+      existingConversation,
+    ] = await Promise.all([
       Tenant.findById(senderId),
       Landlord.findById(senderId),
-      receiverType === "Tenant" ? Tenant.findById(receiverId) : Landlord.findById(receiverId),
+
+      receiverType === "Tenant"
+        ? Tenant.findById(receiverId)
+        : Landlord.findById(receiverId),
+
       Property.findById(propertyId).lean(),
+
       Conversation.findOne({
         participants: { $all: [senderId, receiverId] },
         property: propertyId,
       }),
     ]);
 
-    // Determine sender type
     let senderType;
+
     if (isTenant) {
       senderType = "Tenant";
     } else if (isLandlord) {
@@ -234,40 +267,58 @@ export const sendMessage = async (req) => {
     } else {
       return NextResponse.json(
         { error: "You are an unauthorized sender" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
     if (!receiver) {
-      return NextResponse.json({ error: "Invalid receiver" }, { status: 400 });
-    }
-
-    if (!property) {
-      return NextResponse.json({ error: "Property not found" }, { status: 404 });
-    }
-
-    // Verify the landlord participant actually owns the property
-    const landlordParticipantId = receiverType === "Landlord" ? receiverId : senderId;
-    if (property.landlord.toString() !== landlordParticipantId) {
-      return NextResponse.json({ error: "Receiver is not the property owner" }, { status: 403 });
-    }
-
-    // enforce tenant ↔ landlord only
-    if (senderType === receiverType) {
       return NextResponse.json(
-        { error: "Messages must be between tenant and landlord only" },
-        { status: 403 },
+        { error: "Invalid receiver" },
+        { status: 400 }
       );
     }
 
-    const conversation = existingConversation ?? await Conversation.create({
-      participants: [senderId, receiverId],
-      property: propertyId,
-      status: "active",
-    });
+    if (!property) {
+      return NextResponse.json(
+        { error: "Property not found" },
+        { status: 404 }
+      );
+    }
 
+    const landlordParticipantId =
+      receiverType === "Landlord"
+        ? receiverId
+        : senderId;
 
-    // create message
+    if (
+      property.landlord.toString() !==
+      landlordParticipantId.toString()
+    ) {
+      return NextResponse.json(
+        { error: "Receiver is not the property owner" },
+        { status: 403 }
+      );
+    }
+
+    if (senderType === receiverType) {
+      return NextResponse.json(
+        {
+          error:
+            "Messages must be between tenant and landlord only",
+        },
+        { status: 403 }
+      );
+    }
+
+    let conversation = existingConversation;
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [senderId, receiverId],
+        property: propertyId,
+        status: "active",
+      });
+    }
     const message = await Message.create({
       sender: senderId,
       senderType,
@@ -280,33 +331,79 @@ export const sendMessage = async (req) => {
       ...(fileType && { fileType }),
     });
 
-    // update conversation with last message
+    let homeInterest = null;
+
+    if (senderType === "Tenant") {
+      homeInterest = await HomeInterest.findOneAndUpdate(
+        {
+          tenant: isTenant._id,
+          property: property._id,
+        },
+        {
+          $setOnInsert: {
+            firstName: isTenant.firstName,
+            lastName: isTenant.lastName,
+            email: isTenant.email,
+            message: content?.trim() || "",
+            property: property._id,
+            user: senderId,
+            tenant: isTenant._id,
+            status: "pending",
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+          setDefaultsOnInsert: true,
+        }
+      );
+    }
+
     conversation.lastMessage = message._id;
+
     await conversation.save();
 
-    // Build a plain message object with populated sender for SSE emission
     const senderDoc = isTenant || isLandlord;
+
     const messageForEmit = {
       ...message.toObject(),
+
       sender: {
         _id: senderDoc._id,
-        name: `${senderDoc.firstName || ""} ${senderDoc.lastName || ""}`.trim(),
+        name: `${senderDoc.firstName || ""} ${
+          senderDoc.lastName || ""
+        }`.trim(),
         email: senderDoc.email,
         role: senderType,
-        avatar: senderDoc.avatar || senderDoc.profilePic || null,
+        avatar:
+          senderDoc.avatar ||
+          senderDoc.profilePic ||
+          null,
       },
     };
 
-    // Push to any open SSE connections for this conversation
-    emitToConversation(conversation._id, messageForEmit);
+    emitToConversation(
+      conversation._id,
+      messageForEmit
+    );
 
     return NextResponse.json(
-      { conversation, message, success: true },
-      { status: 201 },
+      {
+        conversation,
+        message,
+        homeInterest,
+        success: true,
+      },
+      { status: 201 }
     );
+
   } catch (err) {
     console.error("Send message error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    );
   }
 };
 

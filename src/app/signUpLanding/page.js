@@ -235,11 +235,6 @@ useEffect(() => {
 
       const data = await response.json();
 
-      console.log("BUTTON ROLE:", role);
-      console.log("NORMALIZED ROLE:", normalizedRole);
-      console.log("FULL API RESPONSE:", data);
-      console.log("USER ROLE:", data.role || data.user?.role);
-
       if (!response.ok) {
         throw new Error(data.message || "Failed to create user");
       }
@@ -272,10 +267,10 @@ useEffect(() => {
   };
 
   return (
-    <>
+    <div className="bg-gray-100 h-auto">
       <h1
-        className="font-bold text-4xl"
-        style={{ paddingLeft: 50, marginTop: 70 }}
+        className="font-bold text-4xl text-blue-950"
+        style={{ paddingLeft: 50, paddingTop: 70 }}
       >
         Sign Up
       </h1>
@@ -285,7 +280,7 @@ useEffect(() => {
       <div className="signUpLoandingContainer md:flex-col col mt-10 mb-10">
         <ToastContainer position="top-center" autoClose={3000} />
 
-        <div className="residencyStatusSection text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10"
+        <div className="residencyStatusSection border-blue-950 text-2xl mt-10 mb-20 md:w-100% w-50% md:mr-10 mr-10"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -302,12 +297,13 @@ useEffect(() => {
             marginLeft: "50px",
             marginBottom: "50px",
           }}>
-          <p style={{ paddingTop: 40, marginBottom: 30 }}>
+          <p className="text-blue-950"
+          style={{ paddingTop: 40, marginBottom: 30 }}>
             What is your residency status?
           </p>
 
           {selectResidencyStatus && !showResidencyStatus && (
-            <p className="text-start text-muted text-2xl mb-2 px-1"
+            <p className="text-start text-blue-950 text-muted text-2xl mb-2 px-1"
               onClick={() => setShowResidencyStatus(true)}
               style={{
                 cursor: "pointer",
@@ -349,7 +345,7 @@ useEffect(() => {
           {showWhoIsUsingPlatform && (
             <>
               <button
-                className={`rounded-full hover:scale-105 md:p-5 p-2 md:px-15 px-0 border-2 md:w-60 w-40 text-2xl text-center cursor-pointer 
+                className={`rounded-full hover:scale-105 md:p-5 p-2 md:px-15 px-0 border-2 md:w-60 w-40 md:text-2xl text-xl text-center cursor-pointer 
                   ${ selectWhoIsUsingPlatform === "myself"
                     ? "text-blue-950 border-blue-950 bg-blue-900"
                     : "text-blue-950 border-blue-950 hover:bg-blue-800 hover:text-white"
@@ -360,12 +356,12 @@ useEffect(() => {
               </button>
 
               <button
-                className={`rounded-full hover:scale-105 md:p-5 p-2 md:px-7 px-0 border-2 md:w-74 w-55 text-2xl text-center cursor-pointer '
-                                ${
-                                  selectWhoIsUsingPlatform === "someoneElse"
-                                    ? " text-blue-950 border-blue-950 bg-blue-900"
-                                    : "text-blue-950 border-blue-950 hover:bg-blue-800 hover:text-white"
-                                }`}
+                className={`rounded-full hover:scale-105 md:p-5 p-2 md:px-7 px-0 border-2 md:w-74 w-55 md:text-2xl text-xl text-center cursor-pointer '
+                ${
+                  selectWhoIsUsingPlatform === "someoneElse"
+                  ? " text-blue-950 border-blue-950 bg-blue-900"
+                  : "text-blue-950 border-blue-950 hover:bg-blue-800 hover:text-white"
+                }`}
                 onClick={() => setSelectWhoIsUsingPlatform("someoneElse")}
               >
                 Someone Else
@@ -386,25 +382,25 @@ useEffect(() => {
         >
           <button
             onClick={() => createUser("tenant")}
-            className="signUpTenant bg-blue-950 hover:scale-105 hover:bg-blue-800 text-white rounded-lg hover:rounded-full p-4 w-100 md:w-64 border-1px solid #ccc text-2xl text-center cursor-pointer">
+            className="signUpTenant bg-blue-950 hover:scale-105 hover:bg-blue-800 text-white rounded-lg hover:rounded-full p-4 w-75 md:w-64 border-1px solid #ccc text-2xl text-center cursor-pointer">
             Sign Up as Tenant
           </button>
 
           <button 
-            onClick={() => createUser("landlord")} className="signUpLandlord bg-blue-950 hover:scale-105 hover:bg-blue-800 hover:rounded-full text-white rounded-lg p-4 w-100 md:w-70 border-1px solid #ccc text-2xl text-center cursor-pointer">
+            onClick={() => createUser("landlord")} className="signUpLandlord bg-blue-950 hover:scale-105 hover:bg-blue-800 hover:rounded-full text-white rounded-lg p-4 w-75 border-1px solid #ccc text-2xl text-center cursor-pointer">
             Sign Up as Landlord
           </button>
         </div>
       </div>
       
-      <p className="md:ml-12 ml-12 md:-mt-40 underline -mt-20 md:mb-20 -mb-15 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
+      <p className="md:ml-12 ml-8 md:-mt-40 underline -mt-20 md:mb-20 -mb-15 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
         style={{ cursor: "pointer"}}
         onClick={() => {
           router.push("/signInTenant");
         }}> Sign In as a Tenant (if you already have an account)
       </p>
       
-      <p className="md:ml-12 ml-12 -md:mt-8 underline -mt-15 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
+      <p className="md:ml-12 ml-7 -md:mt-8 underline -mt-15 text-sm md:font-sm leading-[1.5] text-gray-600 hover:text-blue-600 transition-colors duration-300"
         style={{ cursor: "pointer"}}
         onClick={() => {
           router.push("/signInLandlord");   
@@ -445,7 +441,7 @@ useEffect(() => {
       </div>
 
       {/*End of Banner Section*/}
-    </>
+    </div>
   );
 };
 

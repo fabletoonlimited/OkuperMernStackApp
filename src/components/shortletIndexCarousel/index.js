@@ -21,25 +21,22 @@ const ShortletIndexCarousel = () => {
                 }
 
                 const list = Array.isArray(data) ? data : data.properties;
+                console.log("RAW DATA:", data);
 
-                      console.log("RAW DATA:", data);
-      console.log("LIST:", list);
-      console.log(
-      "CATEGORIES:",
-      list.map((p) => p.category)
-    );
-
-
-
-                // ✅ Filter only shortlets
-                const filtered = list.filter(
-                  (property) => 
-                  property.category &&
-                  property.category.toLowerCase().trim() === "shortlet"
+                console.log("LIST:", list);
+                console.log(
+                "CATEGORIES:",
+                list.map((p) => p.category)
                 );
 
-
-console.log("FILTERED:", filtered);
+        // ✅ Filter only shortlets
+        const filtered = list.filter(
+            (property) => 
+                property.category &&
+                property.category.toLowerCase().trim() === "shortlet"
+            );
+            
+                console.log("FILTERED:", filtered);
 
                 if (filtered.length === 0) {
                     console.error("No shortlet properties found");
@@ -70,12 +67,12 @@ console.log("FILTERED:", filtered);
     if (slicedProperties.length === 0) return null;
 
     return (
-        <div className="flex gap-4 w-fit mx-auto overflow-x-auto h-auto py-8 px-2">
+        <div className="flex gap-4 w-fit mx-auto overflow-x-auto h-auto py-8 md:px-5 px-10">
             {slicedProperties.map((item, index) =>
                 item.isAd ? (
                     <div
                         key={item._id || `ad-${index}`}
-                        className="w-80 flex-shrink-0"
+                        className="w-100 flex-shrink-0"
                     >
                         <AdBanner
                             desc={item.desc}
@@ -86,7 +83,7 @@ console.log("FILTERED:", filtered);
                 ) : (
                     <div
                         key={item._id}
-                        className="w-80 flex-shrink-0"
+                        className="w-100 flex-shrink-0"
                     >
                         <PropertyCard {...item} />
                     </div>

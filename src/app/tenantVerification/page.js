@@ -1,11 +1,12 @@
 import React from 'react'
-import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
-import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
-import ProfilePage from '../tenantProfile/page';
-const verication = () => {
+import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
+import TenantDashboardFooter from "../../components/tenantDashboardFooter";
+import TenantProfilePage from '../tenantProfileForm/page';
+
+const tenantVerification = () => {
   return (
       <div>
-          <LandlordDashboardSidebar />
+          <TenantDashboardSidebar />
           <div className="bg-white shadow-md p-10 rounded-md  ">
               <h3 className="text-5xl font-bold text-blue-950">
                   Dear, Tenant!
@@ -16,10 +17,10 @@ const verication = () => {
               </h3>
           </div>
 
-          <ProfilePage />
-          <LandlordDashboardFooter />
+          <TenantProfilePage />
+          <TenantDashboardFooter />
       </div>
   );
 }
 
-export default verication
+export default tenantVerification

@@ -22,184 +22,37 @@ function TenantMessages({ id }) {
 
   useEffect(() => {
     const fetchMessageData = async () => {
-      try {
+        try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/message/${id}`,
-          { credentials: "include" },
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/message`,
+            {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+            }
         );
 
+        const data = await res.json();
+
         if (!res.ok) {
-          toast.error(`Fetch failed: ${res.status}`);
-          return;
+            toast.error(data.error || "Failed to fetch messages");
+            return;
         }
 
-        const data = await res.json();
         setBackendMessage(data);
-        setActiveConversation(data?.conversation?.[0]);
-      } catch (err) {
+        setActiveConversation(data?.conversations?.[0] || null);
+        } catch (err) {
         toast.error(err.message);
-      }
+        }
     };
 
     fetchMessageData();
-  }, [id]);
+    }, []);
 
-  const inboxMessages = [
-    {
-      id: 1,
-      name: "Titilola Giwa",
-      email: "titilola.giwa1@example.com",
-      gender: "Female",
-      age: 32,
-      occupation: "Product Manager",
-      maritalStatus: "Married",
-      spouseName: "Oluwaseun Giwa",
-      numberOfChildren: 2,
-      religion: "Christianity",
-      companyName: "TechNova Ltd",
-      companyPhone: "+234 801 234 5678",
-      companyEmail: "hr@technova.com",
-      currentAddress: "15 Bourdillon Road",
-      city: "Ikoyi",
-      state: "Lagos",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-      documentType: "National ID",
-      idNumber: "NIN-0012345678",
-      documentImage: "/documents/national-id-1.jpg",
-    },
-    {
-      id: 2,
-      name: "Titilola Giwa",
-      email: "titilola.giwa2@example.com",
-      gender: "Female",
-      age: 28,
-      occupation: "UX Designer",
-      maritalStatus: "Single",
-      spouseName: "",
-      numberOfChildren: 0,
-      religion: "Christianity",
-      companyName: "DesignHub",
-      companyPhone: "+234 802 345 6789",
-      companyEmail: "contact@designhub.com",
-      currentAddress: "22 Admiralty Way",
-      city: "Lekki",
-      state: "Lagos",
-      property: "4Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-      documentType: "Driver License",
-      idNumber: "DL-9876543210",
-      documentImage: "/documents/driver-license-2.jpg",
-    },
-    {
-      id: 3,
-      name: "Titilola Giwa",
-      email: "titilola.giwa3@example.com",
-      gender: "Female",
-      age: 35,
-      occupation: "Business Analyst",
-      maritalStatus: "Married",
-      spouseName: "Kunle Ade",
-      numberOfChildren: 3,
-      religion: "Christianity",
-      companyName: "FinEdge Corp",
-      companyPhone: "+234 803 456 7890",
-      companyEmail: "info@finedge.com",
-      currentAddress: "8 Banana Island Road",
-      city: "Ikoyi",
-      state: "Lagos",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-      documentType: "International Passport",
-      idNumber: "P123456789",
-      documentImage: "/documents/passport-3.jpg",
-    },
-    {
-      id: 4,
-      name: "Titilola Giwa",
-      email: "titilola.giwa4@example.com",
-      gender: "Female",
-      age: 40,
-      occupation: "HR Consultant",
-      maritalStatus: "Divorced",
-      spouseName: "",
-      numberOfChildren: 1,
-      religion: "Christianity",
-      companyName: "PeopleFirst Ltd",
-      companyPhone: "+234 804 567 8901",
-      companyEmail: "support@peoplefirst.com",
-      currentAddress: "12 Osborne Road",
-      city: "Ikoyi",
-      state: "Lagos",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-      documentType: "Voters Card",
-      idNumber: "PVC-44556677",
-      documentImage: "/documents/voters-card-4.jpg",
-    },
-    {
-      id: 5,
-      name: "Titilola Giwa",
-      email: "titilola.giwa5@example.com",
-      gender: "Female",
-      age: 29,
-      occupation: "Marketing Executive",
-      maritalStatus: "Single",
-      spouseName: "",
-      numberOfChildren: 0,
-      religion: "Christianity",
-      companyName: "BrandWave",
-      companyPhone: "+234 805 678 9012",
-      companyEmail: "hello@brandwave.com",
-      currentAddress: "5 Freedom Way",
-      city: "Lekki",
-      state: "Lagos",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-      documentType: "National ID",
-      idNumber: "NIN-5566778899",
-      documentImage: "/documents/national-id-5.jpg",
-    },
-    {
-      id: 6,
-      name: "Titilola Giwa",
-      email: "titilola.giwa6@example.com",
-      gender: "Female",
-      age: 37,
-      occupation: "Operations Manager",
-      maritalStatus: "Married",
-      spouseName: "Adekunle Giwa",
-      numberOfChildren: 2,
-      religion: "Christianity",
-      companyName: "LogiPro Services",
-      companyPhone: "+234 806 789 0123",
-      companyEmail: "admin@logipro.com",
-      currentAddress: "18 Chevron Drive",
-      city: "Lekki",
-      state: "Lagos",
-      property: "3Brd Apartment in Bourdillon, Lekki",
-      message: "Good morning, My name is Juliet Ibhadiyi, I'd like to d",
-      unread: true,
-      avatar: "/avatar1.jpg",
-      documentType: "Driver License",
-      idNumber: "DL-1122334455",
-      documentImage: "/documents/driver-license-6.jpg",
-    },
-  ];
+    const inboxMessages = backendMessage?.conversations || [];
+    const profilePic = backendMessage?.sender?.previewPic;
 
-  const profilePic = backendMessage?.sender?.profilePic;
-
-  return (
+    return (
     <>
       <div className="flex min-h-screen">
           <div className="flex-1 p-6">
@@ -218,13 +71,13 @@ function TenantMessages({ id }) {
                                   style={{ fontSize: "20px" }}>
                                   My messages
                               </h5>
-
+{/* 
                               <button
                                   onClick={() => setOpenCompose(true)}
                                   className="text-blue-800 hover:underline mt-14"
                                   style={{ fontSize: "12px" }}>
                                   Compose
-                              </button>
+                              </button> */}
 
                               <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
                                   {profilePic && (
@@ -276,25 +129,23 @@ function TenantMessages({ id }) {
                                           <p
                                               className="font-light text-black"
                                               style={{ fontSize: "12px" }}>
-                                              {item.name}
+                                              {item.name || "User"}
                                           </p>
                                           <p className="text-xs font-semibold text-black">
-                                              {item.property}
+                                              {item.property?.title || "Property"}
                                           </p>
-                                          <p
+                                            <p
                                               className="font-light text-black whitespace-pre-line"
-                                              style={{ fontSize: "10px" }}>
-                                              {item.message.replace(
-                                                  /(My name)\b/i,
-                                                  "$1\n",
-                                              )}
-                                          </p>
-                                      </div>
-                                  </div>
-                              ))}
-                          </div>
+                                              style={{ fontSize: "10px" }}
+                                            >
+                                              {item.lastMessage?.content || ""}
+                                             </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
 
-                          <div className="hidden md:block flex-1 p-4 bg-gray-50">
+                            <div className="hidden md:block flex-1 p-4 bg-gray-50">
                               {showProfile ? (
                                   <div className="p-8 border-t border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-black">
                                       {/* Avatar */}
@@ -480,9 +331,16 @@ function TenantMessages({ id }) {
                                                   {selectedMessage?.zipCode}
                                               </span>
                                           </p>
-                                      </div>
-                                  </div>
-                              ) : selectedMessage ? (
+
+                                            <p className="text-center">
+                                                <strong>State of Origin: </strong>
+                                                <span className="font-light">
+                                                    {otherParticipant?.stateOfOrigin || "N/A"}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : selectedMessage ? (
                                   <div className="p-17 bg-white h-full items-center">
                                       <p className="text-blue-950 font-bold text-2xl mb-10">
                                           {selectedMessage.property}
@@ -518,14 +376,13 @@ function TenantMessages({ id }) {
                                           </p>
                                       </p>
                                   </div>
-                              ) : (
+                                ) : (
                                   <p className="text-gray-400">
                                       Select a message to view
                                   </p>
-                              )}
-                          </div>
-                      </div>
-
+                                )}
+                            </div>
+                        </div>
                       <ToastContainer />
                   </div>
               </div>

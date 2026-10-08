@@ -112,43 +112,60 @@ function TenantInbox() {
     fetchConversations();
   }, []);
 
-  // Fetch messages when conversation is selected
-  useEffect(() => {
-    if (!selectedConversation) return;
+// Fetch messages when conversation is selected
+useEffect(() => {
+  if (!selectedConversation?._id) return;
 
-    const fetchMessages = async () => {
-      try {
-        const res = await fetch(`/api/message/${selectedConversation._id}`, {
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch(
+        `/api/message/${selectedConversation._id}`,
+        {
+          method: "GET",
           credentials: "include",
-        });
-
-        if (!res.ok) {
-          toast.error("Failed to fetch messages");
-          return;
+          cache: "no-store",
         }
+      );
 
-        const data = await res.json();
-        setMessages(data.messages || []);
-        setShowProfile(false);
+      const data = await res.json();
 
-        // Mark messages as read and clear badge locally
-        await fetch(`/api/message/${selectedConversation._id}/read`, {
+      if (!res.ok) {
+        toast.error(
+          data.error ||
+            data.message ||
+            "Failed to fetch messages"
+        );
+        return;
+      }
+
+      setMessages(data.messages || []);
+      setShowProfile(false);
+
+      setConversations((prev) =>
+        prev.map((conversation) =>
+          conversation._id === selectedConversation._id
+            ? {
+                ...conversation,
+                unreadCount: 0,
+              }
+            : conversation
+        )
+      );
+
+      await fetch(
+        `/api/message/${selectedConversation._id}/read`,
+        {
           method: "PATCH",
           credentials: "include",
-        });
-        setConversations((prev) =>
-          prev.map((c) =>
-            c._id === selectedConversation._id ? { ...c, unreadCount: 0 } : c
-          )
-        );
-      } catch (err) {
-        console.error("Fetch messages error:", err);
-        toast.error(err.message);
-      }
-    };
+        }
+      );
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch messages");
+    }
+  };
 
-    fetchMessages();
-  }, [selectedConversation]);
+  fetchMessages();
+}, [selectedConversation?._id]);
 
   // SSE real-time connection — auto-reconnects with exponential backoff
   useEffect(() => {
@@ -254,78 +271,138 @@ function TenantInbox() {
   };
 
   // Handle sending reply
-  const handleSendReply = async () => {
-    if (!replyText.trim() && !selectedFile) {
-      toast.error("Please enter a message or attach a file");
+ const handleSendReply = async () => {
+  if (!replyText.trim() && !selectedFile) {
+    toast.error("Please enter a message or attach a file");
+    return;
+  }
+
+  if (!selectedConversation) return;
+
+  try {
+    setReplyLoading(true);
+
+    if (!otherParticipant?._id) {
+      toast.error("No recipient found");
       return;
     }
-    if (!selectedConversation) return;
 
-    try {
-      setReplyLoading(true);
-      if (!otherParticipant) {
-        toast.error("No recipient found");
-        return;
-      }
+    const resolvedReceiverType =
+      normalizeRole(otherParticipant?.role) ||
+      (currentActorType === "Tenant" ? "Landlord" : "Tenant");
 
-      const resolvedReceiverType =
-        normalizeRole(otherParticipant?.role) ||
-        (currentActorType === "Tenant" ? "Landlord" : "Tenant");
+    let fileUrl = null;
+    let fileType = null;
 
-      // Upload file first if one is selected
-      let fileUrl = null;
-      let fileType = null;
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-        const uploadRes = await fetch(`/api/message/${selectedConversation._id}/upload`, {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const uploadRes = await fetch(
+        `/api/message/${selectedConversation._id}/upload`,
+        {
           method: "POST",
           credentials: "include",
           body: formData,
-        });
-        if (!uploadRes.ok) {
-          const err = await uploadRes.json();
-          toast.error(err.error || "File upload failed");
-          return;
         }
-        const uploadData = await uploadRes.json();
-        fileUrl = uploadData.fileUrl;
-        fileType = uploadData.fileType;
-      }
+      );
 
-      const res = await fetch("/api/message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          receiverId: otherParticipant._id,
-          receiverType: resolvedReceiverType,
-          propertyId: selectedConversation.property?._id,
-          content: replyText,
-          ...(fileUrl && { fileUrl, fileType }),
-        }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        toast.error(error.error || "Failed to send message");
+      if (!uploadRes.ok) {
+        const err = await uploadRes.json();
+        toast.error(err.error || "File upload failed");
         return;
       }
 
-      const data = await res.json();
-      setMessages([...messages, data.message]);
-      setReplyText("");
-      setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setReadByOther(false);
-      toast.success("Message sent!");
-    } catch (err) {
-      console.error("Send message error:", err);
-      toast.error(err.message);
-    } finally {
-      setReplyLoading(false);
+      const uploadData = await uploadRes.json();
+
+      fileUrl = uploadData.fileUrl;
+      fileType = uploadData.fileType;
     }
-  };
+
+    const res = await fetch("/api/message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        receiverId: otherParticipant._id,
+        receiverType: resolvedReceiverType,
+        propertyId: selectedConversation.property?._id,
+        content: replyText,
+        ...(fileUrl && { fileUrl, fileType }),
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.error || "Failed to send message");
+      return;
+    }
+
+    // Add the new message to the open conversation
+    setMessages((prev) => [...prev, data.message]);
+
+    // Update the conversation list immediately
+    setConversations((prev) => {
+      const existingConversation = prev.find(
+        (conversation) =>
+          conversation._id === data.conversation._id
+      );
+
+      if (existingConversation) {
+        return [
+          {
+            ...existingConversation,
+            lastMessage: data.message,
+            updatedAt: data.conversation.updatedAt,
+          },
+          ...prev.filter(
+            (conversation) =>
+              conversation._id !== data.conversation._id
+          ),
+        ];
+      }
+
+      return [
+        {
+          ...data.conversation,
+          property: selectedConversation.property,
+          participants: selectedConversation.participants,
+          otherParticipant: otherParticipant,
+          lastMessage: data.message,
+        },
+        ...prev,
+      ];
+    });
+
+    // Keep the selected conversation synchronized
+    setSelectedConversation((prev) => ({
+      ...prev,
+      ...data.conversation,
+      property: prev.property,
+      participants: prev.participants,
+      otherParticipant: prev.otherParticipant,
+      lastMessage: data.message,
+    }));
+
+    setReplyText("");
+    setSelectedFile(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    setReadByOther(false);
+
+    toast.success("Message sent!");
+  } catch (err) {
+    toast.error(err.message);
+  } finally {
+    setReplyLoading(false);
+  }
+};
 
   // Generic status action handler (tenant-side)
   const handleStatusAction = async (endpoint, successMsg) => {
@@ -383,7 +460,7 @@ function TenantInbox() {
     getOtherParticipantForConversation(conversation);
 
   const otherParticipant = profileDetails || getOtherParticipant();
-  const profilePic = otherParticipant?.profilePic || otherParticipant?.avatar;
+  const profilePic = otherParticipant?.previewPic || otherParticipant?.avatar;
 
   useEffect(() => {
     if (!selectedConversation) {
@@ -399,7 +476,7 @@ function TenantInbox() {
   }, [selectedConversation]);
 
   useEffect(() => {
-    if (!showProfile) return;
+    // if (!showProfile) return;
     if (!selectedConversation) return;
 
     const participant = getOtherParticipant();
@@ -409,7 +486,9 @@ function TenantInbox() {
     const fetchProfile = async () => {
       try {
         setProfileLoading(true);
-        const res = await fetch(`/api/profile?actorId=${participant._id}`, {
+
+        const res = await fetch(`/api/landlordProfile?actorId=${participant._id}`, 
+        {
           credentials: "include",
         });
 
@@ -418,6 +497,7 @@ function TenantInbox() {
         }
 
         const data = await res.json();
+
         if (isActive) {
           setProfileDetails(data.profile || null);
         }
@@ -435,7 +515,7 @@ function TenantInbox() {
     return () => {
       isActive = false;
     };
-  }, [showProfile, selectedConversation]);
+  }, [selectedConversation]);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -459,7 +539,7 @@ function TenantInbox() {
                 {/* Compose button — pending owner confirmation of purpose (see Figma) */}
                 <button
                   onClick={() => setOpenCompose(true)}
-                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 rounded"
+                  className="bg-gray-500 cursor-not-allowed text-white px-6 py-2 rounded"
                 >
                   Compose
                 </button>
@@ -471,7 +551,7 @@ function TenantInbox() {
                       width={60}
                       height={60}
                       crop="fill"
-                      alt="profile"
+                      alt="tenantProfilePic"
                     />
                   )}
                 </div>
@@ -531,9 +611,9 @@ function TenantInbox() {
                         }`}
                       >
                         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                          {(other?.avatar || other?.profilePic) && (
+                          {(profileDetails?.previewPic || profileDetails?.avatar) && (
                             <Image
-                              src={other.avatar || other.profilePic}
+                              src={profileDetails.previewPic || profileDetails.avatar}
                               alt="avatar"
                               width={48}
                               height={48}
@@ -595,7 +675,7 @@ function TenantInbox() {
                       {/* Avatar */}
                       <h4 className="text-2xl font-bold mb-4 text-blue-950">
                         <Image
-                          src={otherParticipant?.avatar || "/avatar1.jpg"}
+                          src={otherParticipant?.previewPic || "/avatar1.jpg"}
                           alt="avatar"
                           width={120}
                           height={120}
@@ -666,79 +746,7 @@ function TenantInbox() {
                         </span>
                       </p>
 
-                      {/* Occupation */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Occupation: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.occupation || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Marital Status */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Marital Status: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.maritalStatus || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Spouse Name & No of Children if Married */}
-                      {otherParticipant?.maritalStatus === "Married" && (
-                        <>
-                          <p className="text-xl mb-2 text-center">
-                            <strong>Spouse Name: </strong>
-                            <span className="font-light">
-                              {otherParticipant?.spouseName || "N/A"}
-                            </span>
-                          </p>
-                          <p className="text-xl mb-2 text-center">
-                            <strong>No of Children: </strong>
-                            <span className="font-light">
-                              {otherParticipant?.numberOfChildren || "0"}
-                            </span>
-                          </p>
-                        </>
-                      )}
-
-                      {/* Religion */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Religion: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.religion || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Company Name */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Company Name: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.companyName || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Company Phone */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Company Phone: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.companyPhone || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Company Email */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Company Email: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.companyEmail || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Current Address */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Current Address: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.currentAddress || "N/A"}
-                        </span>
-                      </p>
+                      
 
                       <hr className="w-full my-4 border-gray-300" />
 

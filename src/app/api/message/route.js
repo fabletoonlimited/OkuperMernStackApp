@@ -6,8 +6,13 @@ export async function POST(req) {
   try {
     const result = await sendMessage(req);
     return result;
+
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    
+    return NextResponse.json(
+      { error: err.message }, 
+      { status: 500 }
+    );
   }
 }
 

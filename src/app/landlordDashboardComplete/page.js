@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar/index.js";
 import PropertyCard from "@/components/propertyCard";
-import { FaHome, FaMoneyBillWave, FaEye, FaClock } from "react-icons/fa";
+import { FaHome, FaMoneyBillWave, FaEye, FaClock, FaExclamationCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -15,36 +15,61 @@ const page = () => {
     const [loading, setLoading] = useState(false);
     const [properties, setProperties] = useState([]);
     const [propertyCount, setPropertyCount] = useState(0);
+    const [homeInterests, setHomeInterests] = useState([]);
+    const [homeInterestCount, setHomeInterestCount] = useState(0);
     const [landlord, setLandlord] = useState(null);
     const [landlordProfile, setLandlordProfile] = useState(null)
     const [tenant, setIsTenant] = useState(null);
     const [tenantProfile, setTenantProfile] = useState(null)
-    const [dispute, setDispute] = useState([])
+    const [dispute, setDispute] = useState([]);
+    const [disputeCount, setDisputeCount] = useState(0);
+    const [income, setIncome] = useState([]);
+    const [incomeCount, setIncomeCount] = useState(0);
 
-
-    // Landlord
     useEffect(() => {
-        const fetchLandlord = async () => {
-            try {
-                const res = await fetch("/api/landlord", {
-                method: "GET",
-                credentials: "include",
-                });
-            
-                if (!res.ok) {
-                toast.error("Failed to fetch landlord");
-                return;
+    if (!landlord?._id) return;
+
+    const fetchProperties = async () => {
+        try {
+            const res = await fetch(
+                `/api/property?landlordId=${landlord._id}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
                 }
-            
-                const data = await res.json();
-                setLandlord(data);
-            } catch (err) {
-                console.error(err);
-                toast.error("Landlord fetch error");
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error("Property fetch failed:", data);
+                setProperties([]);
+                setPropertyCount(0);
+                return;
             }
-        };
-        fetchLandlord();
-    }, []);
+
+            console.log("LOGGED-IN LANDLORD:", landlord._id);
+            console.log("LANDLORD PROPERTIES:", data);
+
+            const list = Array.isArray(data)
+                ? data
+                : Array.isArray(data?.properties)
+                ? data.properties
+                : [];
+
+            setProperties(list);
+            setPropertyCount(list.length);
+
+        } catch (error) {
+            console.error("Property fetch error:", error);
+            setProperties([]);
+            setPropertyCount(0);
+        }
+    };
+
+        fetchProperties();
+    }, [landlord?._id]);
     
     useEffect(() => {
         const fetchProfile = async () => {
@@ -71,7 +96,7 @@ const page = () => {
             }
         };
     
-            fetchProfile();
+        fetchProfile();
     }, []);
 
     useEffect(() => {
@@ -126,58 +151,72 @@ const page = () => {
     }, []);
 
     useEffect(() => {
-        const fetchProperties = async () => {
-            try {
-                const res = await fetch("/api/property", {
+    const fetchMyProperties = async () => {
+        try {
+            // First get the logged-in landlord
+            const landlordRes = await fetch("/api/landlord", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            if (!landlordRes.ok) {
+                console.error("Failed to fetch landlord");
+                setProperties([]);
+                setPropertyCount(0);
+                return;
+            }
+
+            const landlordData = await landlordRes.json();
+
+            console.log("LOGGED IN LANDLORD:", landlordData);
+            console.log("LANDLORD ID:", landlordData._id);
+
+            if (!landlordData?._id) {
+                console.error("No landlord ID found");
+                setProperties([]);
+                setPropertyCount(0);
+                return;
+            }
+
+            // Now fetch ONLY this landlord's properties
+            const propertyRes = await fetch(
+                `/api/property?landlordId=${landlordData._id}`,
+                {
+                    method: "GET",
                     credentials: "include",
                     cache: "no-store",
-                });
-
-                if (!res.ok) {
-                    setProperties([]);
-                    return;
                 }
+            );
 
-                const data = await res.json();
+            const propertyData = await propertyRes.json();
 
-                console.log("PROPERTIES:", data);
+            console.log("MY LANDLORD PROPERTY RESPONSE:", propertyData);
 
-                setProperties(Array.isArray(data) ? data : []);
-            } catch (err) {
-                console.error("Property fetch error:", err);
+            if (!propertyRes.ok) {
                 setProperties([]);
+                setPropertyCount(0);
+                return;
             }
-        };
 
-        fetchProperties();
-    }, []);
-        
-    //Add Property listing
-    useEffect(() => {
-        const fetchAddProperty = async () => {
-          try {
-            const res = await fetch("/api/property", {
-              credentials: "include",
-            });
-    
-            if (!res.ok) {
-              setPropertyUpload(false);
-              return;
-            }
-    
-            const data = await res.json();
-            setPropertyUpload(Boolean(data.uploaded));
-          } catch (err) {
-            console.error(err);
-            setPropertyUpload(false);
-          } finally {
-            setUtilityLoading(false);
-          }
-        };
-    
-        fetchAddProperty();
-    }, []);
+            const list = Array.isArray(propertyData)
+                ? propertyData
+                : propertyData?.properties || [];
 
+            setProperties(list);
+            setPropertyCount(list.length);
+
+            console.log("PROPERTY COUNT:", list.length);
+
+        } catch (error) {
+            console.error("PROPERTY FETCH ERROR:", error);
+            setProperties([]);
+            setPropertyCount(0);
+        }
+    };
+
+    fetchMyProperties();
+}, []);
 
     useEffect(() => {
         const fetchDispute = async () => {
@@ -188,13 +227,25 @@ const page = () => {
                 });
             
                 if (!res.ok) {
-                toast.error("Failed to fetch dispute");
+                    setDispute([]);
+                    setDisputeCount(0);
+                    toast.error("Failed to fetch dispute")
                 return;
                 }
-            
                 const data = await res.json();
-                setDispute(data);
+
+                const list = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data?.disputes)
+                    ? data.disputes
+                    : [];
+                setDispute(list);
+                setDisputeCount(list.length);
+
             } catch (err) {
+                setDispute([]);
+                setDisputeCount(0);
+
                 console.error(err);
                 toast.error("Dispute fetch error");
             }
@@ -203,29 +254,80 @@ const page = () => {
     }, []);
 
     useEffect(() => {
-        const fetchCompletion = async () => {
+        const fetchIncome = async () => {
             try {
-                const res = await fetch("/api/profile/completion", {
-                    credentials: "include",
+                const res = await fetch("/api/payment", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store"
                 });
 
+                const data = await res.json();
+            
                 if (!res.ok) {
-                    setPropertyCount(0);
+                    console.log("Payment fetch failed:", data);
+                    setIncome([]);
+                    setIncomeCount(0);
                     return;
                 }
+                console.log("PAYMENTS:", data);
 
-                const data = await res.json();
-                setPropertyCount(
-                    Number.isFinite(data.percent) ? data.percent : 0
-                );
-            } catch (err) {
-                console.error("Profile completion error:", err);
-                setPropertyCount(null);
+                const list = Array.isArray(data)
+                ? data
+                : Array.isArray(data?.payments)
+                ? data.payments
+                : [];
+
+                setIncome(list);
+                setIncomeCount(list.length);
+
+            console.log("INCOME COUNT:", list.length);
+
+        } catch (err) {
+            console.error("Payment fetch error:", err);
+            setIncome([]);
+            setIncomeCount(0);
+        }
+    };
+
+    fetchIncome();
+}, []);
+
+useEffect(() => {
+    const fetchHomeInterests = async () => {
+        try {
+            const res = await fetch("/api/homeInterest", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setHomeInterests([]);
+                setHomeInterestCount(0);
+                toast.error(data?.message || "Failed to fetch home interests");
+                return;
             }
-        };
 
-        fetchCompletion();
-    }, []);
+            const list = Array.isArray(data)
+                ? data
+                : Array.isArray(data?.interests)
+                ? data.interests
+                : [];
+
+            setHomeInterests(list);
+            setHomeInterestCount(list.length);
+        } catch (err) {
+            setHomeInterests([]);
+            setHomeInterestCount(0);
+            toast.error("Home interests fetch error");
+        }
+    };
+
+    fetchHomeInterests();
+}, []);
 
     return (
         <>
@@ -268,11 +370,12 @@ const page = () => {
                                 <div className="bg-green-100 p-3 rounded-full text-green-600">
                                     <FaHome />
                                 </div>
+
                                 <div>
                                     <p className="text-gray-500 text-sm">
                                         Total Properties
                                     </p>
-                                    <h2 className="text-xl font-bold">1330</h2>
+                                    <h2 className="text-xl font-bold">{propertyCount}</h2>
                                 </div>
                             </div>
 
@@ -284,19 +387,19 @@ const page = () => {
                                     <p className="text-gray-500 text-sm">
                                         Total Income
                                     </p>
-                                    <h2 className="text-xl font-bold">N33M</h2>
+                                    <h2 className="text-xl font-bold">{incomeCount}</h2>
                                 </div>
                             </div>
 
                             <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4">
                                 <div className="bg-red-100 p-3 rounded-full text-red-600">
-                                    <FaEye />
+                                    <FaExclamationCircle />
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-sm">
-                                        Total Views
+                                        Total Property Disputes
                                     </p>
-                                    <h2 className="text-xl font-bold">84K+</h2>
+                                    <h2 className="text-xl font-bold">{disputeCount}</h2>
                                 </div>
                             </div>
 
@@ -308,7 +411,7 @@ const page = () => {
                                     <p className="text-gray-500 text-sm">
                                         Pending Interests
                                     </p>
-                                    <h2 className="text-xl font-bold">400+</h2>
+                                    <h2 className="text-xl font-bold">{homeInterestCount}</h2>
                                 </div>
                             </div>
                         </div>
@@ -318,75 +421,92 @@ const page = () => {
                             My Property Complaints
                         </h2>
 
-                        <div className="grid grid-cols-3 px-4 mb-2 text-sm text-gray-500 font-medium">
-                            <p>Complaint</p>
-                            <p className="text-center">Resident</p>
-                            <p className="text-right">Rating</p>
-                        </div>
+                    <div className="grid grid-cols-3 px-4 mb-2 text-sm text-gray-500 font-medium">
+                        <p>Complaint</p>
+                        <p className="text-center">Resident</p>
+                        <p className="text-right">Rating</p>
+                    </div>
 
-                        <div className="space-y-4 mb-8">
-
-                        
+                    <div className="space-y-4 mb-8">
                         {dispute.length === 0 ? (
                             <p className="text-gray-500 text-center py-6">
-                                There are currently no complaints. Future tenant or prospective tenant complaint for your property goes here.
+                                There are currently no complaints. Future tenant or
+                                prospective tenant complaints for your property goes here.
                             </p>
-                        ) : (
-                        dispute.map((dispute) => (
-    
-                                <div
-                                    key={dispute._id}
-                                    className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
-                                    <div>
-                                        <p className="text-xs text-gray-400">
-                                            {dispute?.disputeNo}
-                                        </p>
-                                        <p className="font-medium">
-                                            {dispute?.complaint}
-                                        </p>
-                                    </div>
+                            ) : (
+                        <>
+                        {dispute.slice(0, 4).map((item) => (
+                        <div
+                            key={item._id}
+                            className="bg-white p-4 rounded-lg shadow flex items-center justify-between"
+                        >
+                        {/* Complaint */}
+                        <div>
+                            <p className="text-xs text-gray-400">
+                                {item?.disputeNo}
+                            </p>
 
-                                    <div className="flex items-center gap-2">
-                                        <img
-                                              src={tenantProfile?.previewPic}
-                                            className="w-8 h-8 rounded-full"
-                                            alt="resident"
-                                        />
-                                        <p className="text-sm">{tenant?.firstName} {""} {tenant?.lastName}</p>
-                                    </div>
-
-                                    <div className="text-yellow-500 text-lg">
-                                        {dispute?.rating}
-                                    </div>
-                                </div>
-                            )
-                            ))}
+                            <p className="font-medium">
+                                {item?.complaint}
+                            </p>
                         </div>
 
-             
-                     
+                        {/* Resident */}
+                        <div className="flex items-center gap-2">
+                            <img
+                                src={tenantProfile?.previewPic}
+                                className="w-8 h-8 rounded-full"
+                                alt="resident"
+                            />
 
-                        {/* Listings */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 w-full">
-                            <h2 className="text-xl font-semibold mb-4">
-                                My Property Listings
-                            </h2>
+                            <p className="text-sm">
+                                {item?.firstName} {item?.lastName}
+                            </p>
+                        </div>
 
-                            {properties.length === 0 ? (
-                                <p className="text-gray-500 col-span-full text-center py-10">
-                                    You currently have no property listings. Future Property Listings goes here
-                                </p>
-                            ) : (
-                                properties.map((property) => (
-                                    <PropertyCard
-                                        key={property._id}
-                                        {...property}
-                                    />
-                                ))
-                            )}
+                        {/* Rating */}
+                        <div className="text-yellow-500 text-lg">
+                            {item?.rating}
                         </div>
                     </div>
+                    ))}
+
+                    {/* View All */}
+                    {dispute.length > 4 && (
+                        <div className="flex justify-end mt-4">
+                            <button
+                                type="button"
+                                onClick={() => router.push("/landlordDispute")}
+                                className="text-blue-700 font-semibold hover:underline cursor-pointer"
+                            >
+                                View All
+                            </button>
+                        </div>
+                    )}
+                    </>
+                    )}
+                    </div>
+
+                    {/* Listings */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 w-full pb-10">
+                        <h2 className="text-xl font-semibold mb-4 col-span-full">
+                            My Property Listings
+                        </h2>
+
+                        {properties.length === 0 ? (
+                        <p className="text-gray-500 col-span-full text-center py-10">
+                            You currently have no property listings. Future Property Listings goes here
+                        </p>
+                        ) : (
+                        properties.map((property) => (
+                            <PropertyCard
+                            key={property._id}
+                            {...property}
+                            />
+                        )))}
+                    </div>
                 </div>
+            </div>
         </>
     );
 };

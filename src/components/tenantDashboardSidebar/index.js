@@ -5,6 +5,8 @@ import { Menu, X } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {useRouter} from "next/navigation";
+import { FaHome, FaMoneyBillWave, FaEye, FaClock, FaExclamationCircle, FaStar, FaHeart, FaEnvelope, FaCloud, FaUserCheck } from "react-icons/fa";
+
 
 const index = () => {
     const router = useRouter();
@@ -92,27 +94,27 @@ const index = () => {
               </Link>
               <ul className="m-8 -mt-2 justify-between w-42 flex flex-col space-y-6 cursor-pointer">
                   <Link href="/tenantDashboard">
-                      <li className="hover:text-yellow-500">Dashboard</li>
+                      <li className="hover:text-yellow-500 flex items-center gap-2">Dashboard <FaHome /></li>
                   </Link>
 
-                  <Link href="/helpCenter">
-                      <li className="hover:text-yellow-500"> Help Center </li>
+                  <Link href="/help">
+                      <li className="hover:text-yellow-500 flex items-center gap-2"> Help Center <FaCloud /></li>
                   </Link>
 
-                  <Link href="/savedHomes">
-                      <li className="hover:text-yellow-500"> Saved Homes </li>
+                  <Link href="/tenantSavedHomes">
+                      <li className="hover:text-yellow-500 flex items-center gap-2"> Saved Homes <FaHeart /></li>
                   </Link>
 
                   <Link href="/tenantDashboardInbox">
-                      <li className="hover:text-yellow-500"> Messages </li>
+                      <li className="hover:text-yellow-500 flex items-center gap-2"> Messages <FaEnvelope /></li>
                   </Link>
 
                   <Link href="/disputes">
-                      <li className="hover:text-yellow-500">Disputes</li>
+                      <li className="hover:text-yellow-500 flex items-center gap-2">Disputes <FaExclamationCircle /></li>
                   </Link>
 
-                  <Link href="/verification">
-                      <li className="hover:text-yellow-500"> Verification </li>
+                  <Link href="/tenantVerification">
+                      <li className="hover:text-yellow-500 flex items-center gap-2"> Verification <FaUserCheck /></li>
                   </Link>
 
                   <Link href="/homeInterest">

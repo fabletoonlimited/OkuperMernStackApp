@@ -1,12 +1,16 @@
 "use client";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 
 const index = () => {
+  const router = useRouter();
   const [profilePercent, setProfilePercent] = useState(null);
   const [loadingUtility, setLoadingUtility] = useState(true);
   const [uploadedUtility, setUploadedUtility] = useState(false);
 
+  
   //Add Utility
   useEffect(() => {
     const fetchUtilityUpload = async () => {
@@ -39,7 +43,7 @@ const index = () => {
   useEffect(() => {
     const fetchCompletion = async () => {
       try {
-        const res = await fetch("/api/profile/completion", {
+        const res = await fetch("/api/tenantProfile/completion", {
           credentials: "include",
         });
 
@@ -60,31 +64,39 @@ const index = () => {
   }, []);
 
   return (
-    // {Profile}
+    // Profile Completionn
     <div className="md:mt-10 p-2 pr-4 md:px-12">
       <div className="tenantDashboardCard grid grid-cols-2 md:grid-cols-3 md:gap-4 gap-4">
-        <div className="items-center space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto p-5 md:p-8 mb-4" style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-          <h4 className="font-black md:text-2xl text-xl text-center md:text-left md:leading-7 mb-3">
-            Your Profile
-          </h4>
-          <p className="text-center md:text-justify">
-            {profilePercent === null
-              ? "loading..."
-              : `Your profile is ${profilePercent}% complete`
-            }
-          </p>
-          <Link
-            href="/profile"
-            className="bg-blue-900 rounded-xl md:p-2 p-3  text-white text-sm"
+        {profilePercent !== null && profilePercent < 100 && (
+          <div
+            className="items-center space-y-2 rounded-lg bg-white md:w-[310px] md:h-[250px] w-46 h-auto p-5 md:p-8 mb-4"
+            style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}
           >
-            <button
-              className="md:p-8 md:m-0 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={profilePercent === 64}
+            <h4 className="font-black md:text-2xl text-xl text-center md:text-left md:leading-7 mb-3">
+              Your Profile
+            </h4>
+
+            <p className="text-center md:text-justify">
+              {`Your information is ${profilePercent}% complete. Please complete your profile to enjoy full benefits.`}
+            </p>
+
+            <Link
+              href="/profile"
+              className="bg-blue-900 rounded-xl md:p-2 p-3 text-white text-sm"
             >
-              {profilePercent === 64 ? "Uploaded" : "Update Your profile"}
-            </button>
-          </Link>
-        </div>
+              <button
+                className="md:p-8 md:m-0 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={profilePercent === 100}
+              >
+                {profilePercent === 100
+                  ? "Completed"
+                  : profilePercent === 64
+                  ? "Uploaded"
+                  : "Update Your profile"}
+              </button>
+            </Link>
+          </div>
+        )}
 
         {/*Utility bill*/}
         <div
@@ -94,28 +106,34 @@ const index = () => {
           <h4 className="font-black md:text-2xl text-xl text-center md:text-left leading-7 mb-3">
             Utility Bill
           </h4>
-          <p className="text-center md:text-justify">
+          <p className="text-center md:text-justify mb-6">
             {uploadedUtility
               ? "Utility bill uploaded"
               : "Upload your 3 months LAWMA, Water or Electricity utility bill"
             }
           </p>
-          <Link
-            href="/utilityBillUploadPage"
-            className="bg-blue-900  md:p-2 p-3 rounded-xl text-white text-sm"
-          >
+          {uploadedUtility ? (
             <button
-              className="md:p-8 md:m-0 mt-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loadingUtility || uploadedUtility}
+              type="button"
+              disabled
+              className="md:px-12 px-12 md:m-0 mt-4 cursor-not-allowed rounded-full bg-gray-400 p-3 text-sm text-white"
             >
-              {loadingUtility
-                ? "Checking..."
-                : uploadedUtility
-                ? "Uploaded"
-                : "Upload"
-              }
+              Uploaded
             </button>
-          </Link>
+          ) : (
+            <Link
+              href="/utilityBillUploadPage"
+              className="inline-block rounded-xl bg-blue-900 md:p-2 p-3 text-sm text-white"
+            >
+              <button
+                type="button"
+                disabled={loadingUtility}
+                className="md:px-12 px-12 md:m-0 mt-4 w-full cursor-pointer rounded-full bg-blue-900 text-sm text-white"
+              >
+                {loadingUtility ? "Checking..." : "Upload"}
+              </button>
+            </Link>
+          )}
         </div>
 
         <div
@@ -137,6 +155,7 @@ const index = () => {
             </button>
           </Link>
         </div>
+      
       </div>
     </div>
   );

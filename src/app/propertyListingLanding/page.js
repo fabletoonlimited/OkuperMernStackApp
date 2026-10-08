@@ -127,7 +127,7 @@ const Page = () => {
       <LandlordDashboardSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-auto">
         {/* Welcome Section */}
         <div className="mt-8 mx-6 p-6 bg-white shadow">
           <h1 className="font-bold md:text-5xl text-2xl pl-7">
@@ -155,7 +155,7 @@ const Page = () => {
         </div>
 
         {/* Body */}
-        <div className="flex-1">
+        <div className="flex-1 h-auto md:h-auto mt-8 mx-6 p-6 bg-white shadow">
           <PropertyUploadLanding />
         </div>
 
@@ -163,14 +163,14 @@ const Page = () => {
         <LandlordDashboardFooter />
       </div>
 
-<SubscriptModal
-    isOpen={isOpen}
-    onClose={() => setIsOpen(false)}
-    onContinue={handleSubscribe}
-/>
+      <SubscriptModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onContinue={handleSubscribe}
+      />
     </div>
-    
-  );
-};
+        
+    );
+  };
 
 export default Page;

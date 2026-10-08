@@ -1,115 +1,108 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import LandlordDashboardSidebar from "../../components/landlordDashboardSidebar";
 import LandlordDashboardFooter from "../../components/landlordDashboardFooter";
 import LandlordProfilePage from "@/app/landlordProfileForm/page";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const landlordVerification = ({params}) => {
-  
-    // landlord state
+const LandlordVerification = ({ params }) => {
     const [landlord, setLandlord] = useState(null);
-    const [landlordProfile, setLandlordProfile] = useState(null)
-    const [landlordEmail, setLandlordEmail] = useState(null);
-    const {propertyId} = params;
+    const [landlordProfile, setLandlordProfile] = useState(null);
 
-    // ✅ get logged in landlord
-    useEffect(() => {
-        const getMe = async () => {
-            try {
-                const res = await fetch("/api/user/me", {
-                    method: "GET",
-                    cache: "no-store",
-                });
-    
-                const data = await res.json();
-    
-                if (!res.ok) return;
-    
-                // adjust depending on your response shape
-                const email = data?.user?.email || data?.email;
-                setLandlordEmail(email || null);
-            } catch (err) {
-                console.error("Auth me error:", err);
-            }
-        };
-        getMe();
-    }, []);
+    const { propertyId } = params;
 
-    // Landlord
     useEffect(() => {
         const fetchLandlord = async () => {
             try {
                 const res = await fetch("/api/landlord", {
-                method: "GET",
-                credentials: "include",
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
                 });
-            
-                if (!res.ok) {
-                toast.error("Failed to fetch landlord");
-                return;
-                }
-            
+
                 const data = await res.json();
+
+                if (!res.ok) {
+                    toast.error(data?.message || "Failed to fetch landlord");
+                    return;
+                }
+
                 setLandlord(data);
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
                 toast.error("Landlord fetch error");
             }
         };
+
         fetchLandlord();
     }, []);
-    
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch("/api/landlordProfile/upload", {
-                    method: "GET",
-                    credentials: "include",
-                });
-    
+                const res = await fetch(
+                    "/api/landlordProfile/completion",
+                    {
+                        method: "GET",
+                        credentials: "include",
+                        cache: "no-store",
+                    }
+                );
+
+                const data = await res.json();
+
                 if (!res.ok) {
-                    toast.error("Failed to load landlord profile");
+                    if (res.status === 404) {
+                        setLandlordProfile(null);
+                        return;
+                    }
+
+                    toast.error(
+                        data?.message || "Failed to load landlord profile"
+                    );
                     return;
                 }
-    
-                const data = await res.json();        
-                console.log(data); 
-                setLandlordProfile(data);
 
-            } catch (err) {
-                console.error("Profile fetch error:", err);
+                setLandlordProfile(data?.profile || null);
+            } catch (error) {
                 toast.error("Failed to load profile");
-            } finally {
-                setLoading(false);
             }
         };
-    
-            fetchProfile();
+
+        fetchProfile();
     }, []);
 
-  return (
-    <div>
-      <LandlordDashboardSidebar />
-        <div className="bg-white shadow-md p-10 rounded-md  ">
-            <h1 className="font-bold md:text-5xl text-2xl pl-7">
-                Dear, {" "}
-                {
-                    landlord
-                    ? `${landlord.firstName} ${landlord?.lastName}`
-                    : "Landlord"
-                }
-                !
-            </h1>
-            <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
-                We are thrilled that you have chosen to list your property with Okuper.
-            </p>
-        </div>
+    return (
+        <div>
+            <LandlordDashboardSidebar />
 
-      <LandlordProfilePage landlordProfile={landlordProfile} />
-      <LandlordDashboardFooter />
-    </div>
-  );
+            <ToastContainer />
+
+            <div className="bg-white shadow-md p-10 rounded-md">
+                <h1 className="font-bold md:text-5xl text-2xl pl-7">
+                    Dear{" "}
+                    {landlord
+                        ? `${landlord.firstName} ${landlord.lastName}`
+                        : "Landlord"}
+                    !
+                </h1>
+
+                <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
+                    We are thrilled that you have chosen to list your property
+                    with Okuper.
+                </p>
+            </div>
+
+            <LandlordProfilePage
+                landlordProfile={landlordProfile}
+                propertyId={propertyId}
+            />
+
+            <LandlordDashboardFooter />
+        </div>
+    );
 };
 
-export default landlordVerification;
+export default LandlordVerification;

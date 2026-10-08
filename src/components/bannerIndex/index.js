@@ -6,7 +6,6 @@ import userIcon from "../../../public/user.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadset, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import React from "react";
 import { useState, useEffect } from "react";
 
@@ -94,7 +93,7 @@ const router = useRouter();
             </div>
             
             {/* Model Image Mobile */}
-            <div className="absolute bottom-44 left-[50%] z-30 md:hidden md:animate-none hover:scale-105 duration-300 transition">
+            <div className="absolute bottom-37 left-[50%] z-30 md:hidden md:animate-none hover:scale-105 duration-300 transition">
                 <img
                     src={BASE_URL + "/bannerboy_eygggt"}
                     alt="bannerModelTenant"
@@ -102,12 +101,12 @@ const router = useRouter();
                 />
             </div>
 
-            {/* Model Landlord */}
+            {/* Model Tenant Mobile */}
             {!showLandlord && (
             <div className="absolute bottom-45 left-[33%] z-30 hidden md:block animate-slideXTenant opacity-20 transition duration-0">
                 <img
                 src={BASE_URL + "/bannerboy_eygggt"}
-                alt="Tenant"
+                alt="bannerModelTenant"
                 className="h-[537px] w-auto object-contain"
                 />
             </div>
@@ -117,7 +116,7 @@ const router = useRouter();
             <div className="absolute -bottom-109 right-[38%] z-30 hidden md:block animate-fadeInLandlord opacity-100 transition duration-7000">
                 <img
                 src={BASE_URL + "/modelLandlord_jmsizc"}
-                alt="Landlord"
+                alt="BannerLandlordImage"
                 className="h-[1800px] w-auto object-contain"
                 />
             </div>
@@ -168,7 +167,7 @@ const router = useRouter();
                         <h1 className="text-4xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start justify-items-start tanantText">
                         We got you covered
                     </h1>
-                    <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light mt-4 px-4 md:px-0 text-justify md:text-justify">
+                    <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light md:mt-4 mt-0 px-4 md:px-0 text-justify md:text-justify">
                         The Nigerian rental market has become tainted by the
                         greed of middlemen, who often charge exorbitant fees.
                     </h3>
@@ -179,10 +178,10 @@ const router = useRouter();
 
                 {showSecondText && (
                     <div className="flex flex-col gap-4">
-                        <h1 className="text-4xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start justify-items-start tanantText">
+                        <h1 className="text-3xl md:text-4xl font-light mt-4 md:mt-8 md:justify-items-start justify-items-start tanantText">
                         We Understand Your Frustration
                     </h1>
-                    <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light mt-4 px-4 md:px-0 text-justify md:text-justify">
+                    <h3 className="text-sm md:text-lg pr-2 md:pr-10 font-light md:mt-4 mt-0 px-4 md:px-0 text-justify md:text-justify">
                         Tired of dealing with unreliable and unverified tenants and accruing maintenance costs?
                     </h3>
 
@@ -233,7 +232,7 @@ const router = useRouter();
             </div>
 
             {/* Feature Boxes */}
-            <div className="bannerBoxes relative z-30 top-30 md:row md:gap-6 md:px-30 px-12 mb-30 py-0 h-65 flex flex-row md:top-0 gap-8 mt-[-80px] md:mt-[-80px] pb-3
+            <div className="bannerBoxes relative z-30 top-30 md:row md:gap-6 md:px-30 px-0 mb-30 py-0 h-65 flex flex-row md:top-0 gap-8 mt-[-80px] md:mt-[-80px] pb-3
                 md:overflow-hidden overflow-x-auto max-w-auto w-full md:w-auto"
                 style={{
                     scrollbarWidth: "none", // Firefox
@@ -241,20 +240,20 @@ const router = useRouter();
                 }}>
                 {[
                     "Background Check required for home owners and tenants.",
-                    "Property ratings by tenants and flagging of suspicious accounts",
-                    "Tenants NIN identity, proof, financial record and occupation.",
-                    "All communications securely happens within the platform.",
+                    "Tenant's property ratings and flagging of suspicious accounts.",
+                    "Tenants NIN or identity proof, financial record and occupation.",
+                    "All communications and payments securely happens within the platform.",
                 ].map((text, index) => (
                     <div
                         key={index}
-                        className="hover:scale-95 transition w-full md:max-w-[280px] h-250px md:h-[250px] bg-sky-100
-                            rounded-xl px-10 md:px-5.5 py-10 md:py-6 pt-10 shadow-md flex-shrink-0 hover:bg-amber-200"
+                        className="hover:scale-95 transition w-78 md:max-w-[280px] h-250px md:h-[250px] bg-sky-100
+                            rounded-xl px-10 md:px-5.5 py-0 md:pt-10 pt-10 shadow-xl flex-shrink-0 hover:bg-amber-200"
                         style={{ cursor: "pointer" }}>
                         <FontAwesomeIcon
                             icon={faCircleCheck}
-                            className="text-[#0E1D48] text-5xl md:text-3xl mb-2"
+                            className="text-[#0E1D48] text-3xl md:text-3xl mb-2"
                         />
-                        <p className="font-semibold text-2xl md:text-md text-left md:text-left">
+                        <p className="font-semibold text-blue-950 text-2xl md:text-md text-left md:text-left">
                             {text}
                         </p>
                     </div>

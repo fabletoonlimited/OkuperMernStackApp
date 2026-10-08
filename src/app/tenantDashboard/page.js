@@ -15,7 +15,8 @@ function TenantDashboard() {
   const [utilityCompletion, setUtilityCompletion] = useState(false);
   const [utilityLoading, setUtilityLoading] = useState(true);
   const [tenant, setTenant] = useState(null);
-
+  const [loading, setLoading] = useState(false)
+  
 
   const [tenantEmail, setTenantEmail] = useState(null);
 
@@ -93,7 +94,7 @@ function TenantDashboard() {
     fetchCompleteUtility();
   }, []);
 
-  // Profile
+  // Profile Completion
   useEffect(() => {
     const fetchCompletion = async () => {
       try {
@@ -107,7 +108,9 @@ function TenantDashboard() {
         }
 
         const data = await res.json();
-        setProfilePercent(Number.isFinite(data.percent) ? data.percent : 0);
+        setProfilePercent(
+          Number.isFinite(data.percent) ? data.percent : 0
+        );
       } catch (err) {
         console.error("Profile completion error:", err);
         setProfilePercent(null);
@@ -133,8 +136,6 @@ function TenantDashboard() {
 
   return (
     <>
-      {profilePercent && utilityCompletion === 100 && (<TenantDashboardCompleted />) }
-      {profilePercent && utilityCompletion !== null && (
       <div className="tenantDashboardContainer flex">
         {/* Sidebar */}
         <TenantDashboardSidebar />
@@ -148,7 +149,7 @@ function TenantDashboard() {
             }}
           >
             <h1 className="font-bold md:text-5xl text-2xl pl-7 mb-2">
-              Welcome, {tenant?.firstName + " " + tenant?.lastName || "Tenant"}!
+              Welcome, {tenant?.firstName ? tenant.firstName + " " + tenant?.lastName : "Tenant"}!
             </h1>
             <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
               We are thrilled that you have chosen Okuper to rent your next
@@ -169,7 +170,6 @@ function TenantDashboard() {
           </div>
         </div>
       </div>
-) }
   <TenantDashboardFooter />
   </>
   );

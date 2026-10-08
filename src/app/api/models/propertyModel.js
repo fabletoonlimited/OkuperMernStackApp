@@ -95,11 +95,12 @@ const propertySchema = new mongoose.Schema(
     propertyAmenities: { type: [String], default: [] },
     neighbourhoodPostcode: { type: String, default: "00000" },
     nearbyPlaces: { type: [String], default: [] },
-    agent: { type: String, requied: false },
+    agent: { type: String, required: false },
 
     isVerified: { type: Boolean, default: false },
 
 
+    selectedTenant: {type: mongoose.Schema.Types.ObjectId, ref: "Tenant", default: null},
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 
     landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
     admin: [{ type: mongoose.Schema.Types.ObjectId, ref: "SuperAdmin" }],

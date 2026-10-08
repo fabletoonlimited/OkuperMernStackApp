@@ -1,48 +1,69 @@
 import { mongoose } from "@/app/lib/mongoose";
 import { nanoid } from "nanoid";
 
-const disputeSchema = new mongoose.Schema ({
+const disputeSchema = new mongoose.Schema(
+    {
+        disputeNo: {
+            type: String,
+            unique: true,
+        },
 
-    disputeNo: {
-        type: String,
-        required: true,
-        unique: true    
-    },
+        // Filled when TENANT submits
+        tenant: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Tenant",
+            default: null,
+        },
 
-    tenant: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tenant",
-        required: true
-    },
-    property: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Property",
-        required: true
-    },
-    complaint: {
-        type: String,
-        required: true
-    },
-    rating: { type: Number, min: 1, max: 5, default: 0 },
+        // Filled when AGENT submits
+        agent: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Agent",
+            default: null,
+        },
 
-    status: {
-        type: String,
-        enum: ["open", "in_progress", "resolved", "rejected"],
-        default: "open"
+        // The landlord who receives the dispute
+        landlord: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Landlord",
+            required: true,
+        },
+
+        property: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Property",
+            required: true,
+        },
+
+        complaint: {
+            type: String,
+            required: true,
+        },
+
+        rating: {
+            type: Number,
+            min: 1,
+            max: 5,
+            default: 0,
+        },
+
+        status: {
+            type: String,
+            enum: ["open", "in_progress", "resolved", "rejected"],
+            default: "open",
+        },
     },
+    {
+        timestamps: true,
+    }
+);
 
-    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true},
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord", required: true},
-    agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent", required: true},
-    
-    
-}, { timestamps: true });
+disputeSchema.pre("save", function (next) {
+    if (!this.disputeNo) {
+        this.disputeNo = `OkDisCom-${nanoid(6).toUpperCase()}`;
+    }
 
-    disputeSchema.pre("save", async function (next) {
-        if (!this.disputeNo) {
-            this.disputeNo = `OkDisCom-${nanoid(6).toUpperCase()}`;
-        }
-        next();
-    });
+    next();
+});
 
 export default mongoose.models.Dispute || mongoose.model("Dispute", disputeSchema);

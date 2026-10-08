@@ -56,11 +56,11 @@ export default function PropertyCard({
     };
 
     return (
-        <Link href={`/propertyCardExpanded?id=${_id}`}>
-            <div className="w-full rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
+        <Link href={`/propertyCardExpanded?propertyId=${_id}`}>
+            <div className="w-auto rounded-xl overflow-hidden shadow-xl bg-white transition-all duration-300 hover:scale-105 cursor-pointer">
 
                 {/* IMAGE */}
-                <div className="relative w-full h-64">
+                <div className="relative w-auto h-60">
                     <Image
                         src={property?.previewPic || previewPic}
                         alt={`property: ${title || desc || "property"}`}

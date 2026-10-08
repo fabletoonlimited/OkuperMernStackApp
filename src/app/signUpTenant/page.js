@@ -42,6 +42,10 @@ const page = () => {
     }));
   };
 
+  const handleExistingUser = () => {
+    router.push("/signInTenant");
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError("");
@@ -309,7 +313,7 @@ const page = () => {
             className="tenantSignUpBtn bg-blue-950 hover:bg-blue-800 mt-20 text-white p-4 md:w-full w-1/2 border-1px text-2xl text-center cursor-pointer md:mb-0 mb-20"
           >
             {" "}
-            Sign Up{" "}
+            {handleSignUp ? "Signing Up..." : "Sign Up"}{" "}
           </button>
         </div>
       </div>
