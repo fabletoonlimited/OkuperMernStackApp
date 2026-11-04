@@ -193,154 +193,173 @@ const page = () => {
 
   return (
     <>
-      <h1
-        className="font-bold text-4xl"
-        style={{ paddingLeft: 45, marginTop: 70 }}
-      >
-        Signup as Tenant
-      </h1>
+    <div className="h-auto bg-gray-150">
+                <ToastContainer position="top-center" autoClose={3000} />
 
-      {/*Already have account - Sign In Link*/}
-      <div className="signInLinkSection ml-83 mt-3">
-        <p className="text-lg">
-          Already have an account?{" "}
-          <Link href="/signInTenant">
-            <span className="text-blue-600 hover:text-blue-800 underline cursor-pointer font-semibold">
-              Sign In
-            </span>
-          </Link>
-        </p>
-      </div>
+                {error && (
+                    <p className="text-red-600 text-lg text-center">{error}</p>
+                )}
+                    {/* ONE FLEX CONTAINER */}
+                    <div className="max-w-7xl mx-auto px-12 flex flex-col lg:flex-row items-start gap-30 mb-50 mt-20">
+                        {/* ================= LEFT SIDE ================= */}
+                        <div className="w-full lg:w-1/2">
+                            <h1 className="font-bold text-4xl mb-6">
+                                Signup as Tenant
+                            </h1>
 
-      <ToastContainer position="top-center" autoClose={3000} />
+                            <p className="text-lg mb-6">
+                                Already have an account?{" "}
+                                <Link href="/signInTenant">
+                                    <span className="text-blue-600 hover:text-blue-800 underline font-semibold cursor-pointer">
+                                        Sign In
+                                    </span>
+                                </Link>
+                            </p>
 
-      {error && <p className="text-red-600 ml-12 mt-4 text-lg">{error}</p>}
+                            {/* FORM CARD */}
+                            <div className="border rounded-xl p-10 shadow-md">
+                                <label className="block mb-2 font-medium">
+                                    First Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-      {/*SignUp Form*/}
-      
-      <div className="signUpLoandingContainer md:flex-col col mt-10 mb-10">
-        <div
-          className="tenantSignupFormSection text-2xl mt-10 mb-10 md:w-100% w-50% md:mr-10 mr-10"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            maxWidth: "556px",
-            // width: '100%',
-            height: "auto",
-            maxHeight: "100%",
-            border: "1px solid #ccc",
-            padding: "20px",
-            borderRadius: "5px",
-            paddingLeft: "35px",
-            paddingRight: "50px",
-            marginTop: "20px",
-            marginLeft: "50px",
-            paddingBottom: "80px",
-          }}
-        >
-          {/*First Name*/}
-          <p style={{ paddingTop: 40, marginBottom: 30 }}>First Name</p>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleInputChange}
-            placeholder="Enter first name"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Last Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          {/*Last Name*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Last Name</p>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleInputChange}
-            placeholder="Enter last name"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          {/*Email*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Email</p>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder="username@gmail.com"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          {/*Password Confirmation*/}
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>Password</p>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder="password"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    Referral Code (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="referralCode"
+                                    value={formData.referralCode}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>
-            Referral Code (Optional)
-          </p>
-          <input
-            type="text"
-            name="referralCode"
-            value={formData.referralCode}
-            onChange={handleInputChange}
-            placeholder="Enter referral code"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                <label className="block mb-2 font-medium">
+                                    How did you hear about Okuper?
+                                </label>
+                                <input
+                                    type="text"
+                                    name="survey"
+                                    value={formData.survey}
+                                    onChange={handleInputChange}
+                                    className="border-2 border-gray-300 p-3 rounded w-full mb-6"
+                                />
 
-          <p style={{ paddingTop: 20, marginBottom: 30 }}>
-            How did you hear about Okuper
-          </p>
-          <input
-            type="text"
-            name="survey"
-            value={formData.survey}
-            onChange={handleInputChange}
-            placeholder="E.g., Social Media, Friend, Advertisement"
-            className="border-2 border-gray-300 p-3 rounded w-60 md:w-120"
-          />
+                                {/* Terms */}
+                                <div className="flex items-start gap-3 mt-4">
+                                    <input
+                                        type="checkbox"
+                                        checked={termsAccepted}
+                                        onChange={(e) =>
+                                            setTermsAccepted(e.target.checked)
+                                        }
+                                        className="w-5 h-5 accent-blue-700 mt-1"
+                                    />
+                                    <span className="text-sm">
+                                        By signing up, you agree to Okuper's{" "}
+                                        <a
+                                            href="/termsOfService"
+                                            className="text-blue-600 underline">
+                                            Terms of Service
+                                        </a>{" "}
+                                        and{" "}
+                                        <a
+                                            href="/privacyPolicy"
+                                            className="text-blue-600 underline">
+                                            Privacy Policy
+                                        </a>
+                                        .
+                                    </span>
+                                </div>
 
+                                <button
+                                    onClick={handleSignUp}
+                                    className="mt-8 w-full bg-blue-950 hover:bg-blue-800 text-white p-4 text-lg rounded-md transition">
+                                    Sign Up
+                                </button>
+                            </div>
+                        </div>
 
-          {/*SignUp Btn*/}
-          <button
-            onClick={handleSignUp}
-            className="tenantSignUpBtn bg-blue-950 hover:bg-blue-800 mt-20 text-white p-4 md:w-full w-1/2 border-1px text-2xl text-center cursor-pointer md:mb-0 mb-20"
-          >
-            {" "}
-            {handleSignUp ? "Signing Up..." : "Sign Up"}{" "}
-          </button>
-        </div>
-      </div>
-      {/*Terms*/}
-        <div className="termsSection -mt-11 md:mt-10 md:ml-13 ml-13 mr-10 md:mr-0 flex items-center mb-30">
-          <input
-            type="checkbox"
-            id="agreeTerms"
-            checked={termsAccepted}
-            onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="w-7 h-7 border-2 border-blue-950 rounded cursor-pointer accent-blue-700"
-          />
-          {/*Terms Text*/}
-          <span className="text-sm ml-2 md:ml-2 mr-0 md:mr-12 md:mt-0 mt-5">
-            By signing up, you agree to Okuper's{" "}
-            <a href="/termsOfService" className="text-blue-600 underline">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacyPolicy" className="text-blue-600 underline">
-              Privacy Policy
-            </a>
-            .
-          </span>
-        </div>
+                   {/* RIGHT SIDE - BANNER */}
+                    <div className="relative bg-[rgba(0,51,153,1)] mb-30 rounded-2xl shadow-lg mt-10 md:mt-30">
+                        
+                        {/* Banner Top Section */}
+                        <div className={"relative md:h-50 h-70 rounded-2xl mb-15 md:mb-22"}>
+                            <div className={"relative rounded-t-2xl md:w-155 w-50% py-2 md:h-20 leading-relaxed"}>
+                                <h2 className="font-medium md:text-4xl text-3xl text-white leading-10 md:leading-12 md:pt-15 pt-10 px-10 md:px-20 text-center md:text-center">
+                                    <b>
+                                        Rent, Buy & Lease your next Homes Directly on Okuper
+                                    </b>
+                                </h2>
+                                <p className="absolute text-sm md:font-medium leading-[1.2] mt-7 md:mt-7 md:text-[20px] text-white px-10 md:px-20 md:text-center text-center">
+                                    No agents. No hidden fees.<br></br>Connect directly with
+                                    verified tenants on Okuper. Verified people
+                                    and real homes.
+                                </p>
+                            </div>
+                        </div>
 
+                        {/* Images Section */}
+                        <div className="relative bottom-0 md:bottom-0 md:-right-40 -right-25">
+                            {/* <img
+                                src="/BannerSam.png"
+                                alt="Ad Banner Sam"
+                                className={"BannerHouse md:h-auto h-60 md:w-120 w-120 bottom-[-541px] md:bottom-[0px]"}
+                                style={{ position: "absolute", height: "auto" }}
+                            /> */}
+                            <img
+                                src="/bannerGirl.png"
+                                alt="Banner Girl"
+                                className={"bannerLady rounded-b-2xl md:w-70 w-100% md:h-auto h-60"}
+                            />
+                      </div>
+                    </div>
+                    
+                    </div>
+                </div>
+            
         {/* OTP Modal */}
+        {showOtpTenant && (
+
         <OtpTenant
           isOpen={showOtpTenant}
           onClose={() => setShowOtpTenant(false)}
@@ -348,46 +367,7 @@ const page = () => {
           onVerify={handleOtpVerification}
         />
 
-        {/*Banner Section*/}
-        <div className="bannerSection md:flex md:justify-right md:items-right -mt-10 md:-mt-330 ml-10 md:ml-190 md:mb-100 mb-10 md:w-100% w-50% md:mr-10 mr-10">
-          {/* RIGHT SECTION */}
-          <div
-            className={
-              "relative h-80 rounded-2xl shadow-lg bannerBgColor mb-170"
-            }
-          >
-            <div
-              className={
-                "relative p-10 rounded-t-2xl md:w-153.5 w-50% bg-[rgba(0,51,153,1)] py-13 leading-relaxed bannerBgColor "
-              }
-            >
-              <h2 className="font-medium md:text-5xl text-2xl text-white leading-10 md:leading-17 px-0.2 md:px-2 text-center">
-                <b>Rent & Buy your Homes Directly on Okuper</b>
-              </h2>
-            </div>
-
-            <p className="absolute md:font-medium leading-[1.5] -mt-10 md:text-[20px] text-white text-center px-5 md:px-20 text-xl md:text-center">
-              No agents. No hidden fees. Just verified people and real homes.
-            </p>
-
-            {/* RIGHT BANNER IMAGES */}
-            <img
-              src="/bannerGirl.png"
-              alt="bannerGirl"
-              className={
-                "bannerGirl md:h-auto h-60 md:w-110 w-50 bottom-[-275px] md:bottom-[-721px]"
-              }
-              style={{ position: "absolute", height: "auto" }}
-            />
-
-            <img
-              src="/BannerSam.png"
-              alt="Ad Banner Sam"
-              className={"rounded-b-2xl"}
-            />
-          </div>
-        </div>
-        {/*End of Banner Section*/}
+        )}
     
     </>
   );

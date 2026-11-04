@@ -26,6 +26,7 @@ const page = () => {
     const [disputeCount, setDisputeCount] = useState(0);
     const [income, setIncome] = useState([]);
     const [incomeCount, setIncomeCount] = useState(0);
+    const [rating, setRating] = useState(0);
     const [deleteIsDispute, setIsDeleteDispute] = useState([]);
 
 useEffect(() => {
@@ -100,6 +101,22 @@ useEffect(() => {
     
             fetchProfile();
     }, []);
+
+    useEffect(() => {
+        const fetchRating = async () => {
+            try {
+                const res = await fetch("/api/rating",{
+                    method: "GET",
+                    credentials: "include"
+                });
+                if (!res.ok) {
+                    toast.error("Failed to fetch property ratings")
+                }
+            } catch (error) {
+                
+            }
+        }
+    })
 
     useEffect(() => {
         const fetchTenant = async () => {

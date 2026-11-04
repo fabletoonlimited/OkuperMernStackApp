@@ -485,7 +485,7 @@ function LandlordInbox() {
 
         <div className="bg-white shadow-md rounded-md flex min-h-[75vh]">
           <div className="flex-1 flex flex-col mb-0">
-            <div className="p-4 border-gray-200 shadow-4xl shadow-gray-300 border-2 flex items-center justify-between">
+            <div className="p-4 md:flex row  border-gray-200 shadow-4xl shadow-gray-300 border-2 items-center justify-between">
               <div className="flex items-center gap-12">
                 <h5
                   className="font-bold text-blue-950"
@@ -501,7 +501,10 @@ function LandlordInbox() {
                 >
                   Compose
                 </button>
-
+              </div>
+                <p className="text-red-600 text-left py-5">Ensure that you receive property payments on okuper to qualify for our quaterly promos.</p>
+              
+              <div className="flex gap-10">
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
                   {profilePic && (
                     <CldImage
@@ -513,20 +516,20 @@ function LandlordInbox() {
                     />
                   )}
                 </div>
-              </div>
 
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowProfile((prev) => !prev)}
-                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 cursor-pointer"
-                >
-                  {showProfile ? "Back" : "Show Profile"}
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setShowProfile((prev) => !prev)}
+                    className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 cursor-pointer"
+                  >
+                    {showProfile ? "Back" : "Show Profile"}
+                  </button>
 
-                <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700 cursor-pointer">
-                  <FontAwesomeIcon icon={faFlag} />
+                  <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700 cursor-pointer">
+                    <FontAwesomeIcon icon={faFlag} />
+                  </div>
                 </div>
-              </div>
+              </div> 
             </div>
 
             <div className="flex flex-1">

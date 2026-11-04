@@ -6,10 +6,7 @@ import TenantKyc from "../api/models/tenantKycModel.js";
 const buildProfile = (role, actor, kyc) => {
   const name = `${actor?.firstName || ""} ${actor?.lastName || ""}`.trim();
 
-  const currentAddress =
-    role === "landlord"
-      ? kyc?.homeAddress
-      : kyc?.currentAddress;
+  const currentAddress = kyc?.currentAddress || "";
 
   return {
     _id: actor?._id,
@@ -17,8 +14,7 @@ const buildProfile = (role, actor, kyc) => {
 
     // Basic information
     firstName: actor?.firstName || "",
-    lastName: actor?.lastName || "",
-    name,
+    lastName: actor?.lastName || "", 
     email: actor?.email || "",
 
     // KYC information
@@ -32,7 +28,13 @@ const buildProfile = (role, actor, kyc) => {
     occupation: kyc?.occupation || "",
     specifyOccupation: kyc?.specifyOccupation || [],
     maritalStatus: kyc?.maritalStatus || "",
+    spouseName: kyc?.spouseName || "",
+    noOfChildren: kyc?.noOfChildren ?? 0,
     religion: kyc?.religion || "",
+    companyName: kyc?.companyName || "",
+    companyAddress: kyc?.companyAddress || "",
+    companyPhone: kyc?.companyPhone || "",
+    companyEmail: kyc?.companyEmail || "",
 
     // Address
     currentAddress: currentAddress || "",
@@ -40,6 +42,7 @@ const buildProfile = (role, actor, kyc) => {
     state: kyc?.state || "",
     country: kyc?.country || "",
     zipCode: kyc?.zipCode || "",
+    stateOfOrigin: kyc?.stateOfOrigin || "",
 
     // Profile image
     profilePic: kyc?.previewPic || "",

@@ -9,60 +9,60 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CloudUpload, LoaderCircle } from "lucide-react";
 
-const page = ({ currentUserId }) => { 
-const [isAuthenticated, setIsAuthenticated] = useState(false);
-const router = useRouter();
- 
-useEffect(() => {
+const page = ({ currentUserId }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
     const checkAuth = async () => {
-        try {
-            const res = await fetch("/api/user/me", 
-                { credentials: "include" });
-            setIsAuthenticated(res.ok);
-        } catch {
-             setIsAuthenticated(false);
-        }
+      try {
+        const res = await fetch("/api/user/me", { credentials: "include" });
+
+        setIsAuthenticated(res.ok);
+      } catch {
+        setIsAuthenticated(false);
+      }
     };
     checkAuth();
-}, []);
-     
-    const goToContact = () => {
-        router.push("/contact");
-    };
-    const goToRent = () => {
-        router.push("/rent");
-    };
- 
-    const goToSignUp = () => {
-        router.push("/signUpLanding");
-    };
-    const goTopropertyListing = () => {
-        router.push("/propertyListingLanding");
-    };
+  }, []);
 
-    const [selectedFeatures, setSelectedFeatures] = useState([]);
-    const [landlordId, setLandlordId] = useState(null);
-    const [uploadingImages, setUploadingImages] = useState({
-        previewPic: false,
-        Img1: false,
-        Img2: false,
-        Img3: false,
-        Img4: false,
-        Img5: false,
-    })
+  const goToContact = () => {
+    router.push("/contact");
+  };
+  const goToRent = () => {
+    router.push("/rent");
+  };
+
+  const goToSignUp = () => {
+    router.push("/signUpLanding");
+  };
+  const goTopropertyListing = () => {
+    router.push("/propertyListingLanding");
+  };
+
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [landlordId, setLandlordId] = useState(null);
+  const [uploadingImages, setUploadingImages] = useState({
+    previewPic: false,
+    Img1: false,
+    Img2: false,
+    Img3: false,
+    Img4: false,
+    Img5: false,
+  });
 
   // Fetch the logged-in landlord's ID from the JWT cookie on mount
   useEffect(() => {
     const fetchLandlordId = async () => {
-        console.log("Sending landlordId:", landlordId);
-        
-        console.log({
-          ...formData,
-          landlordId,
-        });
+      console.log("Sending landlordId:", landlordId);
+
+      console.log({
+        ...formData,
+        landlordId,
+      });
       try {
-        const res = await fetch("/api/auth/me", 
-          { credentials: "include" });
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+
         if (res.ok) {
           const data = await res.json();
           console.log("ME RESPONSE:", data);
@@ -87,6 +87,7 @@ useEffect(() => {
     address: "",
     state: "",
     price: "",
+    legalFee: "",
     category: "",
     propertyType: "",
     unitsAvailable: "",
@@ -99,7 +100,7 @@ useEffect(() => {
     propertyAmenities: "",
     neighbourhoodPostcode: "",
     nearbyPlaces: "",
-    agent: ""
+    agent: "",
   });
 
   const [imagePreviews, setImagePreviews] = useState({
@@ -130,8 +131,8 @@ useEffect(() => {
     const imgKey = e.target.id;
 
     setUploadingImages((prev) => ({
-    ...prev,
-    [imgKey]: true,
+      ...prev,
+      [imgKey]: true,
     }));
 
     const data = new FormData();
@@ -144,7 +145,7 @@ useEffect(() => {
         {
           method: "POST",
           body: data,
-        }
+        },
       );
 
       const uploadResult = await res.json();
@@ -170,10 +171,10 @@ useEffect(() => {
       console.error(err);
       toast.error("Upload error");
     } finally {
-    setUploadingImages((prev) => ({
-      ...prev,
-      [imgKey]: false,
-    }));      
+      setUploadingImages((prev) => ({
+        ...prev,
+        [imgKey]: false,
+      }));
     }
   };
 
@@ -228,58 +229,57 @@ useEffect(() => {
       "7Bath": "7Bath",
       "8Bath": "8Bath",
     };
-    
+
     const bed = formData.bed;
     const bath = formData.bath;
 
-    const status = formData.status
+    const status = formData.status;
 
     const stateMap = {
-      Abia: "Abia", 
-      Adamawa: "Adamawa", 
-      akwaIbom: "Akwa Ibom", 
-      Anambra: "Anambra", 
-      Bauchi: "Bauchi", 
-      Bayelsa: "Bayelsa", 
-      Benue: "Benue", 
-      Borno: "Borno", 
-      crossRiver: "Cross River", 
+      Abia: "Abia",
+      Adamawa: "Adamawa",
+      akwaIbom: "Akwa Ibom",
+      Anambra: "Anambra",
+      Bauchi: "Bauchi",
+      Bayelsa: "Bayelsa",
+      Benue: "Benue",
+      Borno: "Borno",
+      crossRiver: "Cross River",
       Delta: "Delta",
-      Ebonyi: "Ebonyi", 
-      Edo: "Edo", 
-      Ekiti: "Ekiti", 
-      Enugu: "Enugu", 
-      Gombe: "Gombe", 
-      Imo: "Imo", 
-      Jigawa: "Jigawa", 
-      Kaduna: "Kaduna", 
-      Kano: "Kano", 
-      Katsina: "Katsina", 
-      Kebbi: "Kebbi", 
-      Kogo: "Kogi", 
+      Ebonyi: "Ebonyi",
+      Edo: "Edo",
+      Ekiti: "Ekiti",
+      Enugu: "Enugu",
+      Gombe: "Gombe",
+      Imo: "Imo",
+      Jigawa: "Jigawa",
+      Kaduna: "Kaduna",
+      Kano: "Kano",
+      Katsina: "Katsina",
+      Kebbi: "Kebbi",
+      Kogo: "Kogi",
       Kwara: "Kwara",
-      Lagos: "Lagos", 
-      Nasarawa: "Nasarawa", 
-      Niger: "Niger", 
-      Ogun: "Ogun", 
-      Ondo: "Ondo", 
-      Osun: "Osun", 
-      Oyo: "Oyo", 
-      Plateau: "Plateau", 
-      Rivers: "Rivers", 
-      Sokoto: "Sokoto", 
-      Taraba: "Taraba", 
-      Yobe: "Yobe", 
-      Zamfara: "Zamfara"
-    }
+      Lagos: "Lagos",
+      Nasarawa: "Nasarawa",
+      Niger: "Niger",
+      Ogun: "Ogun",
+      Ondo: "Ondo",
+      Osun: "Osun",
+      Oyo: "Oyo",
+      Plateau: "Plateau",
+      Rivers: "Rivers",
+      Sokoto: "Sokoto",
+      Taraba: "Taraba",
+      Yobe: "Yobe",
+      Zamfara: "Zamfara",
+    };
 
-   const state = formData.state
-    .trim()
-    .split(" ")
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
-
+    const state = formData.state
+      .trim()
+      .split(" ")
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
 
     if (
       !formData.previewPic ||
@@ -290,6 +290,7 @@ useEffect(() => {
       !formData.address ||
       !state ||
       !formData.price ||
+      //   !formData.legalFee ||
       !formData.category ||
       !formData.unitsAvailable ||
       !bed ||
@@ -312,12 +313,12 @@ useEffect(() => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          landlordId, 
+          landlordId,
           propertyType,
           bed,
           bath,
           status,
-          state
+          state,
         }),
       });
 
@@ -329,8 +330,8 @@ useEffect(() => {
       }
       toast.success("Property uploaded successfully");
 
-        console.log(data);
-        console.log(data.property?._id);
+      console.log(data);
+      console.log(data.property?._id);
 
       setTimeout(() => {
         router.push(`/utilityBillUploadPage/${data.property._id}`);
@@ -342,413 +343,415 @@ useEffect(() => {
   };
 
   return (
-      <div>
-          <LandlordDashboardSidebar />
+    <div>
+      <LandlordDashboardSidebar />
 
-          {/* Top Nav Section*/}
-          <div className="landlordDashboardlist mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
-              <h1 className="font-bold md:text-5xl text-2xl pl-7">
-                  Dear, Landlord!
-              </h1>
-              <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify font-medium">
-                  We are thrilled that you have chosen to list your property
-                  with Okuper.
-              </p>
-              <ToastContainer position="top-center" autoClose={3000} />
-          </div>
+      {/* Top Nav Section*/}
+      <div className="landlordDashboardlist mt-8 p-6 bg-white shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
+        <h1 className="font-bold md:text-5xl text-2xl pl-7">Dear, Landlord!</h1>
+        <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify font-medium">
+          We are thrilled that you have chosen to list your property with
+          Okuper.
+        </p>
+        <ToastContainer position="top-center" autoClose={3000} />
+      </div>
 
-          {/* Form Section*/}
-          <div className="bg-white md:w-[1300px] md:h-auto h-auto md:m-8 m-4 md:flex">
-              <form onSubmit={handlePropertyUpload}>
-                  <ul className="font-semibold md:text-2xl md:space-y-10 space-y-8 p-10 md:pt-20 md:ml-18 ">
-                      {/* Picture Upload Section */}
-                      <div className="md:flex gap-5 md:ml-8 mb-10">
-                          <h5 className="mt-4 -ml-7">Pictures:</h5>
+      {/* Form Section*/}
+      <div className="bg-white md:w-[1300px] md:h-auto h-auto md:m-8 m-4 md:flex">
+        <form onSubmit={handlePropertyUpload}>
+          <ul className="font-semibold md:text-2xl md:space-y-10 space-y-8 p-10 md:pt-20 md:ml-18 ">
+            {/* Picture Upload Section */}
+            <div className="md:flex gap-5 md:ml-8 mb-10">
+              <h5 className="mt-4 -ml-7">Pictures:</h5>
 
-                          <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[150px] cursor-pointer">
-                              <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
-                                  id="previewPic"
-                              />
-                                {uploadingImages.previewPic ? (
-                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
-                                ) : imagePreviews.previewPic ? (
-                                    <img
-                                        src={imagePreviews.previewPic}
-                                        alt="Preview"
-                                        className="md:h-[126px] md:w-[150px] object-cover"
-                                    />
-                                ) : (
-                                    <>
-                                        <CloudUpload className="text-gray-300" />
-                                        <p className="text-gray-500 font-medium text-xl">
-                                            Preview picture
-                                        </p>
-                                    </>
-                                )}
-                          </span>
+              <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[150px] cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                  id="previewPic"
+                />
+                {uploadingImages.previewPic ? (
+                  <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                ) : imagePreviews.previewPic ? (
+                  <img
+                    src={imagePreviews.previewPic}
+                    alt="Preview"
+                    className="md:h-[126px] md:w-[150px] object-cover"
+                  />
+                ) : (
+                  <>
+                    <CloudUpload className="text-gray-300" />
+                    <p className="text-gray-500 font-medium text-xl">
+                      Preview picture
+                    </p>
+                  </>
+                )}
+              </span>
 
-                          {/* Image 1 Uploads */}
-                          <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleChange}
-                                className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
-                                id="Img1"
-                                // disabled= {setLoading}
-                            />
-                                {uploadingImages.Img1 ? (
-                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
-                                ) : imagePreviews.Img1 ? (
-                                    <img
-                                        src={imagePreviews.Img1}
-                                        alt="Preview"
-                                        className="md:h-[126px] md:w-[150px] object-cover"
-                                    />
-                                ) : (
-                                    <>
-                                        <CloudUpload className="text-gray-300" />
-                                        <p className="text-gray-500 font-medium text-xl">
-                                            Image 1
-                                        </p>
-                                    </>
-                                )}
-                            </span>
+              {/* Image 1 Uploads */}
+              <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                  id="Img1"
+                  // disabled= {setLoading}
+                />
+                {uploadingImages.Img1 ? (
+                  <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                ) : imagePreviews.Img1 ? (
+                  <img
+                    src={imagePreviews.Img1}
+                    alt="Preview"
+                    className="md:h-[126px] md:w-[150px] object-cover"
+                  />
+                ) : (
+                  <>
+                    <CloudUpload className="text-gray-300" />
+                    <p className="text-gray-500 font-medium text-xl">Image 1</p>
+                  </>
+                )}
+              </span>
 
-                          {/* Image 2 Uploads */}
-                          <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
-                              <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
-                                  id="Img2"
-                              />
+              {/* Image 2 Uploads */}
+              <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                  id="Img2"
+                />
 
-                                {uploadingImages.Img2 ? (
-                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
-                                ) : imagePreviews.Img2 ? (
-                                    <img
-                                        src={imagePreviews.Img2}
-                                        alt="Preview"
-                                        className="md:h-[126px] md:w-[150px] object-cover"
-                                    />
-                                ) : (
-                                    <>
-                                        <CloudUpload className="text-gray-300" />
-                                        <p className="text-gray-500 font-medium text-xl">
-                                            Image 2
-                                        </p>
-                                    </>
-                                )}
-                          </span>
+                {uploadingImages.Img2 ? (
+                  <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                ) : imagePreviews.Img2 ? (
+                  <img
+                    src={imagePreviews.Img2}
+                    alt="Preview"
+                    className="md:h-[126px] md:w-[150px] object-cover"
+                  />
+                ) : (
+                  <>
+                    <CloudUpload className="text-gray-300" />
+                    <p className="text-gray-500 font-medium text-xl">Image 2</p>
+                  </>
+                )}
+              </span>
 
-                          {/* Image 3 Uploads */}
-                          <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
-                              <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
-                                  id="Img3"
-                              />
-                                {uploadingImages.Img3 ? (
-                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
-                                ) : imagePreviews.Img3 ? (
-                                    <img
-                                        src={imagePreviews.Img3}
-                                        alt="Preview"
-                                        className="md:h-[126px] md:w-[150px] object-cover"
-                                    />
-                                ) : (
-                                    <>
-                                        <CloudUpload className="text-gray-300" />
-                                        <p className="text-gray-500 font-medium text-xl">
-                                            Image 3
-                                        </p>
-                                    </>
-                                )}
-                          </span>
+              {/* Image 3 Uploads */}
+              <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute opacity-0 md:h-[126px] md:w-[100px] cursor-pointer"
+                  id="Img3"
+                />
+                {uploadingImages.Img3 ? (
+                  <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                ) : imagePreviews.Img3 ? (
+                  <img
+                    src={imagePreviews.Img3}
+                    alt="Preview"
+                    className="md:h-[126px] md:w-[150px] object-cover"
+                  />
+                ) : (
+                  <>
+                    <CloudUpload className="text-gray-300" />
+                    <p className="text-gray-500 font-medium text-xl">Image 3</p>
+                  </>
+                )}
+              </span>
 
-                          {/* Image 4 Uploads */}
-                          <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
-                              <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
-                                  id="Img4"
-                              />
+              {/* Image 4 Uploads */}
+              <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
+                  id="Img4"
+                />
 
-                                {uploadingImages.Img4 ? (
-                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
-                                ) : imagePreviews.Img4 ? (
-                                    <img
-                                        src={imagePreviews.Img4}
-                                        alt="Preview"
-                                        className="md:h-[126px] md:w-[150px] object-cover"
-                                    />
-                                ) : (
-                                    <>
-                                        <CloudUpload className="text-gray-300" />
-                                        <p className="text-gray-500 font-medium text-xl">
-                                            Image 4
-                                        </p>
-                                    </>
-                                )}
-                          </span>
+                {uploadingImages.Img4 ? (
+                  <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                ) : imagePreviews.Img4 ? (
+                  <img
+                    src={imagePreviews.Img4}
+                    alt="Preview"
+                    className="md:h-[126px] md:w-[150px] object-cover"
+                  />
+                ) : (
+                  <>
+                    <CloudUpload className="text-gray-300" />
+                    <p className="text-gray-500 font-medium text-xl">Image 4</p>
+                  </>
+                )}
+              </span>
 
-                          {/* Image 5 Uploads */}
-                          <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
-                              <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
-                                  id="Img5"
-                              />
-                                {uploadingImages.Img5 ? (
-                                    <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
-                                ) : imagePreviews.Img5 ? (
-                                    <img
-                                        src={imagePreviews.Img5}
-                                        alt="Preview"
-                                        className="md:h-[126px] md:w-[150px] object-cover"
-                                    />
-                                ) : (
-                                    <>
-                                        <CloudUpload className="text-gray-300" />
-                                        <p className="text-gray-500 font-medium text-xl">
-                                            Image 5
-                                        </p>
-                                    </>
-                                )}
-                          </span>
-                      </div>
+              {/* Image 5 Uploads */}
+              <span className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 md:h-[126px] md:w-[145px] cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute md:h-[126px] md:w-[100px] opacity-0 cursor-pointer"
+                  id="Img5"
+                />
+                {uploadingImages.Img5 ? (
+                  <LoaderCircle className="animate-spin text-blue-600 w-10 h-10" />
+                ) : imagePreviews.Img5 ? (
+                  <img
+                    src={imagePreviews.Img5}
+                    alt="Preview"
+                    className="md:h-[126px] md:w-[150px] object-cover"
+                  />
+                ) : (
+                  <>
+                    <CloudUpload className="text-gray-300" />
+                    <p className="text-gray-500 font-medium text-xl">Image 5</p>
+                  </>
+                )}
+              </span>
+            </div>
 
-                      {/* Property Details Section */}
-                      <li className="md:flex">
-                          <h5 className="mt-4"> Title:</h5>
+            {/* Property Details Section */}
+            <li className="md:flex">
+              <h5 className="mt-4"> Title:</h5>
 
-                          <input
-                              type="text"
-                              name="title"
-                              value={formData.title}
-                              onChange={handleInputChange}
-                              placeholder="2 Bedroom Mini Flat in Agbowa"
-                              className="border border-[#233670] md:ml-17 md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
-                          />
-                      </li>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="2 Bedroom Mini Flat in Agbowa"
+                className="border border-[#233670] md:ml-17 md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
+              />
+            </li>
 
-                      <li className="md:flex">
-                          <h5 className="md:mt-4">Address:</h5>
-                          <span className="md:ml-6 space-y-5">
-                              <input
-                                  type="text"
-                                  name="address"
-                                  value={formData.address}
-                                  onChange={handleInputChange}
-                                  // {(e) =>
-                                  //   setFormData((prev) => ({
-                                  //     ...prev,
-                                  //     address: { ...prev.address, line1: e.target.value },
-                                  //   }))
-                                  // }
-                                  placeholder="Address Line"
-                                  className="border border-[#233670] md:w-[850px] w-full pl-5 font-medium md:text-2xl md:h-[67px] h-8"
-                              />
-                          </span>
-                      </li>
-                      <li className="md:flex">
-                          <h5 className="md:mt-4">State:</h5>
-                          <span className="md:ml-15 space-y-5">
-                              <input
-                                  type="text"
-                                  name="state"
-                                  value={formData.state}
-                                  onChange={handleInputChange}
-                                  // {(e) =>
-                                  //   setFormData((prev) => ({
-                                  //     ...prev,
-                                  //     address: { ...prev.address, line2: e.target.value },
-                                  //   }))
-                                  // }
-                                  placeholder="State"
-                                  className="border-[#233670] border md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
-                              />
-                          </span>
-                      </li>
+            <li className="md:flex">
+              <h5 className="md:mt-4">Address:</h5>
+              <span className="md:ml-6 space-y-5">
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  // {(e) =>
+                  //   setFormData((prev) => ({
+                  //     ...prev,
+                  //     address: { ...prev.address, line1: e.target.value },
+                  //   }))
+                  // }
+                  placeholder="Address Line"
+                  className="border border-[#233670] md:w-[850px] w-full pl-5 font-medium md:text-2xl md:h-[67px] h-8"
+                />
+              </span>
+            </li>
+            <li className="md:flex">
+              <h5 className="md:mt-4">State:</h5>
+              <span className="md:ml-15 space-y-5">
+                <input
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  // {(e) =>
+                  //   setFormData((prev) => ({
+                  //     ...prev,
+                  //     address: { ...prev.address, line2: e.target.value },
+                  //   }))
+                  // }
+                  placeholder="State"
+                  className="border-[#233670] border md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
+                />
+              </span>
+            </li>
 
-                      <li className="md:flex">
-                          <h5 className="md:mt-4">Price:</h5>
-                          <span className="md:ml-15">
-                              <input
-                                  type="text"
-                                  name="price"
-                                  value={formData.price}
-                                  onChange={handleInputChange}
-                                  placeholder="e.g. 500000 (numbers only)"
-                                  className="border border-[#233670] md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
-                              />
-                          </span>
-                      </li>
+            <li className="md:flex">
+              <h5 className="md:mt-4">Price:</h5>
+              <span className="md:ml-15">
+                <input
+                  type="text"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  placeholder="e.g. 500000 (numbers only)"
+                  className="border border-[#233670] md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
+                />
+              </span>
+            </li>
 
-                      <li className="md:flex">
-                          <h5 className="mt-4">Category:</h5>
-                          <span className="space-x-2 space-y-4 text-white md:ml-6">
-                              {["Rent", "Buy", "Sell", "Shortlet"].map(
-                                  (feature) => (
-                                      <button
-                                          key={feature}
-                                          type="button"
-                                          onClick={() =>
-                                              setFormData((prev) => ({
-                                                  ...prev,
-                                                  category: feature,
-                                              }))
-                                          }
-                                          className={`w-32 h-15 rounded cursor-pointer transition
+            <li className="md:flex">
+              <h5 className="md:mt-4">Legal Fee:</h5>
+              <span className="md:ml-15">
+                <input
+                  type="text"
+                  name="legalFee"
+                  value={formData.legalFee}
+                  onChange={handleInputChange}
+                  placeholder="e.g. 500000 (numbers only)"
+                  className="border border-[#233670] md:w-[850px] w-full md:h-[67px] pl-5 font-medium md:text-2xl h-8"
+                />
+              </span>
+            </li>
+
+            <li className="md:flex">
+              <h5 className="mt-4">Category:</h5>
+              <span className="space-x-2 space-y-4 text-white md:ml-6">
+                {["Rent", "Sell", "Shortlet"].map((feature) => (
+                  <button
+                    key={feature}
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: feature,
+                      }))
+                    }
+                    className={`w-32 h-15 rounded cursor-pointer transition
                       ${
-                          formData.category === feature
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-900 text-white"
+                        formData.category === feature
+                          ? "bg-blue-700 text-white"
+                          : "bg-blue-900 text-white"
                       }
-                    `}>
-                                          {feature}
-                                      </button>
-                                  ),
-                              )}
-                          </span>
-                      </li>
+                    `}
+                  >
+                    {feature}
+                  </button>
+                ))}
+              </span>
+            </li>
 
-                      <li className="md:flex">
-                          <h5 className="mt-4">Units available</h5>
-                          <span className="md:ml-12">
-                              <input
-                                  type="text"
-                                  name="unitsAvailable"
-                                  value={formData.unitsAvailable}
-                                  onChange={handleInputChange}
-                                  placeholder="No. of property available."
-                                  className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium h-8"
-                              />
-                          </span>
-                      </li>
+            <li className="md:flex">
+              <h5 className="mt-4">Units available</h5>
+              <span className="md:ml-12">
+                <input
+                  type="text"
+                  name="unitsAvailable"
+                  value={formData.unitsAvailable}
+                  onChange={handleInputChange}
+                  placeholder="No. of property available."
+                  className="border border-[#233670] md:w-[760px] w-full md:h-[67px] pl-5 font-medium h-8"
+                />
+              </span>
+            </li>
 
-                      <li className="md:flex propertyType">
-                          <h5 className="mt-4 mr-6">Property Type:</h5>
-                          <span className="space-x-10 space-y-8 text-white ">
-                              {[
-                                  "Apartment",
-                                  "Bungalow",
-                                  "Office",
-                                  "Condo",
-                                  "TownHouse",
-                                  "Duplex",
-                                  "SelfCon",
-                                  "Villa",
-                                  "BQ",
-                                  "Other",
-                              ].map((feature) => (
-                                  <button
-                                      key={feature}
-                                      type="button"
-                                      onClick={() =>
-                                          setFormData((prev) => ({
-                                              ...prev,
-                                              propertyType: feature,
-                                          }))
-                                      }
-                                      className={`md:w-35 w-full h-15 cursor-pointer transition      
+            <li className="md:flex propertyType">
+              <h5 className="mt-4 mr-6">Property Type:</h5>
+              <span className="space-x-10 space-y-8 text-white ">
+                {[
+                  "Apartment",
+                  "Bungalow",
+                  "Office",
+                  "Condo",
+                  "TownHouse",
+                  "Duplex",
+                  "SelfCon",
+                  "Villa",
+                  "BQ",
+                  "Other",
+                ].map((feature) => (
+                  <button
+                    key={feature}
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        propertyType: feature,
+                      }))
+                    }
+                    className={`md:w-35 w-full h-15 cursor-pointer transition      
                       ${
-                          formData.propertyType === feature
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-900 text-white"
+                        formData.propertyType === feature
+                          ? "bg-blue-700 text-white"
+                          : "bg-blue-900 text-white"
                       }
-                    `}>
-                                      <p className="text-lg md:text-md">
-                                          {feature}
-                                      </p>
-                                  </button>
-                              ))}
-                          </span>
-                      </li>
+                    `}
+                  >
+                    <p className="text-lg md:text-md">{feature}</p>
+                  </button>
+                ))}
+              </span>
+            </li>
 
-                      <li className="md:flex">
-                          <h5 className="mt-4">Bed:</h5>
-                          <span className="space-x-2 space-y-4 text-white md:ml-18">
-                              {[
-                                  "1Bdr",
-                                  "2Bdr",
-                                  "3Bdr",
-                                  "4Bdr",
-                                  "5Bdr",
-                                  "6Bdr",
-                                  "7Bdr",
-                                  "8Bdr",
-                              ].map((feature) => (
-                                  <button
-                                      key={feature}
-                                      type="button"
-                                      onClick={() =>
-                                          setFormData((prev) => ({
-                                              ...prev,
-                                              bed: feature,
-                                          }))
-                                      }
-                                      className={`w-25 h-15 rounded-full cursor-pointer
+            <li className="md:flex">
+              <h5 className="mt-4">Bed:</h5>
+              <span className="space-x-2 space-y-4 text-white md:ml-18">
+                {[
+                  "1Bdr",
+                  "2Bdr",
+                  "3Bdr",
+                  "4Bdr",
+                  "5Bdr",
+                  "6Bdr",
+                  "7Bdr",
+                  "8Bdr",
+                ].map((feature) => (
+                  <button
+                    key={feature}
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        bed: feature,
+                      }))
+                    }
+                    className={`w-25 h-15 rounded-full cursor-pointer
                       ${
-                          formData.bed === feature
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-900 text-white"
-                      }
-                    `}>
-                                      {feature}
-                                  </button>
-                              ))}
-                          </span>
-                      </li>
+                        formData.bed === feature
+                        ? "border-blue-700 border-2 text-blue-700"
+                        : "border-blue-900 border-2 text-blue-900"
+                        }
+                    `}
+                  >
+                    {feature}
+                  </button>
+                ))}
+              </span>
+            </li>
 
-                      <hr className="md:w-200 w-100  border-gray-300 md:ml-39" />
+            <hr className="md:w-200 w-100  border-gray-300 md:ml-39" />
 
-                      <li className="md:flex">
-                          <h5 className="mt-4">Bath:</h5>
-                          <span className="space-x-2 space-y-4 text-white md:ml-18">
-                              {[
-                                  "1Bath",
-                                  "2Bath",
-                                  "3Bath",
-                                  "4Bath",
-                                  "5Bath",
-                                  "6Bath",
-                                  "7Bath",
-                                  "8Bath",
-                              ].map((feature) => (
-                                  <button
-                                      key={feature}
-                                      type="button"
-                                      onClick={() =>
-                                          setFormData((prev) => ({
-                                              ...prev,
-                                              bath: feature,
-                                          }))
-                                      }
-                                      className={`w-25 h-15 rounded-full cursor-pointer transition
+            <li className="md:flex">
+              <h5 className="mt-4">Bath:</h5>
+              <span className="space-x-2 space-y-4 text-white md:ml-18">
+                {[
+                  "1Bath",
+                  "2Bath",
+                  "3Bath",
+                  "4Bath",
+                  "5Bath",
+                  "6Bath",
+                  "7Bath",
+                  "8Bath",
+                ].map((feature) => (
+                  <button
+                    key={feature}
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        bath: feature,
+                      }))
+                    }
+                    className={`w-25 h-15 rounded-full cursor-pointer transition
                       ${
-                          formData.bath === feature
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-900 text-white"
+                        formData.bath === feature
+                          ? "bg-blue-700 text-white"
+                          : "bg-blue-900 text-white"
                       }
-                    `}>
-                                      {feature}
-                                  </button>
-                              ))}
-                          </span>
-                      </li>
+                    `}
+                  >
+                    {feature}
+                  </button>
+                ))}
+              </span>
+            </li>
 
             <li className="flex">
               <h5 className="md:m-0  mt-1">Rating:</h5>
@@ -756,7 +759,6 @@ useEffect(() => {
                 <RatingStar rating={3} />
               </span>
             </li>
-            
 
             <li className="md:flex">
               <h5 className="mt-4">Status:</h5>
@@ -782,132 +784,129 @@ useEffect(() => {
                     {feature}
                   </button>
                 ))}
-                </span>
-                </li>
+              </span>
+            </li>
 
-                      <li className="md:flex">
-                          <h5 className="mt-4">Listed By:</h5>
-                          <span className="md:ml-4">
-                              <input
-                                  type="text"
-                                  name="listedBy"
-                                  value={formData.listedBy}
-                                  onChange={handleInputChange}
-                                  placeholder="Enter fullname or company name."
-                                  className="border border-[#233670] md:w-[860px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl"
-                              />
-                          </span>
-                      </li>
+            <li className="md:flex">
+              <h5 className="mt-4">Listed By:</h5>
+              <span className="md:ml-4">
+                <input
+                  type="text"
+                  name="listedBy"
+                  value={formData.listedBy}
+                  onChange={handleInputChange}
+                  placeholder="Enter fullname or company name."
+                  className="border border-[#233670] md:w-[860px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl"
+                />
+              </span>
+            </li>
 
-                      <hr className="md:w-170 w-100 md:my-20 my-15 border-gray-300 md:ml-39" />
+            <hr className="md:w-170 w-100 md:my-20 my-15 border-gray-300 md:ml-39" />
 
-                      <span>
-                          <h3 className="md:text-5xl text-3xl md:mb-20 mb-10">
-                              Features
-                          </h3>
-                      </span>
+            <span>
+              <h3 className="md:text-5xl text-3xl md:mb-20 mb-10">Features</h3>
+            </span>
 
-                      <li>
-                          Building Amenities:
-                          <input
-                              type="text"
-                              name="buildingAmenities"
-                              value={formData.buildingAmenities}
-                              onChange={handleInputChange}
-                              // value={extraFeatures.buildingAmenities}
-                              // onChange={(e) =>
-                              //   setExtraFeatures((prev) => ({
-                              //     ...prev,
-                              //     buildingAmenities: e.target.value,
-                              //   }))
-                              // }
-                              placeholder="Prepaid meter, All room en-suite, etc."
-                              className="border border-[#233670] md:w-[770px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl md:ml-6h-8"
-                          />
-                      </li>
+            <li>
+              Building Amenities:
+              <input
+                type="text"
+                name="buildingAmenities"
+                value={formData.buildingAmenities}
+                onChange={handleInputChange}
+                // value={extraFeatures.buildingAmenities}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     buildingAmenities: e.target.value,
+                //   }))
+                // }
+                placeholder="Prepaid meter, All room en-suite, etc."
+                className="border border-[#233670] md:w-[770px] w-full md:h-[67px] h-10 pl-5 font-medium md:text-2xl md:ml-6h-8"
+              />
+            </li>
 
-                      <li>
-                          Property Amenities:
-                          <input
-                              type="text"
-                              name="propertyAmenities"
-                              value={formData.propertyAmenities}
-                              onChange={handleInputChange}
-                              // value={extraFeatures.propertyAmenities}
-                              // onChange={(e) =>
-                              //   setExtraFeatures((prev) => ({
-                              //     ...prev,
-                              //     propertyAmenities: e.target.value,
-                              //   }))
-                              // }
-                              placeholder="Standby security, 24hrs light,Standby Generator, etc."
-                              className="border border-[#233670] md:w-[747px] w-full md:h-[67px] pl-5 font-medium h-10 md:text-2xl md:ml-6"
-                          />
-                      </li>
+            <li>
+              Property Amenities:
+              <input
+                type="text"
+                name="propertyAmenities"
+                value={formData.propertyAmenities}
+                onChange={handleInputChange}
+                // value={extraFeatures.propertyAmenities}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     propertyAmenities: e.target.value,
+                //   }))
+                // }
+                placeholder="Standby security, 24hrs light,Standby Generator, etc."
+                className="border border-[#233670] md:w-[747px] w-full md:h-[67px] pl-5 font-medium h-10 md:text-2xl md:ml-6"
+              />
+            </li>
 
-                      <li>
-                          Neighbourhood postcode:
-                          <input
-                              type="text"
-                              name="neighbourhoodPostcode"
-                              value={formData.neighbourhoodPostcode}
-                              onChange={handleInputChange}
-                              // value={extraFeatures.neighbourhoodPostcode}
-                              // onChange={(e) =>
-                              //   setExtraFeatures((prev) => ({
-                              //     ...prev,
-                              //     neighbourhoodPostcode: e.target.value,
-                              //   }))
-                              // }
-                              placeholder="00000"
-                              className="border border-[#233670] md:w-[670px] md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 w-full h-10"
-                          />
-                      </li>
+            <li>
+              Neighbourhood postcode:
+              <input
+                type="text"
+                name="neighbourhoodPostcode"
+                value={formData.neighbourhoodPostcode}
+                onChange={handleInputChange}
+                // value={extraFeatures.neighbourhoodPostcode}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     neighbourhoodPostcode: e.target.value,
+                //   }))
+                // }
+                placeholder="00000"
+                className="border border-[#233670] md:w-[670px] md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 w-full h-10"
+              />
+            </li>
 
-                      <li>
-                          Nearby Places:
-                          <input
-                              type="text"
-                              name="nearbyPlaces"
-                              value={formData.nearbyPlaces}
-                              onChange={handleInputChange}
-                              // value={extraFeatures.nearbyPlaces}
-                              // onChange={(e) =>
-                              //   setExtraFeatures((prev) => ({
-                              //     ...prev,
-                              //     nearbyPlaces: e.target.value,
-                              //   }))
-                              // }
-                              placeholder="Schools, Malls, Govt hospitals, Central Mosque, etc."
-                              className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
-                          />
-                      </li>
+            <li>
+              Nearby Places:
+              <input
+                type="text"
+                name="nearbyPlaces"
+                value={formData.nearbyPlaces}
+                onChange={handleInputChange}
+                // value={extraFeatures.nearbyPlaces}
+                // onChange={(e) =>
+                //   setExtraFeatures((prev) => ({
+                //     ...prev,
+                //     nearbyPlaces: e.target.value,
+                //   }))
+                // }
+                placeholder="Schools, Malls, Govt hospitals, Central Mosque, etc."
+                className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
+              />
+            </li>
 
-                      <li>
-                          Marketer:
-                          <input
-                              type="text"
-                              name="agent"
-                              value={formData.agent}
-                              onChange={handleInputChange}
-                            
-                              placeholder="Marketer's full name"
-                              className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
-                          />
-                      </li>
+            <li>
+              Marketer:
+              <input
+                type="text"
+                name="agent"
+                value={formData.agent}
+                onChange={handleInputChange}
+                placeholder="Marketer's full name"
+                className="border border-[#233670] md:w-[800px] w-full md:h-[67px] pl-5 font-medium md:text-2xl md:ml-6 h-10"
+              />
+            </li>
 
-
-                      <span className="flex justify-center mt-15">
-                          <button
-                              type="submit"
-                              className="bg-blue-700 md:w-[300px] w-full h-15 rounded cursor-pointer text-white hover:bg-blue-900">
-                              Submit
-                          </button>
-                      </span>
-                  </ul>
-              </form>
-            </div>
-        <LandlordDashboardFooter />
+            <span className="flex justify-center mt-15">
+              <button
+                type="submit"
+                className="bg-blue-700 md:w-[300px] w-full h-15 rounded cursor-pointer text-white hover:bg-blue-900"
+              >
+                Submit
+              </button>
+            </span>
+          </ul>
+        </form>
+      </div>
+      <LandlordDashboardFooter />
     </div>
   );
 };

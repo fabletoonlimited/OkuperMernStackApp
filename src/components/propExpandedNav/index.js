@@ -34,7 +34,7 @@ const Index = ({ propertyId }) => {
                     </Link>
 
                     <Link href="/rent">
-                        <h3 className="font-regular text-blue-800">
+                        <h3 className="font-regular text-md text-blue-800 md:w-30 w-20">
                             Back to Listing
                         </h3>
                     </Link>
@@ -42,7 +42,7 @@ const Index = ({ propertyId }) => {
 
                 {/* Logo */}
                 <Link href="/">
-                    <div className="flex items-center ml-26">
+                    <div className="flex items-center">
                         <img
                             src="/logo.png"
                             alt="Okuper Logo"

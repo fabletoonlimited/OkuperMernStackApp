@@ -112,7 +112,7 @@ const page = () => {
   
 
   return (
-    <>
+    <div className="h-auto bg-gray-150">
       <h1
         className="font-bold text-4xl text-blue-950"
         style={{ paddingLeft: 45, marginTop: 70 }}
@@ -180,7 +180,7 @@ const page = () => {
         </div>
 
         {/* RIGHT SIDE - BANNER */}
-        <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg mt-10 md:-mt-22 mb-50">
+        <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg mt-10 md:-mt-22 mb-30">
           {/* Banner Top Section */}
           <div className={"relative md:h-50 h-65 rounded-2xl mb-15 md:mb-22"}>
             <div
@@ -188,10 +188,10 @@ const page = () => {
                 "relative rounded-t-2xl md:w-155 w-50% py-2 md:h-20 leading-relaxed"
               }
             >
-              <h2 className="font-medium md:text-4xl text-3xl text-white leading-10 md:leading-12 md:pt-15 pt-10 px-15 md:px-20 text-center md:text-center">
+              <h2 className="font-medium md:text-4xl text-3xl text-white leading-10 md:leading-12 md:pt-15 pt-10 px-10 md:px-20 text-center md:text-center">
                 <b>Rent, Buy & Lease your Homes Directly on Okuper</b>
               </h2>
-              <p className="absolute text-sm md:font-medium leading-[1.2] mt-7 md:mt-7 md:text-[20px] text-white px-15 md:px-20 md:text-center text-center">
+              <p className="absolute text-sm md:font-medium leading-[1.2] mt-7 md:mt-7 md:text-[20px] text-white px-10 md:px-20 md:text-center text-center">
                 No agents. No hidden fees.<br></br>Connect directly with your
                 next home owners on Okuper. Verified people and real homes.
               </p>
@@ -211,7 +211,7 @@ const page = () => {
         </div>
         {/*End of Banner Section*/}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -123,12 +123,7 @@ function Nav() {
                     <li className="text-sm">RENT</li>
                 </Link>
 
-                <Link
-                    href="/sell"
-                    onClick={() => setIsMenuOpen(false)}
-                >
-                    <li className="text-sm">SELL</li>
-                </Link>
+        
 
                 <Link
                     href="/buy"

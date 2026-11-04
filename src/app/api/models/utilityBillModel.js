@@ -2,16 +2,6 @@ import { mongoose } from "@/app/lib/mongoose";
 
 const utilityBillSchema = new mongoose.Schema(
   {
-    property: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Property",
-      required: false,
-    },
-    uploadedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      refPath: "uploadedByModel",
-      required: true,
-    },
     uploadedByModel: {
       type: String,
       enum: ["Landlord", "Tenant"],
@@ -25,6 +15,10 @@ const utilityBillSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    property: {type: mongoose.Schema.Types.ObjectId,ref: "Property", required: false},
+    uploadedBy: {type: mongoose.Schema.Types.ObjectId, refPath: "uploadedByModel", required: true},
+    
   },
   { timestamps: true }
 );

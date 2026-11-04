@@ -1,159 +1,123 @@
+
 "use client";
 
-import React from 'react'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation' 
+import React, { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { CloudUpload } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useParams } from "next/navigation"
 
-const page = () => {
-  const { propertyId } = useParams();
-  console.log("PROPERTY ID:", propertyId);
+export default function UtilityBillUploadPage() {
+  const router = useRouter();
+  const params = useParams();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const router = useRouter()
-  const [file, setFile] = useState(null)
-  const [userId, setUserId] = useState(null);
-  const [role, setRole] = useState(null);
+  const propertyId = params?.propertyId;
+
+  const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        const res = await fetch("/api/user/me", 
-          { credentials: "include" });
-          if (res.ok) {
-            const data = await res.json();
-            setRole(data.role || null);
-          }
-        } catch (err) {
-          console.error("Failed to fetch user role:", err);
-        setRole(null);
-      }
-    };
-    fetchUserRole();
-  }, []);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!file) {
-      toast.error("Please select a file.");
-        return;
-      }
-      setUploading(true)
-      
-    try {
-      console.log("propertyId:", propertyId);
-      const formData = new FormData()
-      formData.append('utilityBill', file);
-      formData.append("propertyId", propertyId)
+    if (!propertyId || typeof propertyId !== "string") {
+      toast.error("Property ID is missing. Open this page from your property.");
+      return;
+    }
 
-      const res = await fetch("/api/uploads/utilityBill",{
-      method: "POST",
-      body: formData,
+    if (!file) {
+      toast.error("Please select a utility bill.");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("utilityBill", file);
+      formData.append("propertyId", propertyId);
+
+      const res = await fetch("/api/uploads/utilityBill", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
       });
 
-      const uploadResult = await res.json();
+      const result = await res.json();
 
-      console.log(uploadResult)
-
-      if (res.ok) {
-        toast.success("File uploaded successfully!");
-
-    switch (uploadResult.property.category) {
-    case "Rent":
-      router.push("/rent");
-      break;
-
-    case "Buy":
-      router.push("/buy");
-      break;
-
-    case "Sell":
-      router.push("/sell");
-      break;
-
-    case "Shortlet":
-      router.push("/shortlet");
-      break;
-
-    default:
-      router.push("/allProperties");
-    }
-      } else {
-        toast.error(uploadResult.error);
+      if (!res.ok) {
+        toast.error(
+          result.message ||
+            result.error ||
+            "Utility bill upload failed."
+        );
+        return;
       }
-    } catch (error) {
-      console.error(error)
-      toast.error("An error occured while uploading")
+
+      toast.success("Utility bill uploaded successfully!");
+
+      const category = result.property?.category;
+
+      switch (category) {
+        case "Rent":
+          router.push("/rent");
+          break;
+
+        case "Buy":
+        case "Sell":
+          router.push("/buy");
+          break;
+
+        case "Shortlet":
+          router.push("/shortlets");
+          break;
+
+        default:
+          router.push("/landlordDashboardComplete");
+          break;
+      }
+    } catch {
+      toast.error("An error occurred while uploading the utility bill.");
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
   };
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/user/me", 
-          { credentials: "include" });
-            setIsAuthenticated(res.ok);
-      } catch {
-        setIsAuthenticated(false);
-      }
-    };
-      checkAuth();
-  },  []);
-
-  // Fetch the logged-in user's ID from the JWT cookie on mount
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const res = await fetch("/api/user/me", 
-          { credentials: "include" });
-          if (res.ok) {
-            const data = await res.json();
-            setUserId(data.actorId || null);
-        }
-      } catch (err) {
-          console.error("Failed to fetch user ID:", err);
-      }
-    };
-    fetchUserId();
-  }, []);
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 -mt-30">
-      <h1 className='text-4xl font-black mb-4'>Upload your utility (LAWMA, WATER or LIGHT) bill.</h1>
-      <p> Please ensure that your address on the utility bill matches the one on file for property verification.</p>
-        
-        <form 
-          onSubmit={handleSubmit}
-          className="cursor-pointer text-gray-600 text-center flex flex-col items-center justify-center my-10 border-2 border-dashed rounded-lg p-6 w-full max-w-md"
+    <div className="md:flex flex-col items-center justify-center min-h-screen p-4 mt-20">
+      <h1 className="md:text-4xl text-2xl text-blue-900 font-black mb-4 px-5">
+        Upload your utility (LAWMA, WATER or LIGHT) bill.
+      </h1>
+
+      <p className="text-black px-5">
+        Please ensure that the address on your utility bill matches the
+        address on file for property verification.
+      </p>
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center justify-center my-10 border-2 border-dashed rounded-lg p-6 w-full max-w-md"
+      >
+        <input
+          type="file"
+          name="utilityBill"
+          accept=".pdf,.jpg,.jpeg,.png"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          required
+          className="cursor-pointer text-gray-600"
+        />
+
+        <CloudUpload className="text-gray-300 mt-4" />
+
+        <button
+          type="submit"
+          disabled={uploading || !propertyId}
+          className="mt-6 bg-blue-900 cursor-pointer text-white px-10 py-2 rounded-full hover:bg-blue-700 transition-colors duration-300 disabled:opacity-50"
         >
-          <input 
-            type="file" 
-            name="utilityBill" 
-            accept=".pdf,.jpg,.jpeg,.png" 
-            onChange={(e) => setFile(e.target.files[0])}
-            required 
-          />
-           <CloudUpload className="text-gray-300" />
-           <button 
-            type="submit"
-            disabled={uploading}
-            className=" bg-blue-900 cursor-pointer text-white px-50 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center gap-2"
-          >
-            {uploading ? "Uploading..." : "Upload"}
-          </button>
-        </form>
-       
+          {uploading ? "Uploading..." : "Upload utility bill"}
+        </button>
+      </form>
+
       <ToastContainer />
     </div>
-  )
+  );
 }
-
-export default page

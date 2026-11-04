@@ -60,8 +60,7 @@ function Footer() {
 
       <div className="bg-blue-950 text-white py-4 font-bold md:w-full w-full">
         <div className="max-w-5xl mx-auto flex justify-between text-center text-xs font-light gap-4 md:gap-0 md:px-0 px-5">
-          <p className='text-md text-white'>Okuper 2025</p>
-          <p className='text-md text-white'>Copyright© Okuper Technologies Limited. 2026.</p>
+          <p className='text-md text-white'>Copyright© Okuper Technologies Limited 2026.</p>
           <p className='text-md text-white'>Terms</p>
           <p className='text-md text-white'>Privacy</p>
         </div>

@@ -228,9 +228,10 @@ export default function BankSearch() {
                                 <button
                                     type="button"
                                     onClick={() => setShowDropdown(!showDropdown)}
-                                    className={`absolute right-3 bottom-1 -translate-y-1 hover:scale-110 transition-transform ${
-                                    showDropdown ? "rotate-180" : ""
-                                    }`}
+                                    className={`absolute right-3  bottom-1 -translate-y-1 hover:scale-110 transition-transform 
+                                        ${
+                                        showDropdown ? "rotate-180" : ""
+                                        }`}
                                 >
                                     ▼
                                 </button>
@@ -261,7 +262,7 @@ export default function BankSearch() {
 
                          <button
                             type="submit"
-                            className={`absolute right-218 bottom-1 bg-blue-900 text-white px-10 py-2 rounded-lg -translate-y-1 hover:scale-110 }`}
+                            className={`absolute cursor-pointer right-218 bottom-1 bg-blue-900 text-white px-10 py-2 rounded-lg -translate-y-1 hover:scale-110 }`}
                         >
                             Submit
                         </button>

@@ -34,9 +34,11 @@ const propertySchema = new mongoose.Schema(
 
     price: { type: String, required: true },
 
+    legalFee: {type: String},
+
     category: {
       type: String,
-      enum: ["Rent", "Buy", "Sell", "Shortlet"],
+      enum: ["Rent", "Sell", "Shortlet"],
       default: "Rent",
     },
 
@@ -80,7 +82,12 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    rating: { type: Number, min: 0, max: 5, default: 0 },
+    rating: { 
+      type: Number, 
+      min: 0, 
+      max: 5, 
+      default: 0 
+    },
 
     status: {
       type: String,
@@ -99,6 +106,10 @@ const propertySchema = new mongoose.Schema(
 
     isVerified: { type: Boolean, default: false },
 
+    utilityBillUploaded: {
+      type: Boolean,
+      default: false,
+    },
 
     selectedTenant: {type: mongoose.Schema.Types.ObjectId, ref: "Tenant", default: null},
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant"}, 

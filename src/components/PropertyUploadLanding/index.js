@@ -15,6 +15,7 @@ const Index = () => {
   const [subscribed, setIsSubscribed] = useState(false);
   const [checking, setChecking] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
 
 
   // const landlordId = localStorage.getItem("landlordId");
@@ -87,7 +88,7 @@ const Index = () => {
     try {
       setNavigating(true);
 
-    if (!subscribed && propertyCount >= 1 && !property) {
+    if (!subscribed && propertyCount >= 2 && !property) {
       setIsOpen(true);
       return;
     }
@@ -106,12 +107,12 @@ const Index = () => {
   }
 
   // create 3 slots
-  const slots = [0, 1, 2,3];
+  const slots = [0, 1, 2, 3, 4, 5];
 
   return (
     
-    <div className="bg-white md:w-[1300px] md:h-[2098px] h-210 m-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 md:px-50 md:py-20 px-10 py-10 gap-8">
+    <div className="h-auto m-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:px-50 md:py-20 px-10 py-0 gap-8">
         {slots.map((slotIndex) => {
           const property = properties[slotIndex] || null;
           const previewUrl = property?.previewPic || null;
@@ -126,7 +127,7 @@ const Index = () => {
           <div key={slotIndex} className="flex flex-col items-center mt-8">
             <>
               <div
-                className="md:w-60 md:h-60 w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden"
+                className="md:w-60 md:h-60 w-40 h-40 bg-white rounded-full flex items-center justify-center overflow-hidden"
                 style={{ cursor: "pointer" }}
               >
                 {previewUrl ? (
@@ -141,10 +142,10 @@ const Index = () => {
                   </span>
                 )}
               </div>
-
+              <div className="flex gap-5">
                 <button 
                   onClick={() => handlePropertyCount(property)}
-                  className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-medium"
+                  className="mt-4 bg-blue-700 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl md:rounded-full rounded-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-medium"
                   disabled={loading === true || !!property}
                 >   
                   {navigating
@@ -154,6 +155,20 @@ const Index = () => {
                     : "Start uploading"
                   }   
                 </button>
+
+                {/* EDIT UTILITY BILL */}
+                {property && (
+                  <button
+                    onClick={() =>
+                      router.push(`/utilityBillUploadPage/${property._id}`)
+                    }
+                    className="mt-4 bg-blue-900 text-white px-6 py-2 md:px-10 md:py-4 md:text-xl md:rounded-full rounded-none cursor-pointer font-medium hover:bg-blue-800"
+                  >
+                    Edit utility
+                  </button>
+                )}
+              </div>
+                
             </>
           </div>
         );

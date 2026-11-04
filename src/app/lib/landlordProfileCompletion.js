@@ -1,30 +1,8 @@
 const PROFILE_SECTIONS = {
-  basic: [
-    "firstName",
-    "lastName",
-    "email",
-    "phone",
-  ],
-
-  identity: [
-    "documentType",
-    "idNumber",
-    "documentImage",
-  ],
-
-  personal: [
-    "previewPic",
-    "gender",
-    "age",
-    "stateOfOrigin",
-  ],
-
-  address: [
-    "currentAddress",
-    "city",
-    "state",
-    "country",
-  ],
+  basic: ["previewPic", "firstName", "lastName", "email", "phone"],
+  identity: ["documentType", "idNumber", "documentImage", "status"],
+  personal: ["gender", "age", "stateOfOrigin"],
+  address: ["currentAddress", "city", "state", "country", "zipCode"],
 };
 
 const isPresent = (value) => {

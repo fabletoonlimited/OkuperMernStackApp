@@ -64,10 +64,11 @@ const ShortletIndexCarousel = () => {
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
-    if (slicedProperties.length === 0) return null;
+    if (slicedProperties.length === 0) 
+        return null;
 
     return (
-        <div className="flex gap-4 w-fit mx-auto overflow-x-auto h-auto py-8 md:px-5 px-10">
+        <div className="md:flex row gap-10 md:px-6 px-3 space-y-10 w-full mx-auto md:overflow-x-auto overflow-x-hidden h-auto py-8">
             {slicedProperties.map((item, index) =>
                 item.isAd ? (
                     <div

@@ -13,7 +13,7 @@ export async function POST(req) {
     let {
       // user,
       landlordId, previewPic, Img1, Img2, Img3, Img4, Img5, Img6, title, address, state, price, 
-      category, propertyType, bed, bath, savedHomes, unitsAvailable, rating, status, listedBy, 
+      legalFee, category, propertyType, bed, bath, savedHomes, unitsAvailable, rating, status, listedBy, 
       buildingAmenities, propertyAmenities, neighbourhoodPostcode, nearbyPlaces,agent, isVerified 
     } = body;
     
@@ -58,6 +58,7 @@ export async function POST(req) {
       address,
       state,
       price,
+      legalFee,
       category,
       unitsAvailable,
       propertyType: validPropertyType,
@@ -72,8 +73,8 @@ export async function POST(req) {
       nearbyPlaces,
       agent,
       savedHomes: savedHomes ?? [],
-     
       isVerified,
+      utilityBillUploaded: false,
     });
 
     return NextResponse.json({
@@ -96,43 +97,103 @@ export async function POST(req) {
 }
 
 // GET PROPERTIES
+
 export async function GET(request) {
   try {
     await dbConnect();
-    const { searchParams } = new URL(request.url);
 
+    const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const landlordId = searchParams.get("landlordId");
 
+    // Fetch a single property by ID.
     if (id) {
-    const property = await Property.findById(id)
-      .populate("landlord", "name email phone profilePic")
-      .populate("utilityBill")       
-      if (!property) 
-        return NextResponse.json({ message: "Property not found" }, 
-        { status: 404 });
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return NextResponse.json(
+          { message: "Invalid property ID" },
+          { status: 400 }
+        );
+      }
+
+      // Landlord-specific access: this branch should only be used
+      // when the server has independently verified ownership.
+      if (landlordId) {
+        if (!mongoose.Types.ObjectId.isValid(landlordId)) {
+          return NextResponse.json(
+            { message: "Invalid landlord ID" },
+            { status: 400 }
+          );
+        }
+
+        const property = await Property.findOne({
+          _id: id,
+          landlord: landlordId,
+        })
+          .populate("landlord", "name email phone profilePic")
+          .populate("utilityBill");
+
+        if (!property) {
+          return NextResponse.json(
+            { message: "Property not found" },
+            { status: 404 }
+          );
+        }
+
+        return NextResponse.json(property, { status: 200 });
+      }
+
+      // Public property details require an uploaded utility bill.
+      const property = await Property.findOne({
+        _id: id,
+        utilityBillUploaded: true,
+      })
+        .populate("landlord", "name email phone profilePic")
+        .populate("utilityBill");
+
+      if (!property) {
+        return NextResponse.json(
+          { message: "Property not found" },
+          { status: 404 }
+        );
+      }
+
       return NextResponse.json(property, { status: 200 });
     }
 
-    if (landlordId && mongoose.Types.ObjectId.isValid(landlordId)) {
-      const properties = await Property.find({ landlord: landlordId })
-      .sort({ createdAt: -1 
-      });
+    // Landlord dashboard: show all properties belonging to this landlord.
+    if (landlordId) {
+      if (!mongoose.Types.ObjectId.isValid(landlordId)) {
+        return NextResponse.json(
+          { message: "Invalid landlord ID" },
+          { status: 400 }
+        );
+      }
+
+      const properties = await Property.find({
+        landlord: landlordId,
+      }).sort({ createdAt: -1 });
+
       return NextResponse.json(properties, { status: 200 });
     }
 
-    if (landlordId && !mongoose.Types.ObjectId.isValid(landlordId)) {
-      return NextResponse.json([], { status: 200 });
-    }
+    // Public Rent, Buy and Shortlet listings:
+    // fetch eligible properties from ALL landlords.
+    const properties = await Property.find({
+      utilityBillUploaded: true,
+    })
+      .populate("landlord", "name email phone profilePic")
+      .sort({ createdAt: -1 });
 
-    //fallback for all properties
-    const properties = await Property.find().sort({ createdAt: -1 });
     return NextResponse.json(properties, { status: 200 });
   } catch (err) {
-    console.error("GET /api/property error:", err);
-    return NextResponse.json({ message: err.message || "Failed to fetch properties" }, { status: 500 });
+    return NextResponse.json(
+      { message: err.message || "Failed to fetch properties" },
+      { status: 500 }
+    );
   }
 }
+
+
 
 // UPDATE PROPERTY
 export async function PUT(request) {

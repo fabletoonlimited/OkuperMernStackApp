@@ -205,15 +205,14 @@ const page = () => {
   };
         return (
             <>
+                <div className="w-full bg-gray-150 py-16 h-auto">
                 <ToastContainer position="top-center" autoClose={3000} />
 
                 {error && (
                     <p className="text-red-600 text-lg text-center">{error}</p>
                 )}
-
-                <div className="w-full min-h-screen bg-white py-16">
                     {/* ONE FLEX CONTAINER */}
-                    <div className="max-w-7xl mx-auto px-12 flex flex-col lg:flex-row items-start gap-20">
+                    <div className="max-w-7xl mx-auto px-12 flex flex-col lg:flex-row items-start gap-30 mb-50">
                         {/* ================= LEFT SIDE ================= */}
                         <div className="w-full lg:w-1/2">
                             <h1 className="font-bold text-4xl mb-6">
@@ -332,36 +331,41 @@ const page = () => {
                             </div>
                         </div>
 
-                        {/* ================= RIGHT SIDE ================= */}
-                        <div className="w-full lg:w-1/2 flex justify-end">
-                            <div className="relative bg-[rgba(0,51,153,1)] rounded-2xl shadow-lg overflow-hidden ">
-                                {/* Blue Header */}
-                                <div className="bg-[#003399] p-12 w-full md:mt-5 mt-10">
-                                    <h2 className="text-4xl font-semibold md:leading-snug leading-tight text-white text-center">
-                                        Rent, Sell & Lease your Homes Directly on Okuper
-                                    </h2>
-                                </div>
-
-                                {/* Middle Text */}
-                                <p className="absolute top-44 text-white text-center text-lg px-12 md:mt-4 mt-30">
-                                    No agents. No hidden fees.Just verified
-                                    people and real homes.
+                   {/* RIGHT SIDE - BANNER */}
+                    <div className="relative bg-[rgba(0,51,153,1)] mb-30 rounded-2xl shadow-lg mt-10 md:mt-30">
+                        
+                        {/* Banner Top Section */}
+                        <div className={"relative md:h-50 h-70 rounded-2xl mb-15 md:mb-22"}>
+                            <div className={"relative rounded-t-2xl md:w-155 w-50% py-2 md:h-20 leading-relaxed"}>
+                                <h2 className="font-medium md:text-4xl text-3xl text-white leading-10 md:leading-12 md:pt-15 pt-10 px-10 md:px-20 text-center md:text-center">
+                                    <b>
+                                        Sell, Lease & List your Properties Directly on Okuper
+                                    </b>
+                                </h2>
+                                <p className="absolute text-sm md:font-medium leading-[1.2] mt-7 md:mt-7 md:text-[20px] text-white px-10 md:px-20 md:text-center text-center">
+                                    No agents. No hidden fees.<br></br>Connect directly with
+                                    verified tenants on Okuper. Verified people
+                                    and real homes.
                                 </p>
-
-                                {/* Images */}
-                                <img
-                                    src="/bannerGirl.png"
-                                    alt="Banner Girl"
-                                    className="absolute -bottom-10 right-0 w-[80%] md:w-[90%] max-w-none"
-                                />
-
-                                <img
-                                    src="/BannerSam.png"
-                                    alt="Ad Banner Sam"
-                                    className="w-full h-full"
-                                />
                             </div>
                         </div>
+
+                        {/* Images Section */}
+                        <div className="relative bottom-0 md:bottom-0 md:-right-40 -right-25">
+                            {/* <img
+                                src="/BannerSam.png"
+                                alt="Ad Banner Sam"
+                                className={"BannerHouse md:h-auto h-60 md:w-120 w-120 bottom-[-541px] md:bottom-[0px]"}
+                                style={{ position: "absolute", height: "auto" }}
+                            /> */}
+                            <img
+                                src="/bannerGirl.png"
+                                alt="Banner Girl"
+                                className={"bannerLady rounded-b-2xl md:w-70 w-100% md:h-auto h-60"}
+                            />
+                      </div>
+                    </div>
+                    
                     </div>
                 </div>
 

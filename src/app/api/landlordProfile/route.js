@@ -57,12 +57,9 @@ export async function GET(request) {
 }
 
 const buildKycUpdate = (payload, role, actor) => {
-  const documentImage =
-    payload.documentImage || payload.previewPic || payload.avatar;
- 
-
+  
   const base = {
-    previewPic: payload.previewPic || payload.avatar,
+    previewPic: payload.previewPic ?? payload.avatar,
     documentImage: payload.documentImage,
     phone: payload.phone,
     documentType: payload.documentType,
@@ -77,7 +74,8 @@ const buildKycUpdate = (payload, role, actor) => {
   };
 
   if (role === "landlord") {
-    base.currentHomeAddress = payload.currentAddress;
+    base.currentAddress = payload.currentAddress;
+    
     base.user = actor.user;
     base.landlord = actor._id;
     base.landlordDashboard = actor.landlordDashboard;

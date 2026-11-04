@@ -1,12 +1,5 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/app/lib/mongoose";
-import {banks} from "@/app/data/banks"
-import BankDetails from "@/app/api/models/bankDetailsModel.js";
-
-
-//POST Account detals
-import { NextResponse } from "next/server";
-import dbConnect from "@/app/lib/mongoose";
 import { banks } from "@/app/data/banks";
 import BankDetails from "@/app/api/models/bankDetailsModel.js";
 
@@ -36,11 +29,6 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-
-    console.log("Saving bank details...");
-console.log("Landlord:", landlord);
-console.log("Account:", accountNo);
-console.log("Bank:", bank);
 
     const bankDetails = await BankDetails.findOneAndUpdate(
       { landlord },
@@ -98,22 +86,22 @@ export async function GET() {
   }
 }
 
-// GET BANKS
-export async function GET() {
+// // GET BANKS
+// export async function GET() {
 
-  try {
-    await dbConnect();
+//   try {
+//     await dbConnect();
     
-    return NextResponse.json({
-      "responseCode":"00",
-      "responseMessage": "successful",
-      "data": banks,
-    }
-  );
-  } catch (error) {
-    return NextResponse.json(
-      {message: error.message || "Server error, something went wrong"},
-      { status: 500 }
-    );  
-  }
-};
+//     return NextResponse.json({
+//       "responseCode":"00",
+//       "responseMessage": "successful",
+//       "data": banks,
+//     }
+//   );
+//   } catch (error) {
+//     return NextResponse.json(
+//       {message: error.message || "Server error, something went wrong"},
+//       { status: 500 }
+//     );  
+//   }
+// };

@@ -243,29 +243,25 @@ function landlordDashboard() {
         setChecking(true);
     
         try {
-            // if not subscribed and already uploaded 1 property -> block
+            // if not subscribed and already uploaded 2 property -> block
             if (!isSubscribed && propertyCount >= 2) {
                 setIsOpen(true);
                 return;
             }
-    
-            // allowed
-            router.push("/propertyListingLanding");
-
-            
+            // router.push("/landlordSubscriptionPaymentAdvice");
         } finally {
             setChecking(false);
         }
     };
         console.log({
             profilePercent,
+            propertyCount,
             utilityCompletion,
             bankCompletion,
         });
 
-    if (profilePercent === 100 && 
-        utilityCompletion &&
-        bankCompletion
+    if (profilePercent === 100 
+        // && propertyCount === 2
         ) {
         return (
           <>

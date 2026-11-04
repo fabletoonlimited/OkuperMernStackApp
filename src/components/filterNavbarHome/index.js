@@ -21,7 +21,7 @@ function FilterNavbarIndex() {
 
     const [properties, setProperties] = useState([]);
 
-    const pillSelect = "appearance-none bg-white h-14 W-26 px-4 pr-20 text-base text-2xl rounded-lg border border-gray-300 flex items-center";
+    const pillSelect = "appearance-none bg-white h-14 md:w-40 w-80 px-4 pr-20 text-sm text-gray-600 text-2xl rounded-lg border border-gray-300 flex items-center";
 
     const updateFilter = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
@@ -97,7 +97,7 @@ function FilterNavbarIndex() {
     const router = useRouter();
 
     return (
-        <form className="flex items-center bg-blue-900 px-8 py-7.5 justify-around gap-6">
+        <form className="md:flex row items-center justify-center bg-blue-900 px-8 py-8 gap-6 md:space-y-0 space-y-5 mb-10">
             {/* Search */}
             <div className="relative">
                 <input
@@ -105,18 +105,18 @@ function FilterNavbarIndex() {
                     value={filters.query}
                     onChange={(e) => updateFilter("query", e.target.value)}
                     placeholder="Search"
-                    className="h-14 w-80 rounded-lg bg-white pl-4 pr-10 text-sm text-gray-700 outline-none"
+                    className="h-14 md:w-75 w-80 rounded-lg bg-white pl-4 pr-10 text-sm text-gray-600 outline-none"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <FontAwesomeIcon icon={faMagnifyingGlass} className="text-black text-lg" />
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-600 text-lg" />
                 </span>
             </div>
 
             {/* Filters */}
-            {filterConfig.map(({ key, placeholder, options, suffix }) => (
+                {filterConfig.map(({ key, placeholder, options, suffix }) => (
                 <div key={key} className="relative">
                     <select
-                        className={pillSelect}
+                        className={pillSelect} 
                         value={filters[key]}
                         onChange={(e) => updateFilter(key, e.target.value)}
                     >
@@ -131,16 +131,19 @@ function FilterNavbarIndex() {
 
                     <FontAwesomeIcon
                         icon={faChevronDown}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none"
                     />
                 </div>
             ))}
 
             {/* Right icon */}
-            <div className="h-14 flex items-center rounded-lg justify-center text-white hover:bg-white/10 gap-1 pb-3">
-                <p className="text-sm mt-2 font-medium"></p>
-                <img src="/houseIcon.png" alt="Home Icon" className="h-10 mt-4" /> 
-            </div>
+            <Link href="/save">
+                <div className="h-14 flex items-center rounded-lg justify-center text-white hover:bg-white/10 gap-1 pb-3">
+                    <p className="text-sm mt-2 font-medium"></p>
+                    <img src="/houseIcon.png" alt="Home Icon" 
+                    className="h-10 mt-4" /> 
+                </div>
+            </Link>
         </form>
     );
 }

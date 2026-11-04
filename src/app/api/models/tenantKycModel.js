@@ -6,7 +6,6 @@ const tenantKycSchema = new mongoose.Schema(
       type: String, 
       required: true 
     },
-
     firstName: {
       type: String,
       required: true,
@@ -19,7 +18,6 @@ const tenantKycSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     phone: {
       type: String,
       required: true,
@@ -163,27 +161,9 @@ const tenantKycSchema = new mongoose.Schema(
         "FCT Abuja",
       ],
     },
-
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    tenant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Tenant",
-      required: true,
-    },
-    tenantDashboard: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "TenantDashboard",
-      required: true,
-    },
-    addressVerification: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "AddressVerification",
-      required: false,
-    },
-
-    
-    landlord: { type: mongoose.Schema.Types.ObjectId, ref: "Landlord" },
-    
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true },
+    addressVerification: { type: mongoose.Schema.Types.ObjectId, ref: "AddressVerification", required: false },    
   },{ timestamps: true },
 );
 

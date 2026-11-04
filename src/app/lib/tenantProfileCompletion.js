@@ -1,13 +1,39 @@
-const PROFILE_REQUIRED_FIELDS = {
-  tenant: ["firstName", "lastName", "email", "phone"],
-};
 
 const PROFILE_SECTIONS = {
-  basic: ["firstName", "lastName", "email", "phone"],
-  identity: ["documentType", "idNumber", "documentImage"],
-  personal: ["gender", "age", "occupation", "maritalStatus", "religion"],
-  work: ["companyName", "companyAddress", "companyPhone", "companyEmail"],
-  address: ["currentAddress", "city", "state", "country", "zipCode"],
+  basic: [
+    "previewPic",
+    "firstName",
+    "lastName",
+    "email",
+    "phone",
+  ],
+
+  identity: [
+    "documentType",
+    "idNumber",
+    "documentImage",
+  ],
+
+  personal: [
+    "age",
+    "occupation",
+    "maritalStatus",
+    "religion",
+  ],
+
+  work: [
+    "companyName",
+    "companyAddress",
+    "companyPhone",
+  ],
+
+  address: [
+    "currentAddress",
+    "city",
+    "state",
+    "country",
+    "stateOfOrigin",
+  ],
 };
 
 const isPresent = (value) => {
@@ -16,7 +42,9 @@ const isPresent = (value) => {
   }
 
   if (Array.isArray(value)) {
-    return value.length > 0;
+    return value.some((item) =>
+      typeof item === "string" ? item.trim().length > 0 : item !== null && item !== undefined
+    );
   }
 
   if (typeof value === "string") {
@@ -27,35 +55,36 @@ const isPresent = (value) => {
     return !Number.isNaN(value);
   }
 
-  if (typeof value === "boolean") {
-    return value === true;
-  }
-
   return true;
 };
 
-export const computeProfileCompletion = (profile, role) => {
-  const normalizedRole = role === "landlord" ? "landlord" : "tenant";
-  const baseFields = PROFILE_REQUIRED_FIELDS[normalizedRole] || [];
-
+export const computeProfileCompletion = (profile) => {
   const sectionKeys = Object.keys(PROFILE_SECTIONS);
-  const sectionWeight = sectionKeys.length ? 100 / sectionKeys.length : 0;
 
-  const percent = sectionKeys.reduce((total, key) => {
-    const sectionFields = PROFILE_SECTIONS[key] || [];
-    if (sectionFields.length === 0) return total;
+  const sectionWeight = 100 / sectionKeys.length;
 
-    const filledCount = sectionFields.filter((field) =>
-      isPresent(profile?.[field]),
+  let percent = 0;
+
+  for (const key of sectionKeys) {
+    const fields = PROFILE_SECTIONS[key];
+
+    const filledCount = fields.filter((field) =>
+      isPresent(profile?.[field])
     ).length;
 
-    const sectionScore = (filledCount / sectionFields.length) * sectionWeight;
-    return total + sectionScore;
-  }, 0);
+    percent += (filledCount / fields.length) * sectionWeight;
+  }
 
-  const allFields = sectionKeys.flatMap((key) => PROFILE_SECTIONS[key] || []);
-  const fields = allFields.length ? allFields : baseFields;
-  const missingFields = fields.filter((field) => !isPresent(profile?.[field]));
+  const allFields = sectionKeys.flatMap(
+    (key) => PROFILE_SECTIONS[key]
+  );
 
-  return { percent: Math.round(percent), missingFields };
+  const missingFields = allFields.filter(
+    (field) => !isPresent(profile?.[field])
+  );
+
+  return {
+    percent: Math.round(percent),
+    missingFields,
+  };
 };

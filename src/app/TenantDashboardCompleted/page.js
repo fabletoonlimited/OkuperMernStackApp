@@ -12,12 +12,40 @@ import Link from "next/link"
 const Page = (_id) => {
     const [tenant, setTenant] = useState(null);
     const [tenantKyc, setTenantKyc] = useState(null);
+    const [tenantProfile, setTenantProfile] = useState(null)
     const [savedHomesCount, setSavedHomesCount] = useState(null);
     const [messages, setMessages] = useState(null);
     const [disputes, setDisputes] = useState(null);
     const [payment, setPayment] = useState(null);
     const [property, setProperty] = useState(null);
 
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await fetch("/api/tenantProfile/upload", {
+                    method: "GET",
+                    credentials: "include",
+                });
+    
+                if (!res.ok) {
+                    toast.error("Failed to load tenant profile");
+                    return;
+                }
+    
+                const data = await res.json();        
+                console.log(data); 
+                setTenantProfile(data);
+
+            } catch (err) {
+                console.error("Profile fetch error:", err);
+                toast.error("Failed to load profile");
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchProfile();
+    }, []);
 
     //Fetch Tenant
     useEffect(() => {
@@ -140,7 +168,7 @@ const Page = (_id) => {
     useEffect(() => {
         const fetchTransactionCount = async () => {
             try {
-                const res = await fetch("/api/payment/Xpress", {
+                const res = await fetch("/api/payment/xPress", {
                     method: "GET",
                     credentials: "include",
                     body: JSON.stringify({
@@ -207,19 +235,23 @@ const Page = (_id) => {
             {/* Main Content */}
             <div className="flex-1 p-6">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex justify-between items-center mb-8 bg-linear-to-r from-blue-900 to-blue-700 p-7">
                     <div>
-                        <p className="text-sm text-gray-500">Mon, 19 2026</p>
-                        <h1 className="text-3xl font-bold text-blue-950 mb-2">
-                            Welcome back, {tenant?.firstName + " " + tenant?.lastName || "Tenant"}!
+                        <p className="text-sm text-white">Mon, 19 2026</p>
+                        <h1 className="font-bold md:text-5xl text-white text-2xl">
+                            Dear, {}
+                            {tenant
+                            ? `${tenant.firstName} ${tenant?.lastName}`
+                            : "Landlord"}
+                            !
                         </h1>
-                        <p className="text-gray-500">
+                        <p className="text-white">
                             This is your complete dashboard summary report
                         </p>
                     </div>
 
                     <img
-                        src={tenantKyc?.previewPic || null}
+                        src={tenantProfile?.previewPic || null}
                         className="w-10 h-10 rounded-full"
                     />
                 </div>

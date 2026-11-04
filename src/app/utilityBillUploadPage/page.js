@@ -49,8 +49,8 @@ const Page = () => {
       return;
     }
 
-    if (role !== "tenant") {
-      toast.error("Only tenants can upload a utility bill here.");
+    if (!["landlord", "tenant"].includes(role)) {
+      toast.error("You must be logged in as a tenant or landlord.");
       return;
     }
 
@@ -70,7 +70,7 @@ const Page = () => {
 
       const uploadResult = await res.json();
 
-      console.log("TENANT UTILITY UPLOAD RESULT:", uploadResult);
+      console.log("LANDLORD UTILITY UPLOAD RESULT:", uploadResult);
 
       if (!res.ok) {
         toast.error(uploadResult.error || "Upload failed.");
@@ -80,7 +80,11 @@ const Page = () => {
       toast.success("Utility bill uploaded successfully!");
 
       setTimeout(() => {
-        router.push("/tenantDashboard");
+        if (role === "tenant") {
+          router.push("/tenantDashboard");
+        } else {
+        router.push("/landlordDashboardComplete");
+        }
       }, 1000);
 
     } catch (error) {

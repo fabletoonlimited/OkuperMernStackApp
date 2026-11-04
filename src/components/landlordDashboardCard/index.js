@@ -16,19 +16,13 @@ const index = ({profilePercent}) => {
   const [checking, setChecking] = useState(false);
   const [utilityLoading, setUtilityLoading] = useState(true);
   const [utilityCompletion, setUtilityCompletion] = useState(false);
-
   const [loadingListing, setLoadingListing] = useState(false);
   const [uploadedListing, setUploadedListing] = useState(false);
   const [subscribed, setIsSubscribed] = useState(false);
-
   const [bankCompletion, setBankCompletion] = useState(false);
-
-  const [landlord, setLandlord] = useState(null);
   const [landlordId, setLandlordId] = useState(null);
-
   const [propertyCount, setPropertyCount] = useState(0);
-
-  // landlord state
+  const [landlord, setLandlord] = useState(null);
   const [landlordEmail, setLandlordEmail] = useState(null);
 
   // ✅ get logged in landlord
@@ -232,59 +226,62 @@ const handleUploadClick = async (e) => {
 };
 
   return (
-    <>
-      {/* Dashboard Card */}
-      <div className="md:mt-10 p-4 row md:px-12">
-        <ToastContainer />
-        <div className="landlordDashboardCard grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="space-y-2 rounded-lg md:w-auto w-80 bg-blue-600 p-6 shadow-lg hover:shadow-xl hover:scale-105 transition duration-300">
-            <h4 className="text-white font-bold mb-3">Your Profile</h4>
-              <p className="text-white">
-                {profilePercent === null
-                  ? "Your profile information is loading"
-                  : `Your information is ${profilePercent}% complete. Please complete your profile to enjoy full benefits.`
-                }
-              </p>
-
-              <Link href="/landlordVerification">
-                <div className="flex justify-center">
-                  <button 
-                  className="bg-white hover:bg-amber-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:rounded-full px-6 py-2 w-full text-blue0-900 text-sm mt-6 cursor-pointertransition"
-                  disabled={profilePercent === 100}
-                  >
-                    {profilePercent === 100 ? "Uploaded" : "Update Your profile"}
-                  </button>
-                </div>
-              </Link>
-          </div>
-
-          {/* Listings */}
-            {/* {profilePercent === 100 && ( */}
-              <div className="space-y-2 rounded-lg hover:rounded-none bg-amber-400 p-6 md:w-auto w-80 shadow-md hover:scale-105 transition-transform duration-300">
-                <h4 className="text-blue-950 font-bold mb-3">Listings</h4>
-
-                <p className="text-blue-950">
-                  { propertyCount >= 2
-                    ? "You have used up your free 2 property upload. Subscribe to upload more properties."
-                    : "Add your 2 free property listing to begin showcasing it to prospective tenants."
+    <div className="row">
+      <ToastContainer />
+      <div className="landlordDashboardCard grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {/* Dashboard Card */}
+        {profilePercent !== 100 && (
+          <div className="md:mt-10 p-4 row md:px-12 ">
+            <div className="space-y-2 rounded-lg h-57 w-80 bg-blue-600 p-6 shadow-lg hover:shadow-xl hover:scale-105 transition duration-300">
+              <h4 className="text-white font-bold mb-3">Your Profile</h4>
+            <p className="text-center md:text-justify text-white">
+                  {profilePercent === null
+                    ? "Your profile information is loading"
+                    : `Your information is ${profilePercent}% complete. Please complete your profile to enjoy full benefits.`
                   }
                 </p>
 
-                <div className="flex justify-center">
-                  
-                  <button
-                    onClick={handleUploadClick}
-                    className="bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold hover:rounded-full px-6 py-2 w-full text-white text-sm mt-6 cursor-pointer hover:bg-blue-800 transition"
-                    disabled={loadingListing === true || checking}
+                <Link href="/landlordVerification">
+                  <div className="flex justify-center">
+                    <button 
+                    className="bg-white hover:bg-amber-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:rounded-full px-6 py-2 w-full text-blue0-900 text-sm mt-4 cursor-pointertransition"
+                    disabled={profilePercent === 100}
                   >
-                    {loadingListing
-                      ? "Loading..."
-                      : !subscribed && propertyCount >=2
-                      ? "Subscribe"
-                      : "Add Listing"
-                    }
+                    {profilePercent === 100 ? "Uploaded" : "Update Your profile"}
                   </button>
-                </div>
+                  </div>
+                </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Listings */}
+        {/* {profilePercent !== 100 && ( */}
+        <div className="md:mt-10 p-4 row md:px-12">
+          <div className="space-y-2 rounded-lg hover:rounded-none bg-amber-400 p-4 h-57 w-80 shadow-md hover:scale-105 transition-transform duration-300">
+            <h4 className="text-blue-950 font-bold mb-3 pt-2">Listings</h4>
+
+              <p className="text-blue-950">
+                { propertyCount >= 2
+                  ? "You have used up your free 2 property upload. Subscribe to upload more properties."
+                  : "Add your 2 free property listing to begin showcasing it to prospective tenants."
+                }
+              </p>
+
+              <div className="flex justify-center">    
+                <button
+                  onClick={handleUploadClick}
+                  className="bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold hover:rounded-full px-6 py-2 w-full text-white text-sm mt-10 cursor-pointer hover:bg-blue-800 transition"
+                  disabled={loadingListing === true || checking}
+                >
+                  {loadingListing
+                    ? "Loading..."
+                    : !subscribed && propertyCount >=2
+                    ? "Subscribe"
+                    : "Add Listing"
+                  }
+                </button>
+              </div>
 
                 <SubscriptionModal1
                   isOpen={isOpen}
@@ -299,41 +296,47 @@ const handleUploadClick = async (e) => {
                   isOpen={isOpen2}
                   onClose={() => setIsOpen2(false)}
                 />     
-              </div>
-
-          {/* Account Details */}
-          <div className="space-y-2 rounded-lg md:w-auto w-80 bg-blue-600 p-6 shadow-md hover:shadow-lg hover:scale-105 transition duration-300">
-            <h4 className="text-white font-bold text-lg">
-              Bank Account
-            </h4>
-
-            <p className="text-white">
-              Add your bank account details to receive tenant payments directly.
-            </p>
-
-            <Link href="/landlordAccountForm">
-              <div className="flex justify-center">
-                <button
-                  disabled={bankCompletion}
-                  className="bg-gray-100 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed hover:rounded-full px-6 py-2 w-full text-blue-950 font-bold text-sm mt-6 cursor-pointer transition"
-                >
-                  {bankCompletion ? "Account Added" : "Add Bank Account"}
-                </button>
-              </div>
-            </Link>
+            </div>
           </div>
-        
+        {/* )} */}
+
+          
+        {/* Account Details */}
+        {profilePercent !== 100 && (
+          <div className="md:mt-10 p-4 row md:px-12">
+
+            <div className="space-y-2 rounded-lg h-57 w-80 bg-blue-600 p-6 shadow-md hover:shadow-lg hover:scale-105 transition duration-300">
+              <h4 className="text-white font-bold text-lg">
+                Bank Account
+              </h4>
+
+              <p className="text-white">
+                Add your bank account details to receive tenant payments directly.
+              </p>
+
+              <Link href="/landlordAccountForm">
+                <div className="flex justify-center">
+                  <button
+                    disabled={bankCompletion}
+                    className="bg-gray-100 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed hover:rounded-full px-6 py-2 w-full text-blue-950 font-bold text-sm mt-10 cursor-pointer transition"
+                  >
+                    {bankCompletion ? "Account Added" : "Add Bank Account"}
+                  </button>
+                </div>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center justify-center">
           {/*Advert */}
           <Link href={""}>
             <div className="h-30 bg-gray-700 md:w-295 w-80 mt-20 md:justify-center justify-left md:items-center items-left px-6">
               <p className="justify-center items-center pt-12 pl-10 text-white">Video Advert goes here...</p>
             </div>
           </Link>
-        </div>
-
-     
       </div>
-    </>
+    </div>
   );
 };
 

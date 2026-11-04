@@ -6,14 +6,11 @@ import BankDetails from "../../models/bankDetailsModel";
 
 
 export async function GET(req) {
-
   await dbConnect();
 
   try {
-
     const token = req.cookies.get("token")?.value;
-console.log("BANKS:", banks);
-console.log("TOTAL BANKS:", banks.length);
+
     if (!token) {
       return NextResponse.json(
         {message:"Unauthorized"},
@@ -21,19 +18,14 @@ console.log("TOTAL BANKS:", banks.length);
       );
     }
 
-
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET
     );
-
-console.log("Decoded ID:", decoded.id);
-
     const bankDetails = await BankDetails.findOne({
       landlord: decoded.id
     });
 
-console.log("Found bank details:", bankDetails);
     return NextResponse.json({
       bankDetails,
       data: banks,

@@ -21,7 +21,7 @@ function Buy() {
                 const data = await res.json();
 
                 const filtered = data.filter(
-                    (property) => property.category === "Buy",
+                    (property) => property.category === "Sell",
                 );
 
                 setPropertyItems(filtered);

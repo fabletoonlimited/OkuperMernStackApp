@@ -5,6 +5,8 @@ import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle, faExclamationCircle, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 
 const emptyProfile = {
     previewPic: "",
@@ -102,6 +104,7 @@ const LandlordProfilePage = ({ landlordProfile, propertyId }) => {
     const [uploading, setUploading] = useState(false);
     const [stepIndex, setStepIndex] = useState(0);
     const [role, setRole] = useState("landlord");
+    const [status, setStatus] = useState("Pending");
 
     useEffect(() => {
         if (!landlordProfile) {
@@ -110,21 +113,53 @@ const LandlordProfilePage = ({ landlordProfile, propertyId }) => {
         }
 
         setFormData((prev) => ({
-            ...prev,
-            ...landlordProfile,
-            currentAddress:
-                landlordProfile.currentAddress ||
-                "",
-            previewPic:
-                landlordProfile.previewPic ||
-                landlordProfile.profilePic ||
-                "",
-            stateOfOrigin: landlordProfile.stateOfOrigin || "",
+        ...prev,
+        firstName: data.firstName || prev.firstName || "",
+        lastName: data.lastName || prev.lastName || "",
+        email: data.email || prev.email || "",
+        phone: data.phone || prev.phone || "",
+        previewPic:
+            data.previewPic || data.profilePic || prev.previewPic || "",
+        documentType: data.documentType || prev.documentType || "",
+        idNumber: data.idNumber || prev.idNumber || "",
+        documentImage: data.documentImage || prev.documentImage || "",
+        gender: data.gender || prev.gender || "",
+        age: data.age ?? prev.age ?? "",
+        stateOfOrigin: data.stateOfOrigin || prev.stateOfOrigin || "",
+        currentAddress: data.currentAddress || prev.currentAddress || "",
+        city: data.city || prev.city || "",
+        state: data.state || prev.state || "",
+        country: data.country || prev.country || "",
+        zipCode: data.zipCode || prev.zipCode || "",
         }));
 
         setLoading(false);
     }, [landlordProfile]);
 
+    useEffect(() => {
+        const fetchStatus = async () => {
+            try {
+                const statusRes = await fetch("/api/iDkyc", {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store"
+                });
+
+                const statusData = await res.json;
+
+                if (!statusRes.ok) {
+                    toast.error(statusData?.message || "Failed to fetch status");
+                    return;
+                }
+
+                setStatus(data.status || "Pending");
+            } catch (error) {
+                toast.error("Status fetch error");
+        } 
+        fetchStatus();
+        }
+    }, []);
+    
     useEffect(() => {
         const fetchLandlord = async () => {
             try {
@@ -144,6 +179,7 @@ const LandlordProfilePage = ({ landlordProfile, propertyId }) => {
                 }
 
                 setRole("landlord");
+                setStatus(data.status || "Pending");
 
                 setFormData((prev) => ({
                     ...prev,
@@ -413,7 +449,7 @@ const LandlordProfilePage = ({ landlordProfile, propertyId }) => {
                         />
                     </div>
 
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-1">
                         <label className={labelClass}>
                             Document upload
                         </label>
@@ -447,6 +483,37 @@ const LandlordProfilePage = ({ landlordProfile, propertyId }) => {
                             )}
                         </div>
                     </div>
+            <div className="md:col-span-1">
+        <p className="font-bold mt-1 text-sm text-blue-950">Status</p>
+
+        <p className="mt-3 flex items-center gap-2">
+        {status?.toLowerCase() === "approved" ? (
+        <>
+            <FontAwesomeIcon
+            icon={faCheckCircle}
+            className="text-green-600"
+            />
+            <span className="text-green-600">Approved</span>
+        </>
+        ) : status?.toLowerCase() === "rejected" ? (
+        <>
+            <FontAwesomeIcon
+            icon={faExclamationCircle}
+            className="text-red-600"
+            />
+            <span className="text-red-600">Rejected</span>
+        </>
+        ) : (
+        <>
+            <FontAwesomeIcon
+            icon={faExclamationTriangle}
+            className="text-yellow-600"
+            />
+            <span className="text-yellow-600">Pending</span>
+        </>
+        )}
+    </p>
+    </div>
                 </div>
             );
         }

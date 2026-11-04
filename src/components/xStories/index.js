@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 const index = () => {
   return (
-    <div className="bg-gray-700 w-full md:w-full min-h-auto h-auto text-white px-5 pt-20">
+    <div className="bg-gray-500 w-full md:w-full md:h-auto h-auto text-white px-5 pt-20 pb-30">
       <h3 className='font-medium text-3xl mb-20'>Prospective tenant's stories as seen on X</h3>
         <div className='flex md:gap-18 gap-10 -ml-8 overflow-x-auto scroll-smooth scrollbar-hide'>
           <Image 

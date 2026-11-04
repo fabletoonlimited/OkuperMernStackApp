@@ -487,7 +487,7 @@ useEffect(() => {
       try {
         setProfileLoading(true);
 
-        const res = await fetch(`/api/landlordProfile?actorId=${participant._id}`, 
+        const res = await fetch(`/api/tenantProfile?actorId=${participant._id}`, 
         {
           credentials: "include",
         });
@@ -521,496 +521,603 @@ useEffect(() => {
     <div className="flex min-h-screen bg-gray-100">
       <TenantDashboardSidebar />
       <div className="flex-1 p-6">
-        <div className="bg-white shadow-md p-6 rounded-md mb-6">
-          <h3 className="text-3xl font-bold text-blue-800">Inbox</h3>
-        </div>
-
-        <div className="bg-white shadow-md rounded-md flex min-h-[75vh]">
-          <div className="flex-1 flex flex-col mb-0">
-            <div className="p-4 border-gray-200 shadow-4xl shadow-gray-300 border-2 flex items-center justify-between">
-              <div className="flex items-center gap-12">
-                <h5
-                  className="font-bold text-blue-950"
-                  style={{ fontSize: "20px" }}
-                >
-                  My messages
-                </h5>
-
-                {/* Compose button — pending owner confirmation of purpose (see Figma) */}
-                <button
-                  onClick={() => setOpenCompose(true)}
-                  className="bg-gray-500 cursor-not-allowed text-white px-6 py-2 rounded"
-                >
-                  Compose
-                </button>
-
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
-                  {profilePic && (
-                    <CldImage
-                      src={profilePic}
-                      width={60}
-                      height={60}
-                      crop="fill"
-                      alt="tenantProfilePic"
+              <div className="bg-white shadow-md p-6 rounded-md mb-6">
+                <h3 className="text-3xl font-bold text-blue-800">Inbox</h3>
+              </div>
+      
+              <div className="bg-white shadow-md rounded-md flex min-h-[75vh]">
+                <div className="flex-1 flex flex-col mb-0">
+                  <div className="p-4 md:flex row  border-gray-200 shadow-4xl shadow-gray-300 border-2 items-center justify-between">
+                    <div className="flex items-center gap-12">
+                      <h5
+                        className="font-bold text-blue-950"
+                        style={{ fontSize: "20px" }}
+                      >
+                        My messages
+                      </h5>
+      
+                      {/* Compose button — pending owner confirmation of purpose (see Figma) */}
+                      <button
+                        onClick={() => setOpenCompose(false)}
+                        className="bg-gray-400 text-white px-6 py-2 cursor-not-allowed rounded"
+                      >
+                        Compose
+                      </button>
+                    </div>
+                      <p className="text-red-600 text-left py-5">Ensure that you make your property payments on okuper to avoid scams.</p>
+                    
+                    <div className="flex gap-10">
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
+                        {profilePic && (
+                          <CldImage
+                            src={previewPic}
+                            width={60}
+                            height={60}
+                            crop="fill"
+                            alt="profile"
+                          />
+                        )}
+                      </div>
+      
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => setShowProfile((prev) => !prev)}
+                          className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700 cursor-pointer"
+                        >
+                          {showProfile ? "Back" : "Show Profile"}
+                        </button>
+      
+                        <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700 cursor-pointer">
+                          <FontAwesomeIcon icon={faFlag} />
+                        </div>
+                      </div>
+                    </div> 
+                  </div>
+      
+                  <div className="flex flex-1">
+                    <div className="w-full md:w-1/3 bg-white border-gray-200 border-4 overflow-y-auto">
+                      <div className="p-2 border-b border-gray-100">
+                        <input
+                          type="text"
+                          value={convSearch}
+                          onChange={(e) => setConvSearch(e.target.value)}
+                          placeholder="Search conversations..."
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+                        />
+                      </div>
+                      {loading ? (
+                        <p className="p-4 text-gray-500">Loading conversations...</p>
+                      ) : conversations.length === 0 ? (
+                        <p className="p-4 text-gray-500">No conversations</p>
+                      ) : (
+                        conversations
+                          .filter((conv) => {
+                            if (!convSearch.trim()) return true;
+                            const q = convSearch.toLowerCase();
+                            const other = getOtherParticipantForConversation(conv);
+                            return (
+                              other?.name?.toLowerCase().includes(q) ||
+                              conv.property?.title?.toLowerCase().includes(q)
+                            );
+                          })
+                          .map((conv) => {
+                          const lastMsg = conv.lastMessage;
+                          const other = getOtherParticipantForConversation(conv);
+                          return (
+                            <div
+                              key={conv._id}
+                              onClick={() => setSelectedConversation(conv)}
+                              className={`flex gap-3 px-2 py-2 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
+                                selectedConversation?._id === conv._id
+                                  ? "bg-blue-100"
+                                  : ""
+                              }`}
+                            >
+                              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+                                {(other?.avatar || other?.profilePic) && (
+                                  <Image
+                                    src={other.avatar || other.profilePic}
+                                    alt="avatar"
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover"
+                                  />
+                                )}
+                              </div>
+      
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <p
+                                    className="font-light text-black"
+                                    style={{ fontSize: "12px" }}
+                                  >
+                                    {other?.name}
+                                  </p>
+                                  {conv.unreadCount > 0 && (
+                                    <span className="bg-blue-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                      {conv.unreadCount > 9 ? "9+" : conv.unreadCount}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs font-semibold text-black">
+                                  {conv.property?.title}
+                                </p>
+                                {conv.status && conv.status !== "active" && (
+                                  <span
+                                    className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-white capitalize ${
+                                      conv.status === "inspection" ? "bg-amber-500" :
+                                      conv.status === "accepted"   ? "bg-blue-600"  :
+                                      conv.status === "completed"  ? "bg-green-600" :
+                                      conv.status === "rejected"   ? "bg-red-500"   :
+                                                                      "bg-gray-400"
+                                    }`}
+                                    style={{ fontSize: "9px" }}
+                                  >
+                                    {conv.status}
+                                  </span>
+                                )}
+                                <p
+                                  className="font-light text-black truncate"
+                                  style={{ fontSize: "10px" }}
+                                >
+                                  {lastMsg?.content}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+      
+                    <div className="hidden md:block flex-1 p-4 bg-gray-50 overflow-y-auto">
+                      {showProfile ? (
+                        profileLoading && !profileDetails ? (
+                          <p className="p-4 text-gray-500">Loading profile...</p>
+                        ) : (
+                          <div className="p-8 border-t border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-black">
+                            {/* Avatar */}
+                            <h4 className="text-2xl font-bold mb-4 text-blue-950">
+                              <Image
+                                src={otherParticipant?.avatar || "/avatar1.jpg"}
+                                alt="avatar"
+                                width={120}
+                                height={120}
+                                className="rounded-full"
+                              />
+                            </h4>
+      
+                            {/* Name */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Name: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.name}
+                              </span>
+                            </p>
+      
+                            {/* Email */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Email: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.email}
+                              </span>
+                            </p>
+      
+                            {/* Document Type */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Document Type: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.documentType || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* ID Number */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>ID No: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.idNumber || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Document Image */}
+                            {otherParticipant?.documentImage && (
+                              <div className="mt-4">
+                                <Image
+                                  src={otherParticipant?.documentImage}
+                                  alt="Document"
+                                  width={300}
+                                  height={160}
+                                  className="rounded-md border mb-6"
+                                />
+                              </div>
+                            )}
+      
+                            <hr className="w-full my-4 border-gray-300" />
+      
+                            {/* Gender */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Gender: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.gender || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Age */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Age: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.age || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Occupation */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Occupation: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.occupation || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Marital Status */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Marital Status: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.maritalStatus || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Spouse Name & No of Children if Married */}
+                            {otherParticipant?.maritalStatus === "Married" && (
+                              <>
+                                <p className="text-xl mb-2 text-center">
+                                  <strong>Spouse Name: </strong>
+                                  <span className="font-light">
+                                    {otherParticipant?.spouseName || "N/A"}
+                                  </span>
+                                </p>
+                                <p className="text-xl mb-2 text-center">
+                                  <strong>No of Children: </strong>
+                                  <span className="font-light">
+                                    {otherParticipant?.numberOfChildren || "0"}
+                                  </span>
+                                </p>
+                              </>
+                            )}
+      
+                            {/* Religion */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Religion: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.religion || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Company Name */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Company Name: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.companyName || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Company Phone */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Company Phone: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.companyPhone || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Company Email */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Company Email: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.companyEmail || "N/A"}
+                              </span>
+                            </p>
+      
+                            {/* Current Address */}
+                            <p className="text-xl mb-2 text-center">
+                              <strong>Current Address: </strong>
+                              <span className="font-light">
+                                {otherParticipant?.currentAddress || "N/A"}
+                              </span>
+                            </p>
+      
+                            <hr className="w-full my-4 border-gray-300" />
+      
+                            {/* 2x2 Grid for City, State, Country, Zip Code */}
+                            <div className="grid grid-cols-2 gap-4 text-xl mt-2 w-full max-w-sm">
+                              <p className="text-center">
+                                <strong>City: </strong>
+                                <span className="font-light">
+                                  {otherParticipant?.city || "N/A"}
+                                </span>
+                              </p>
+                              <p className="text-center">
+                                <strong>State: </strong>
+                                <span className="font-light">
+                                  {otherParticipant?.state || "N/A"}
+                                </span>
+                              </p>
+                              <p className="text-center">
+                                <strong>Country: </strong>
+                                <span className="font-light">
+                                  {otherParticipant?.country || "N/A"}
+                                </span>
+                              </p>
+                              <p className="text-center">
+                                <strong>Zip Code: </strong>
+                                <span className="font-light">
+                                  {otherParticipant?.zipCode || "N/A"}
+                                </span>
+                              </p>
+                              <p className="text-center">
+                                <strong>State of Origin: </strong>
+                                <span className="font-light">
+                                  {otherParticipant?.stateOfOrigin || "N/A"}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      ) : selectedConversation && messages.length > 0 ? (
+                        <div className="p-4 bg-white h-full flex flex-col">
+                          <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                            <div className="flex items-center gap-3">
+                              <p className="text-blue-950 font-bold text-2xl">
+                                {selectedConversation.property?.title}
+                              </p>
+                              <button
+                                onClick={() => { setShowMsgSearch((v) => !v); setMsgSearch(""); }}
+                                className="text-sm text-blue-700 hover:text-blue-900 font-medium"
+                              >
+                                {showMsgSearch ? "Close search" : "Search messages"}
+                              </button>
+                            </div>
+      
+                            {/* Status action buttons — change based on conversation stage */}
+                            <div className="flex gap-2 flex-wrap">
+                              {selectedConversation.status === "active" && (
+                                <button
+                                  onClick={handleProceedWithInspection}
+                                  disabled={inspectionLoading}
+                                  className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-green-700 hover:bg-green-600 disabled:bg-gray-400 transition duration-200"
+                                >
+                                  {inspectionLoading ? "Processing..." : "Proceed with Inspection"}
+                                </button>
+                              )}
+      
+                              {selectedConversation.status === "inspection" && (
+                                <>
+                                  <button
+                                    onClick={() => handleStatusAction("accept", "Tenant accepted!")}
+                                    disabled={actionLoading}
+                                    className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-blue-700 hover:bg-blue-600 disabled:bg-gray-400 transition duration-200"
+                                  >
+                                    Accept Tenant
+                                  </button>
+                                  <button
+                                    onClick={() => handleStatusAction("reject", "Tenant rejected after inspection.")}
+                                    disabled={actionLoading}
+                                    className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-red-600 hover:bg-red-500 disabled:bg-gray-400 transition duration-200"
+                                  >
+                                    Reject After Inspection
+                                  </button>
+                                  <button
+                                    onClick={() => handleStatusAction("cancel", "Inspection cancelled.")}
+                                    disabled={actionLoading}
+                                    className="px-4 py-2 text-sm font-semibold text-gray-700 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 transition duration-200"
+                                  >
+                                    Cancel Inspection
+                                  </button>
+                                </>
+                              )}
+      
+                              {selectedConversation.status === "accepted" && (
+                                <button
+                                  onClick={() => handleStatusAction("complete", "Rental marked as completed!")}
+                                  disabled={actionLoading}
+                                  className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-purple-700 hover:bg-purple-600 disabled:bg-gray-400 transition duration-200"
+                                >
+                                  {actionLoading ? "Processing..." : "Mark as Completed"}
+                                </button>
+                              )}
+      
+                              {["completed", "rejected", "cancelled"].includes(selectedConversation.status) && (
+                                <span className={`px-4 py-2 text-sm font-semibold rounded-lg capitalize ${
+                                  selectedConversation.status === "completed" ? "bg-green-100 text-green-800" :
+                                  selectedConversation.status === "rejected" ? "bg-red-100 text-red-800" :
+                                  "bg-gray-100 text-gray-600"
+                                }`}>
+                                  {selectedConversation.status}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+      
+                          {showMsgSearch && (
+                            <div className="mb-2">
+                              <input
+                                type="text"
+                                value={msgSearch}
+                                onChange={(e) => setMsgSearch(e.target.value)}
+                                placeholder="Search messages..."
+                                className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+                                autoFocus
+                              />
+                            </div>
+                          )}
+      
+                          <div className="relative flex-1 min-h-0">
+                          <div
+                            ref={messagesContainerRef}
+                            className="h-full overflow-y-auto mb-4 space-y-4"
+                            onScroll={(e) => {
+                              const el = e.currentTarget;
+                              const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+                              setIsScrolledUp(distanceFromBottom > 100);
+                            }}
+                          >
+                            {(() => {
+                              // Track the _id of the last self-sent message (works with filtered lists too)
+                              let lastSelfId = null;
+                              messages.forEach((msg) => {
+                                const sid = msg?.sender && typeof msg.sender === "object"
+                                  ? msg.sender._id || msg.sender.id
+                                  : msg.sender;
+                                if (normalizeId(sid) !== normalizeId(otherParticipant?._id)) {
+                                  lastSelfId = msg._id;
+                                }
+                              });
+      
+                              const displayMessages = msgSearch.trim()
+                                ? messages.filter((m) => m.content?.toLowerCase().includes(msgSearch.toLowerCase()))
+                                : messages;
+      
+                              return displayMessages.map((msg) => {
+                                const senderId =
+                                  msg?.sender && typeof msg.sender === "object"
+                                    ? msg.sender._id || msg.sender.id
+                                    : msg.sender;
+                                const fromOther =
+                                  normalizeId(senderId) ===
+                                  normalizeId(otherParticipant?._id);
+      
+                                return (
+                                  <div key={msg._id}>
+                                    <div
+                                      className={`p-3 rounded-lg ${
+                                        fromOther
+                                          ? "bg-gray-200 text-left"
+                                          : "bg-blue-200 text-right ml-auto"
+                                      } max-w-xs`}
+                                    >
+                                      <p className="font-semibold text-sm">
+                                        {fromOther ? otherParticipant?.name : "You"}
+                                      </p>
+                                      {msg.fileUrl && msg.fileType?.startsWith("image/") && (
+                                        <Image
+                                          src={msg.fileUrl}
+                                          alt="attachment"
+                                          width={200}
+                                          height={150}
+                                          className="rounded mt-1 mb-1 object-cover"
+                                        />
+                                      )}
+                                      {msg.fileUrl && msg.fileType === "application/pdf" && (
+                                        <a
+                                          href={msg.fileUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-1 text-blue-700 underline text-xs mt-1 mb-1"
+                                        >
+                                          📄 View Document
+                                        </a>
+                                      )}
+                                      {msg.content && <p className="text-sm">{msg.content}</p>}
+                                      <p className="text-xs text-gray-600 mt-1">
+                                        {new Date(msg.createdAt).toLocaleTimeString()}
+                                      </p>
+                                    </div>
+                                    {!fromOther && readByOther && msg._id === lastSelfId && (
+                                      <p className="text-xs text-right text-gray-400 mr-1 mt-0.5">Seen ✓</p>
+                                    )}
+                                  </div>
+                                );
+                              });
+                            })()}
+                            <div ref={messagesEndRef} />
+                          </div>
+      
+                          {isScrolledUp && (
+                            <button
+                              onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })}
+                              className="absolute bottom-2 right-3 bg-blue-700 text-white rounded-full w-9 h-9 flex items-center justify-center shadow-md hover:bg-blue-600 transition"
+                              title="Jump to latest message"
+                            >
+                              ↓
+                            </button>
+                          )}
+                          </div>
+      
+                          <div className="flex flex-col gap-1">
+                            {connectionStatus === "reconnecting" && (
+                              <p className="text-xs text-center text-amber-600 bg-amber-50 rounded px-2 py-1">Reconnecting...</p>
+                            )}
+                            {isOtherTyping && (
+                              <p className="text-xs text-gray-500 italic px-1">Typing...</p>
+                            )}
+                            {selectedFile && (
+                              <div className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs text-gray-600">
+                                <span>📎 {selectedFile.name}</span>
+                                <button onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-red-500 hover:text-red-700 font-bold">✕</button>
+                              </div>
+                            )}
+                            <div className="flex gap-2">
+                              <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,application/pdf"
+                                className="hidden"
+                                onChange={handleFileSelect}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 text-gray-500 text-sm"
+                                title="Attach file"
+                              >
+                                📎
+                              </button>
+                              <input
+                                type="text"
+                                value={replyText}
+                                onChange={(e) => { setReplyText(e.target.value); handleTyping(); }}
+                                onKeyPress={(e) => {
+                                  if (e.key === "Enter" && !replyLoading) {
+                                    handleSendReply();
+                                  }
+                                }}
+                                placeholder="Type a message..."
+                                maxLength={1000}
+                                className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                              />
+                              <button
+                                onClick={handleSendReply}
+                                disabled={replyLoading || replyText.length > 1000}
+                                className="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                              >
+                                {replyLoading ? "Sending..." : "Send"}
+                              </button>
+                            </div>
+                            <p className={`text-xs text-right ${replyText.length >= 1000 ? "text-red-500" : "text-gray-400"}`}>
+                              {replyText.length}/1000
+                            </p>
+                          </div>
+                        </div>
+                      ) : selectedConversation ? (
+                        <p className="text-gray-400 text-center mt-10">
+                          No messages in this conversation
+                        </p>
+                      ) : (
+                        <p className="text-gray-400 text-center mt-10">
+                          Select a conversation to view messages
+                        </p>
+                      )}
+                    </div>
+                  </div>
+      
+                  <TenantDashboardFooter />
+                  <ToastContainer />
+                  {/* ComposeModal — restored for owner review, not yet wired to send */}
+                  {openCompose && (
+                    <ComposeModal
+                      onClose={() => setOpenCompose(false)}
                     />
                   )}
                 </div>
               </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowProfile((prev) => !prev)}
-                  className="bg-blue-800 text-white px-6 py-2 hover:bg-blue-700"
-                >
-                  {showProfile ? "Back" : "Show Profile"}
-                </button>
-
-                <div className="border-2 border-blue-700 rounded-md w-10 h-10 flex items-center justify-center text-blue-700">
-                  <FontAwesomeIcon icon={faFlag} />
-                </div>
-              </div>
             </div>
-
-            <div className="flex flex-1">
-              <div className="w-full md:w-1/3 bg-white border-gray-200 border-4 overflow-y-auto">
-                <div className="p-2 border-b border-gray-100">
-                  <input
-                    type="text"
-                    value={convSearch}
-                    onChange={(e) => setConvSearch(e.target.value)}
-                    placeholder="Search conversations..."
-                    className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
-                  />
-                </div>
-                {loading ? (
-                  <p className="p-4 text-gray-500">Loading conversations...</p>
-                ) : conversations.length === 0 ? (
-                  <p className="p-4 text-gray-500">No conversations</p>
-                ) : (
-                  conversations
-                    .filter((conv) => {
-                      if (!convSearch.trim()) return true;
-                      const q = convSearch.toLowerCase();
-                      const other = getOtherParticipantForConversation(conv);
-                      return (
-                        other?.name?.toLowerCase().includes(q) ||
-                        conv.property?.title?.toLowerCase().includes(q)
-                      );
-                    })
-                    .map((conv) => {
-                    const lastMsg = conv.lastMessage;
-                    const other = getOtherParticipantForConversation(conv);
-                    return (
-                      <div
-                        key={conv._id}
-                        onClick={() => setSelectedConversation(conv)}
-                        className={`flex gap-3 px-2 py-2 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
-                          selectedConversation?._id === conv._id
-                            ? "bg-blue-100"
-                            : ""
-                        }`}
-                      >
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                          {(profileDetails?.previewPic || profileDetails?.avatar) && (
-                            <Image
-                              src={profileDetails.previewPic || profileDetails.avatar}
-                              alt="avatar"
-                              width={48}
-                              height={48}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <p
-                              className="font-light text-black"
-                              style={{ fontSize: "12px" }}
-                            >
-                              {other?.name}
-                            </p>
-                            {conv.unreadCount > 0 && (
-                              <span className="bg-blue-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                                {conv.unreadCount > 9 ? "9+" : conv.unreadCount}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs font-semibold text-black">
-                            {conv.property?.title}
-                          </p>
-                          {conv.status && conv.status !== "active" && (
-                            <span
-                              className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-white capitalize ${
-                                conv.status === "inspection" ? "bg-amber-500" :
-                                conv.status === "accepted"   ? "bg-blue-600"  :
-                                conv.status === "completed"  ? "bg-green-600" :
-                                conv.status === "rejected"   ? "bg-red-500"   :
-                                                               "bg-gray-400"
-                              }`}
-                              style={{ fontSize: "9px" }}
-                            >
-                              {conv.status}
-                            </span>
-                          )}
-                          <p
-                            className="font-light text-black truncate"
-                            style={{ fontSize: "10px" }}
-                          >
-                            {lastMsg?.content}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              <div className="hidden md:block flex-1 p-4 bg-gray-50 overflow-y-auto">
-                {showProfile ? (
-                  profileLoading && !profileDetails ? (
-                    <p className="p-4 text-gray-500">Loading profile...</p>
-                  ) : (
-                    <div className="p-8 border-t border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-black">
-                      {/* Avatar */}
-                      <h4 className="text-2xl font-bold mb-4 text-blue-950">
-                        <Image
-                          src={otherParticipant?.previewPic || "/avatar1.jpg"}
-                          alt="avatar"
-                          width={120}
-                          height={120}
-                          className="rounded-full"
-                        />
-                      </h4>
-
-                      {/* Name */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Name: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.name}
-                        </span>
-                      </p>
-
-                      {/* Email */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Email: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.email}
-                        </span>
-                      </p>
-
-                      {/* Document Type */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Document Type: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.documentType || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* ID Number */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>ID No: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.idNumber || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Document Image */}
-                      {otherParticipant?.documentImage && (
-                        <div className="mt-4">
-                          <Image
-                            src={otherParticipant?.documentImage}
-                            alt="Document"
-                            width={300}
-                            height={160}
-                            className="rounded-md border mb-6"
-                          />
-                        </div>
-                      )}
-
-                      <hr className="w-full my-4 border-gray-300" />
-
-                      {/* Gender */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Gender: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.gender || "N/A"}
-                        </span>
-                      </p>
-
-                      {/* Age */}
-                      <p className="text-xl mb-2 text-center">
-                        <strong>Age: </strong>
-                        <span className="font-light">
-                          {otherParticipant?.age || "N/A"}
-                        </span>
-                      </p>
-
-                      
-
-                      <hr className="w-full my-4 border-gray-300" />
-
-                      {/* 2x2 Grid for City, State, Country, Zip Code */}
-                      <div className="grid grid-cols-2 gap-4 text-xl mt-2 w-full max-w-sm">
-                        <p className="text-center">
-                          <strong>City: </strong>
-                          <span className="font-light">
-                            {otherParticipant?.city || "N/A"}
-                          </span>
-                        </p>
-                        <p className="text-center">
-                          <strong>State: </strong>
-                          <span className="font-light">
-                            {otherParticipant?.state || "N/A"}
-                          </span>
-                        </p>
-                        <p className="text-center">
-                          <strong>Country: </strong>
-                          <span className="font-light">
-                            {otherParticipant?.country || "N/A"}
-                          </span>
-                        </p>
-                        <p className="text-center">
-                          <strong>Zip Code: </strong>
-                          <span className="font-light">
-                            {otherParticipant?.zipCode || "N/A"}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  )
-                ) : selectedConversation && messages.length > 0 ? (
-                  <div className="p-4 bg-white h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                      <div className="flex items-center gap-3">
-                        <p className="text-blue-950 font-bold text-2xl">
-                          {selectedConversation.property?.title}
-                        </p>
-                        <button
-                          onClick={() => { setShowMsgSearch((v) => !v); setMsgSearch(""); }}
-                          className="text-sm text-blue-700 hover:text-blue-900 font-medium"
-                        >
-                          {showMsgSearch ? "Close search" : "Search messages"}
-                        </button>
-                      </div>
-
-                      {/* Tenant-side status actions */}
-                      <div className="flex gap-2 flex-wrap">
-                        {selectedConversation.status === "inspection" && (
-                          <>
-                            <button
-                              onClick={() => handleStatusAction("cancel", "Inspection cancelled.")}
-                              disabled={actionLoading}
-                              className="px-4 py-2 text-sm font-semibold text-gray-700 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 transition duration-200"
-                            >
-                              Cancel Inspection
-                            </button>
-                            <button
-                              onClick={() => handleStatusAction("reject", "Property rejected after inspection.")}
-                              disabled={actionLoading}
-                              className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-red-600 hover:bg-red-500 disabled:bg-gray-400 transition duration-200"
-                            >
-                              Reject Property
-                            </button>
-                          </>
-                        )}
-
-                        {selectedConversation.status !== "active" && selectedConversation.status !== "inspection" && (
-                          <span className={`px-4 py-2 text-sm font-semibold rounded-lg capitalize ${
-                            selectedConversation.status === "completed" ? "bg-green-100 text-green-800" :
-                            selectedConversation.status === "accepted" ? "bg-blue-100 text-blue-800" :
-                            selectedConversation.status === "rejected" ? "bg-red-100 text-red-800" :
-                            "bg-gray-100 text-gray-600"
-                          }`}>
-                            {selectedConversation.status}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {showMsgSearch && (
-                      <div className="mb-2">
-                        <input
-                          type="text"
-                          value={msgSearch}
-                          onChange={(e) => setMsgSearch(e.target.value)}
-                          placeholder="Search messages..."
-                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
-                          autoFocus
-                        />
-                      </div>
-                    )}
-
-                    <div className="relative flex-1 min-h-0">
-                    <div
-                      ref={messagesContainerRef}
-                      className="h-full overflow-y-auto mb-4 space-y-4"
-                      onScroll={(e) => {
-                        const el = e.currentTarget;
-                        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-                        setIsScrolledUp(distanceFromBottom > 100);
-                      }}
-                    >
-                      {(() => {
-                        // Track the _id of the last self-sent message (works with filtered lists too)
-                        let lastSelfId = null;
-                        messages.forEach((msg) => {
-                          const sid = msg?.sender && typeof msg.sender === "object"
-                            ? msg.sender._id || msg.sender.id
-                            : msg.sender;
-                          if (normalizeId(sid) !== normalizeId(otherParticipant?._id)) {
-                            lastSelfId = msg._id;
-                          }
-                        });
-
-                        const displayMessages = msgSearch.trim()
-                          ? messages.filter((m) => m.content?.toLowerCase().includes(msgSearch.toLowerCase()))
-                          : messages;
-
-                        return displayMessages.map((msg) => {
-                          const senderId =
-                            msg?.sender && typeof msg.sender === "object"
-                              ? msg.sender._id || msg.sender.id
-                              : msg.sender;
-                          const fromOther =
-                            normalizeId(senderId) ===
-                            normalizeId(otherParticipant?._id);
-
-                          return (
-                            <div key={msg._id}>
-                              <div
-                                className={`p-3 rounded-lg ${
-                                  fromOther
-                                    ? "bg-gray-200 text-left"
-                                    : "bg-blue-200 text-right ml-auto"
-                                } max-w-xs`}
-                              >
-                                <p className="font-semibold text-sm">
-                                  {fromOther ? otherParticipant?.name : "You"}
-                                </p>
-                                {msg.fileUrl && msg.fileType?.startsWith("image/") && (
-                                  <Image
-                                    src={msg.fileUrl}
-                                    alt="attachment"
-                                    width={200}
-                                    height={150}
-                                    className="rounded mt-1 mb-1 object-cover"
-                                  />
-                                )}
-                                {msg.fileUrl && msg.fileType === "application/pdf" && (
-                                  <a
-                                    href={msg.fileUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-1 text-blue-700 underline text-xs mt-1 mb-1"
-                                  >
-                                    📄 View Document
-                                  </a>
-                                )}
-                                {msg.content && <p className="text-sm">{msg.content}</p>}
-                                <p className="text-xs text-gray-600 mt-1">
-                                  {new Date(msg.createdAt).toLocaleTimeString()}
-                                </p>
-                              </div>
-                              {!fromOther && readByOther && msg._id === lastSelfId && (
-                                <p className="text-xs text-right text-gray-400 mr-1 mt-0.5">Seen ✓</p>
-                              )}
-                            </div>
-                          );
-                        });
-                      })()}
-                      <div ref={messagesEndRef} />
-                    </div>
-
-                    {isScrolledUp && (
-                      <button
-                        onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })}
-                        className="absolute bottom-2 right-3 bg-blue-700 text-white rounded-full w-9 h-9 flex items-center justify-center shadow-md hover:bg-blue-600 transition"
-                        title="Jump to latest message"
-                      >
-                        ↓
-                      </button>
-                    )}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                      {connectionStatus === "reconnecting" && (
-                        <p className="text-xs text-center text-amber-600 bg-amber-50 rounded px-2 py-1">Reconnecting...</p>
-                      )}
-                      {isOtherTyping && (
-                        <p className="text-xs text-gray-500 italic px-1">Typing...</p>
-                      )}
-                      {selectedFile && (
-                        <div className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs text-gray-600">
-                          <span>📎 {selectedFile.name}</span>
-                          <button onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-red-500 hover:text-red-700 font-bold">✕</button>
-                        </div>
-                      )}
-                      <div className="flex gap-2">
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp,application/pdf"
-                          className="hidden"
-                          onChange={handleFileSelect}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 text-gray-500 text-sm"
-                          title="Attach file"
-                        >
-                          📎
-                        </button>
-                        <input
-                          type="text"
-                          value={replyText}
-                          onChange={(e) => { setReplyText(e.target.value); handleTyping(); }}
-                          onKeyPress={(e) => {
-                            if (e.key === "Enter" && !replyLoading) {
-                              handleSendReply();
-                            }
-                          }}
-                          placeholder="Type a message..."
-                          maxLength={1000}
-                          className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        />
-                        <button
-                          onClick={handleSendReply}
-                          disabled={replyLoading || replyText.length > 1000}
-                          className="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-                        >
-                          {replyLoading ? "Sending..." : "Send"}
-                        </button>
-                      </div>
-                      <p className={`text-xs text-right ${replyText.length >= 1000 ? "text-red-500" : "text-gray-400"}`}>
-                        {replyText.length}/1000
-                      </p>
-                    </div>
-                  </div>
-                ) : selectedConversation ? (
-                  <p className="text-gray-400 text-center mt-10">
-                    No messages in this conversation
-                  </p>
-                ) : (
-                  <p className="text-gray-400 text-center mt-10">
-                    Select a conversation to view messages
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <TenantDashboardFooter />
-            <ToastContainer />
-            {/* ComposeModal — restored for owner review, not yet wired to send */}
-            {openCompose && (
-              <ComposeModal
-                onClose={() => setOpenCompose(false)}
-              />
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

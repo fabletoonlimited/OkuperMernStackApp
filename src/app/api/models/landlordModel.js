@@ -40,7 +40,9 @@ const landlordSchema = new mongoose.Schema(
     payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
     disputes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Dispute"}],
     homeInterests: [{ type: mongoose.Schema.Types.ObjectId, ref: "HomeInterest"}],
-    subscription: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}]
+    subscription: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subscription"}],
+    landlordAccountDetails: {type: mongoose.Schema.Types.ObjectId,ref: "LandlordAccountDetails"},
+    
     
   }, { timestamps: true }
 );

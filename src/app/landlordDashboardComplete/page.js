@@ -18,6 +18,7 @@ const page = () => {
     const [homeInterests, setHomeInterests] = useState([]);
     const [homeInterestCount, setHomeInterestCount] = useState(0);
     const [landlord, setLandlord] = useState(null);
+    const [landlordKyc, setLandlordKyc] = useState(null);
     const [landlordProfile, setLandlordProfile] = useState(null)
     const [tenant, setIsTenant] = useState(null);
     const [tenantProfile, setTenantProfile] = useState(null)
@@ -26,10 +27,58 @@ const page = () => {
     const [income, setIncome] = useState([]);
     const [incomeCount, setIncomeCount] = useState(0);
 
+    //Fetch Tenant
+    useEffect(() => {
+        const fetchLandlord = async () => {
+            try {
+              const res = await fetch("/api/landlord", {
+                method: "GET",
+                credentials: "include",
+              });
+    
+              if (!res.ok) {
+                console.error("Failed to fetch landlord");
+                return;
+              }
+    
+              const landlord = await res.json();
+              setLandlord(landlord);
+            } catch (err) {
+              console.error("Tenant fetch error:", err);
+            }
+        };
+    
+            fetchLandlord();
+        }, []);
+
+       //landlord KYC
+        useEffect(() => {
+          const fetchKyc = async () => {
+          try {
+            const kycRes = await fetch("/api/landlordKyc", {
+              method: "GET",
+              credentials: "include"
+            });
+    
+            if (!kycRes) {
+              toast.error("Failed to fetch landlord KYC");
+              return;
+            }
+            const kycData = await kycRes.json();
+            if (kycData) {
+              setLandlordKyc(kycData);
+            }
+          }
+          catch (err) {
+            toast.error("KYC fetch error:", err);
+          }
+          fetchKyc();
+        }}, []);
+    
     useEffect(() => {
     if (!landlord?._id) return;
 
-    const fetchProperties = async () => {
+    const fetchProperties = async () => {        
         try {
             const res = await fetch(
                 `/api/property?landlordId=${landlord._id}`,
@@ -43,15 +92,10 @@ const page = () => {
             const data = await res.json();
 
             if (!res.ok) {
-                console.error("Property fetch failed:", data);
                 setProperties([]);
                 setPropertyCount(0);
                 return;
             }
-
-            console.log("LOGGED-IN LANDLORD:", landlord._id);
-            console.log("LANDLORD PROPERTIES:", data);
-
             const list = Array.isArray(data)
                 ? data
                 : Array.isArray(data?.properties)
@@ -61,8 +105,7 @@ const page = () => {
             setProperties(list);
             setPropertyCount(list.length);
 
-        } catch (error) {
-            console.error("Property fetch error:", error);
+        } catch {
             setProperties([]);
             setPropertyCount(0);
         }
@@ -150,73 +193,6 @@ const page = () => {
         fetchTenantProfile();
     }, []);
 
-    useEffect(() => {
-    const fetchMyProperties = async () => {
-        try {
-            // First get the logged-in landlord
-            const landlordRes = await fetch("/api/landlord", {
-                method: "GET",
-                credentials: "include",
-                cache: "no-store",
-            });
-
-            if (!landlordRes.ok) {
-                console.error("Failed to fetch landlord");
-                setProperties([]);
-                setPropertyCount(0);
-                return;
-            }
-
-            const landlordData = await landlordRes.json();
-
-            console.log("LOGGED IN LANDLORD:", landlordData);
-            console.log("LANDLORD ID:", landlordData._id);
-
-            if (!landlordData?._id) {
-                console.error("No landlord ID found");
-                setProperties([]);
-                setPropertyCount(0);
-                return;
-            }
-
-            // Now fetch ONLY this landlord's properties
-            const propertyRes = await fetch(
-                `/api/property?landlordId=${landlordData._id}`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                    cache: "no-store",
-                }
-            );
-
-            const propertyData = await propertyRes.json();
-
-            console.log("MY LANDLORD PROPERTY RESPONSE:", propertyData);
-
-            if (!propertyRes.ok) {
-                setProperties([]);
-                setPropertyCount(0);
-                return;
-            }
-
-            const list = Array.isArray(propertyData)
-                ? propertyData
-                : propertyData?.properties || [];
-
-            setProperties(list);
-            setPropertyCount(list.length);
-
-            console.log("PROPERTY COUNT:", list.length);
-
-        } catch (error) {
-            console.error("PROPERTY FETCH ERROR:", error);
-            setProperties([]);
-            setPropertyCount(0);
-        }
-    };
-
-    fetchMyProperties();
-}, []);
 
     useEffect(() => {
         const fetchDispute = async () => {
@@ -253,38 +229,33 @@ const page = () => {
         fetchDispute();
     }, []);
 
-    useEffect(() => {
-        const fetchIncome = async () => {
-            try {
-                const res = await fetch("/api/payment", {
+    
+useEffect(() => {
+    const fetchIncome = async () => {
+        try {
+            const res = await fetch("/api/payment/xPress", {
                 method: "GET",
                 credentials: "include",
-                cache: "no-store"
-                });
+                cache: "no-store",
+            });
 
-                const data = await res.json();
-            
-                if (!res.ok) {
-                    console.log("Payment fetch failed:", data);
-                    setIncome([]);
-                    setIncomeCount(0);
-                    return;
-                }
-                console.log("PAYMENTS:", data);
+            const data = await res.json();
 
-                const list = Array.isArray(data)
+            if (!res.ok) {
+                setIncome([]);
+                setIncomeCount(0);
+                return;
+            }
+
+            const list = Array.isArray(data)
                 ? data
                 : Array.isArray(data?.payments)
                 ? data.payments
                 : [];
 
-                setIncome(list);
-                setIncomeCount(list.length);
-
-            console.log("INCOME COUNT:", list.length);
-
-        } catch (err) {
-            console.error("Payment fetch error:", err);
+            setIncome(list);
+            setIncomeCount(list.length);
+        } catch {
             setIncome([]);
             setIncomeCount(0);
         }
@@ -292,6 +263,7 @@ const page = () => {
 
     fetchIncome();
 }, []);
+
 
 useEffect(() => {
     const fetchHomeInterests = async () => {
@@ -339,7 +311,7 @@ useEffect(() => {
                 <div className=" flex-1 p-6 mt-5">
                         
                     {/* Header */}
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex justify-between items-center mb-8 bg-linear-to-r from-blue-900 to-blue-700 p-7">
                         <div>
                             <p className="text-sm text-blue-950">
                                 {new Date().toLocaleDateString()}
@@ -489,19 +461,22 @@ useEffect(() => {
 
                     {/* Listings */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 w-full pb-10">
-                        <h2 className="text-xl font-semibold mb-4 col-span-full">
+                        <h2 className="text-xl font-semibold col-span-full">
                             My Property Listings
                         </h2>
+                        <p className="text-red-500 col-span-full text-left -mt-5">
+                        Kindly note that if you don't upload your utility bill. Your property will not be visible to potential tenants on the platform.</p>
 
                         {properties.length === 0 ? (
                         <p className="text-gray-500 col-span-full text-center py-10">
-                            You currently have no property listings. Future Property Listings goes here
+                            You currently have no property listings. Future Property Listings goes here. 
                         </p>
                         ) : (
                         properties.map((property) => (
                             <PropertyCard
                             key={property._id}
                             {...property}
+                            landlordId={landlord._id}
                             />
                         )))}
                     </div>

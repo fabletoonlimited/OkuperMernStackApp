@@ -45,7 +45,6 @@ const paymentSchema = new mongoose.Schema(
         type: Number,
         default: 0,
     },
-
     splitPaymentReference: {
         type: String,
         default: null,

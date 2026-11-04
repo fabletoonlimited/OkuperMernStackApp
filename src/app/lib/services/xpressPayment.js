@@ -30,9 +30,16 @@ export const initializePayment = async ({
   const normalizedEmail = email.trim().toLowerCase();
 
   //Calculate total amount for Xpress
-  const serviceCharge = amount * 0.03;
+  const okuperServiceCharge = amount * 0.03
+  const serviceCharge = amount * 0.1;
   const legalFee = amount * 0.07;
-  const finalPaidAmount = amount + legalFee + serviceCharge;
+  let finalPaidAmount;
+  
+  if (!serviceCharge) {
+    finalPaidAmount = amount + legalFee + okuperServiceCharge;
+  } else {
+    finalPaidAmount = amount + legalFee + serviceCharge + okuperServiceCharge;
+  }
 
   // Initialize payment with Xpress
   const response = await fetch(
@@ -53,7 +60,8 @@ export const initializePayment = async ({
     }
   );
 
-  if (!response.ok) {throw new Error("Payment initialization failed")}
+  if (!response.ok) 
+    {throw new Error("Payment initialization failed")}
 
   const result = await response.json();
   if (!result.status) {
@@ -125,6 +133,5 @@ export const verifyPayment = async (reference) => {
     },
     { new: true }
   )};
-
   return result;
 };

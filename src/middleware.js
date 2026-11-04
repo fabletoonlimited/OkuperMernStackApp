@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
@@ -5,13 +6,12 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
-
   const token = req.cookies.get("token")?.value;
 
   let user = null;
 
-  // 🔐 Verify token
-  if (token) {
+  // Verify the authentication token
+  if (token && process.env.JWT_SECRET) {
     try {
       const { payload } = await jwtVerify(token, JWT_SECRET);
       user = payload;
@@ -21,6 +21,7 @@ export async function middleware(req) {
   }
 
   const isAuthenticated = !!user;
+  const role = user?.role;
 
   const SIGNUP_ROUTES = [
     "/signUpLanding",
@@ -37,16 +38,6 @@ export async function middleware(req) {
     superAdmin: "/dashboardSuperAdmin",
   };
 
-  // 🚫 Block signup pages ONLY for authenticated users
-  if (SIGNUP_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
-    if (isAuthenticated) {
-      const redirectTo = DASHBOARD_REDIRECT[user.role] || "/";
-      return NextResponse.redirect(new URL(redirectTo, req.url));
-    }
-
-    return NextResponse.next();
-  }
-
   const PUBLIC_ROUTES = [
     "/signInAdmin",
     "/signInAgent",
@@ -59,7 +50,7 @@ export async function middleware(req) {
     "/policy",
     "/privacy",
     "/rent",
-    "/sell",
+    "/buy",
     "/shortlets",
     "/terms",
     "/xStories",
@@ -70,40 +61,25 @@ export async function middleware(req) {
     "/propertyCardExpanded",
     "/report",
     "/favorites",
-];
+  ];
 
   const PUBLIC_API_ROUTES = [
     "/api/script",
     "/api/send-email",
-
     "/api/user",
-
     "/api/landlord",
     "/api/loginLandlord",
-
     "/api/tenant",
     "/api/loginTenant",
-
-    // "/api/admin",
     "/api/loginAdmin",
-
-    // "/api/agent",
     "/api/loginAgent",
-
-    // "/api/support",
     "/api/loginSupport",
-
-    // "/api/superAdmin",
     "/api/loginSuperAdmin",
-
     "/api/otp",
-    
     "/api/auth/reset-password",
     "/api/landlordKyc",
-    
     "/api/rent",
-
-    "/api/sell",
+    "/api/buy",
     "/api/shortlets",
     "/api/report",
     "/api/policy",
@@ -113,47 +89,10 @@ export async function middleware(req) {
     "/api/privacy",
     "/api/xStories",
     "/api/property",
-
     "/api/auth/logout",
-    "/api/auth/reset-password",
-  ];
-
-  const PROTECTED_ROUTES = [
-    "/landlordDashboard",
-    "/landlordDashboardCompleted",
-    "/landlordDashboardInbox",
-    "/landlord/properties",
-    "/landlord/messages",
-    "/landlordAddressVerification",
-    "/landlordSubscription",
-    "/landlord/profile",
-    "/landlord/disputes",
-    "/landlord/subscription",
-    "/landlord/payment",
-    "/tenantDashboard",
-    "/tenantDashboardCompleted",
-    "/landlordAccountForm",
-    "/tenantDashboardInbox",
-    "/tenant/properties",
-    "/tenant/messages",
-    "/tenantAddressVerification",
-    "/tenant/profile",
-    "/tenant/disputes",
-    "/tenant/payment",
-    "/utilityBillUploadPage",
-    "/propertyRequestForm",
-    "/propertyListingLanding",
-    "/propertyListingUploadForm",
-    "/savedHomes",
-    "/admin/users",
-    "/auth/me",
-    "/settings",
-    "/tenantDisputeForm",
-    "/verification",
   ];
 
   const PROTECTED_API_ROUTES = [
-    // "/api/profile",
     "/api/landlordAddressVerification",
     "/api/landlordSubscription",
     "/api/message",
@@ -164,141 +103,133 @@ export async function middleware(req) {
     "/api/propertyListingUploadForm",
     "/api/savedHomes",
     "/api/admin/users",
-    "/api/propertyCardExpanded",
     "/api/auth/me",
     "/api/settings",
     "/api/tenantDisputeForm",
     "/api/verification",
     "/api/disputes",
-    "/api/verification",
-    "/api/payment/Xpress",
+    "/api/payment/xPress",
     "/api/uploads/utilityBill",
     "/api/subscription",
     "/api/referral",
     "/api/analytics",
     "/api/notifications",
-    "/api/propertyListingLanding",
-    "/api/propertyListingUploadForm",
     "/api/landlordAccountForm",
-    "/api/favorites"
-
-    // "/api/tenantDashboard",
-    // "/api/tenantDashboardCompleted",
-    // "/api/tenantDashboardInbox",
-    // "/api/tenant/properties",
-    // "/api/tenant/messages",
-    // "/api/tenant/profile",
-    // "/api/landlordDashboard",
-    // "/api/landlordDashboardCompleted",
-    // "/api/landlordDashboardInbox",
-    // "/api/landlord/properties",
-    // "/api/landlord/messages",
+    "/api/favorites",
   ];
 
-  // ======================
-  // 🌍 Always public pages
-  // ======================
+  // Prevent authenticated users from returning to signup pages.
   if (
-      ALWAYS_PUBLIC_ROUTES.some(
-          route =>
-              pathname === route ||
-              pathname.startsWith(`${route}/`)
-      )
+    SIGNUP_ROUTES.some(
+      (route) =>
+        pathname === route || pathname.startsWith(`${route}/`)
+    )
   ) {
-      return NextResponse.next();
-  }
-
-  // ======================
-  // ✅ Allow public APIs
-  // ======================
-if (
-  PUBLIC_API_ROUTES.some(
-    route => pathname === route || pathname.startsWith(`${route}/`)
-  )
-) {
-  return NextResponse.next();
-}
-
-  // ======================
-  // 🔒 Protect API routes first
-  // ======================
-if (
-  PROTECTED_API_ROUTES.some(
-    route => pathname === route || pathname.startsWith(`${route}/`)
-  )
-) {
-  if (!isAuthenticated) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-}
-
-  // ======================
-  // ✅ Allow public pages
-  // ======================
-  if (PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
     if (isAuthenticated) {
-      if (user.role === "landlord") {
-        return NextResponse.redirect(new URL("/landlordDashboard", req.url));
-      }
-      if (user.role === "tenant") {
-        return NextResponse.redirect(new URL("/tenantDashboard", req.url));
-      }
-      if (user.role === "admin") {
-        return NextResponse.redirect(new URL("/dashboardAdmin", req.url));
-      }
-      if (user.role === "superAdmin") {
-        return NextResponse.redirect(new URL("/dashboardSuperAdmin", req.url));
-      }
-      if (user.role === "agent") {
-        return NextResponse.redirect(new URL("/agentDashboard", req.url));
-      }
-      if (user.role === "support") {
-        return NextResponse.redirect(new URL("/supportDashboard", req.url));
-      }
+      const redirectTo = DASHBOARD_REDIRECT[role] || "/";
+      return NextResponse.redirect(new URL(redirectTo, req.url));
     }
 
     return NextResponse.next();
   }
 
-  // ======================
-  // 🔒 Protect dashboards
-  // ======================
+  // Public pages that must remain accessible to everyone.
+  if (
+    ALWAYS_PUBLIC_ROUTES.some(
+      (route) =>
+        pathname === route || pathname.startsWith(`${route}/`)
+    )
+  ) {
+    return NextResponse.next();
+  }
+
+  // Public API routes.
+  if (
+    PUBLIC_API_ROUTES.some(
+      (route) =>
+        pathname === route || pathname.startsWith(`${route}/`)
+    )
+  ) {
+    return NextResponse.next();
+  }
+
+  // Protected API routes.
+  if (
+    PROTECTED_API_ROUTES.some(
+      (route) =>
+        pathname === route || pathname.startsWith(`${route}/`)
+    )
+  ) {
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+  }
+
+  // Public pages stay accessible even when the user is signed in.
+  // In particular, do not redirect /rent, /buy, or /shortlets.
+  if (
+    PUBLIC_ROUTES.some(
+      (route) =>
+        pathname === route || pathname.startsWith(`${route}/`)
+    )
+  ) {
+    return NextResponse.next();
+  }
+
+  // Protect landlord dashboard pages.
   if (pathname.startsWith("/landlordDashboard")) {
-    if (!isAuthenticated || user.role !== "landlord") {
-      return NextResponse.redirect(new URL("/signInLandlord", req.url));
+    if (!isAuthenticated || role !== "landlord") {
+      return NextResponse.redirect(
+        new URL("/signInLandlord", req.url)
+      );
     }
   }
 
+  // Protect tenant dashboard pages.
   if (pathname.startsWith("/tenantDashboard")) {
-    if (!isAuthenticated || user.role !== "tenant") {
-      return NextResponse.redirect(new URL("/signInTenant", req.url));
+    if (!isAuthenticated || role !== "tenant") {
+      return NextResponse.redirect(
+        new URL("/signInTenant", req.url)
+      );
     }
   }
 
+  // Protect admin dashboard pages.
   if (pathname.startsWith("/dashboardAdmin")) {
-    if (!isAuthenticated || user.role !== "admin") {
-      return NextResponse.redirect(new URL("/signInAdmin", req.url));
+    if (!isAuthenticated || role !== "admin") {
+      return NextResponse.redirect(
+        new URL("/signInAdmin", req.url)
+      );
     }
   }
 
+  // Protect super-admin dashboard pages.
   if (pathname.startsWith("/dashboardSuperAdmin")) {
-    if (!isAuthenticated || user.role !== "superAdmin") {
-      return NextResponse.redirect(new URL("/signInSuperAdmin", req.url));
+    if (!isAuthenticated || role !== "superAdmin") {
+      return NextResponse.redirect(
+        new URL("/signInSuperAdmin", req.url)
+      );
     }
   }
 
-    if (pathname.startsWith("/agentDashboard")) { 
-    if (!isAuthenticated || user.role !== "agent") {
-      return NextResponse.redirect(new URL("/signInAgent", req.url));
+  // Protect agent dashboard pages.
+  if (pathname.startsWith("/agentDashboard")) {
+    if (!isAuthenticated || role !== "agent") {
+      return NextResponse.redirect(
+        new URL("/signInAgent", req.url)
+      );
     }
   }
 
-    if (pathname.startsWith("/supportDashboard")) {
-    if (!isAuthenticated || user.role !== "support") {
-      return NextResponse.redirect(new URL("/signInSupport", req.url));
+  // Protect support dashboard pages.
+  if (pathname.startsWith("/supportDashboard")) {
+    if (!isAuthenticated || role !== "support") {
+      return NextResponse.redirect(
+        new URL("/signInSupport", req.url)
+      );
     }
   }
 
@@ -306,7 +237,5 @@ if (
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -129,15 +129,15 @@ const Page = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-auto">
         {/* Welcome Section */}
-        <div className="mt-8 mx-6 p-6 bg-white shadow">
-          <h1 className="font-bold md:text-5xl text-2xl pl-7">
+        <div className="mt-8 md:mx-6 mx-0 p-6 bg-blue-900 shadow">
+          <h1 className="font-bold md:text-5xl text-white text-2xl md:pl-7 pl-0">
             Dear, {}
             {landlord
               ? `${landlord.firstName} ${landlord?.lastName}`
               : "Landlord"}
             !
           </h1>
-          <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
+          <p className="mt-2 md:text-xl md:pl-7 pl-0 w-auto  text-white text-justify">
             We are thrilled that you have chosen to list your property with
             Okuper.
           </p>
@@ -150,12 +150,12 @@ const Page = () => {
           </h3>
 
           <p className="mt-2 md:text-xl font-medium">
-            Please use the form below to upload two FREE your property.
+            Please use the form below to upload your two FREE your property. Kindly note that if you don't upload your utility bill. Your property will not be visible to potential tenants on the platform until you add your property Nepa or Lawma bill.
           </p>
         </div>
 
         {/* Body */}
-        <div className="flex-1 h-auto md:h-auto mt-8 mx-6 p-6 bg-white shadow">
+        <div className="flex-1 h-auto md:h-auto mt-8 mx-6  p-6 bg-amber-400 shadow-2xl md:w-[1380px]  rounded-2xl">
           <PropertyUploadLanding />
         </div>
 

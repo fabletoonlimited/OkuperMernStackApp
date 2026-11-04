@@ -10,6 +10,7 @@ import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
 export default function PropertyCard({
     _id,
+    landlordId,
     previewPic,
     unitsAvailable,
     price,
@@ -29,26 +30,39 @@ export default function PropertyCard({
 {
     const [property, setProperty] = useState(null);
 
-    useEffect (() => {
-        const fetchProperty = async() => {
-            try { 
-                const res = await fetch(`/api/property?id=${_id}`, {
-                method: "GET",
-                credentials: "include",
-            });
+ 
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const query = new URLSearchParams({ id: _id });
 
-            if (!res.ok) throw new Error("Failed to fetch property");
+                if (landlordId) {
+                    query.set("landlordId", landlordId);
+                }
 
-            const data = await res.json();
-            setProperty(data)
+                const res = await fetch(`/api/property?${query.toString()}`, {
+                    method: "GET",
+                    credentials: "include",
+                });
 
-        } catch (error) {
-            console.error(error);
-        }}
+                const data = await res.json();
+
+                if (!res.ok) {
+                    setProperty(null);
+                    return;
+                }
+
+                setProperty(data);
+            } catch {
+                setProperty(null);
+            }
+        };
+
         if (_id) {
             fetchProperty();
         }
-    }, [_id]);
+    }, [_id, landlordId]);
+
 
     const handleSaveProperty = async (e) => {
         e.preventDefault();
@@ -57,7 +71,7 @@ export default function PropertyCard({
 
     return (
         <Link href={`/propertyCardExpanded?propertyId=${_id}`}>
-            <div className="w-auto rounded-xl overflow-hidden shadow-xl bg-white transition-all duration-300 hover:scale-105 cursor-pointer">
+            <div className="md:w-100 w-80 rounded-xl overflow-hidden shadow-xl bg-white transition-all duration-300 hover:scale-105 cursor-pointer">
 
                 {/* IMAGE */}
                 <div className="relative w-auto h-60">
@@ -71,7 +85,7 @@ export default function PropertyCard({
                         draggable={false}
                     />
 
-                    {property?.savedHomes && (
+                    {/* {property?.savedHomes && (
                         <div className="absolute top-2 right-2 h-12 w-12 md:h-16 md:w-16 bg-blue-900/75 rounded-full border-2 border-white flex items-center justify-center">
                             <FontAwesomeIcon
                                 icon={faCircleCheck}
@@ -79,7 +93,7 @@ export default function PropertyCard({
                                 className="text-white text-2xl md:text-4xl cursor-pointer"
                             />
                         </div>
-                    )}
+                    )} */}
 
                     {typeof property?.unitsAvailable === "number" && (
                         <div className="absolute top-2 left-2 bg-blue-600/75 text-white text-xs px-2 py-1 rounded-xl">
@@ -94,9 +108,15 @@ export default function PropertyCard({
                 <div className="p-4 text-center">
                     <h3 className="text-lg font-semibold mt-2 mb-2">
                         ₦{property?.price
-                            ? Number(String(property?.price).replace(/[^0-9.]/g, "")).toLocaleString()
-                            : "N/A"}{" "}
-                        / yr
+                            ? Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()
+                            : "N/A"
+                        }
+                        {property?.category?.toLowerCase() === "shortlet"
+                            ? " / day"
+                            : property?.category?.toLowerCase() === "rent"
+                            ? " / yr"
+                            : ""
+                        }
                     </h3>
 
                     <p className="text-sm text-gray-800 mt-2">

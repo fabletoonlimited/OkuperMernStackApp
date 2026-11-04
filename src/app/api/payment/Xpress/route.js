@@ -12,9 +12,7 @@ export async function POST(req) {
         const body = await req.json();
 
         const 
-        { reference, email, amount, currency, status, 
-            isSplitpayment, splitPaymentReference, user 
-        } = body;
+        { reference, email, amount, currency, status, isSplitpayment, legalFee, serviceCharge, splitPaymentReference, user } = body;
 
         if ( !reference || !email || !amount || !currency || !status || !isSplitpayment || !user) {
         return NextResponse.json(

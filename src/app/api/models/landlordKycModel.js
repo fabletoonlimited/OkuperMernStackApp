@@ -74,16 +74,12 @@ const landlordKycSchema = new mongoose.Schema(
             type: String,
         },
 
-        landlord: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Landlord",
-            required: true,
-        },
-    },
-    {
-        timestamps: true,
-    }
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        landlord: {type: mongoose.Schema.Types.ObjectId,ref: "Landlord", required: true},
+        landlordAccountDetails: {type: mongoose.Schema.Types.ObjectId,ref: "LandlordAccountDetails"},
+    },    
+    {timestamps: true,}
 );
 
-export default mongoose.models.LandlordKyc ||
-    mongoose.model("LandlordKyc", landlordKycSchema);
+
+export default mongoose.models.LandlordKyc || mongoose.model("LandlordKyc", landlordKycSchema);

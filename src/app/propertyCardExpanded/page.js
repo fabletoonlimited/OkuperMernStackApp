@@ -20,8 +20,7 @@ const Index = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const searchParams = useSearchParams();
     const propertyId = searchParams.get("propertyId");
-    console.log("PROPERTY ID:", propertyId);    const [property, setProperty] = useState(null);
-
+    const [property, setProperty] = useState(null);
     const [hoverLeft, setHoverLeft] = useState(false);
     const [hoverRight, setHoverRight] = useState(false);
 
@@ -296,7 +295,7 @@ useEffect(() => {
                         <input type="text" />
                     </div>
                     {/* <FontAwesomeIcon icon={faMagnifyingGlass} /> */}
-                <div></div>
+                    <div></div>
                 </div>
                 <div></div>
                 <div></div>
@@ -383,21 +382,27 @@ useEffect(() => {
                 {/* PROPERTY DETAILS */}
                 <div className="flex flex-col md:flex-row justify-between mt-4 gap-6 items-center ">
                     <div className="w-full md:flex-1 p-4 rounded-lg ml-2 md:ml-0">
-                        <h2 className="font-bold text-2xl md:text-4xl mb-1">
+                        <h2 className="font-bold text-3xl md:text-4xl mb-1">
                             {propertyLoading ? "Loading..." : (property?.title || "Property")}
                         </h2>
                         <h4 className="text-blue-950 text-2xl md:text-2xl md:mb-2 mb-5">
-                            {property?.address || ""}{property?.state ? `, ${property.state}` : ""}
+                            {property?.address || ""}{property?.state ? `, ${property.state}` : ""}.
                         </h4>
                         <span className="text-5xl md:text-5xl md:font-bold font-black">
                             {property?.price ? `₦${Number(String(property.price).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
                         </span>
+                        <span className="text-5xl md:text-5xl md:font-bold font-black">
+                            {property?.legalFee ? `₦${Number(String(property.legalFee).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
+                        </span>
+                        <span className="text-5xl md:text-5xl md:font-bold font-black">
+                            {property?.serviceCharge ? `₦${Number(String(property.serviceCharge).replace(/[^0-9.]/g, "")).toLocaleString()}` : ""}
+                        </span>
                         <p className="text-lg md:mt-1 mt-2 text-blue-900">
-                            Price displayed is not inclusive of Landlord's 7% legal fee & Okuper's 3% service charge.
+                            Price displayed is not inclusive of Okuper's 3% fee.
                         </p>
 
-                        <div className="flex flex-wrap md:gap-2 gap-6 md:mt-4 mt-7">
-                            <div className="md:px-10 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 py-4 border-blue-950 flex  justify-between gap-3">
+                        <div className="md:flex row md:gap-10 space-y-5 gap-10 md:mt-10 mt-7">
+                            <div className="md:px-10 h-11 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-19 border-blue-950 flex rounded-2xl justify-between gap-3">
                                 <div>
                                     <FontAwesomeIcon icon={faHouse} />
                                 </div>
@@ -406,7 +411,7 @@ useEffect(() => {
                                 </div>
                             </div>
 
-                            <div className="md:px-16 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-20.5 py-4 border-blue- flex  justify-between gap-3 ">
+                            <div className="md:px-10 h-11 md:py-1 bg-gray-100 text-2xl md:text-2xl border-1 px-16 border-blue-950 flex rounded-2xl justify-between gap-3">
                                 <div>
                                     <FontAwesomeIcon icon={faBed} />
                                 </div>

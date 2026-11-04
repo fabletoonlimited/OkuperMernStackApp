@@ -70,20 +70,20 @@ function Homepage() {
       <StorySection />
 
       {/* Trending Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-4 py-2">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-3xl text-blue-900 font-semibold">Trending Homes</h3>
+      <section className="px-5 md:px-4 md:py-10 py-20 bg-gray-200 -mt-40">
+        <div className="flex items-center justify-between mb-2 pt-10">
+          <h3 className="text-3xl text-blue-950 font-semibold">Trending Homes</h3>
           <div className="hidden md:flex gap-4">
             <FaChevronCircleLeft
-              color={hoverLeft ? "#003399" : "#e4e5e9"}
+              color={hoverLeft ? "#003559" : "#003399"}
               size={40}
-              className="cursor-pointer"
+              className="cursor-pointer "
               onMouseEnter={() => setHoverLeft(true)}
               onMouseLeave={() => setHoverLeft(false)}
               onClick={() => scrollLeft(trendingRef)}
             />
             <FaChevronCircleRight
-              color={hoverRight ? "#003399" : "#e4e5e9"}
+              color={hoverLeft ? "#003559" : "#003399"}
               size={40}
               className="cursor-pointer"
               onMouseEnter={() => setHoverRight(true)}
@@ -94,14 +94,16 @@ function Homepage() {
 
         </div>
         
-      {/*Carousel*/}
-        <div ref={trendingRef} className="md:flex row gap-4 w-screen h-auto bg-gray-400 overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide">
-          <TrendingRentIndexCarousel rent={mixedItems} />
+        {/*Carousel*/}
+        <div ref={trendingRef} 
+          className="md:flex row gap-4 md:w-screen w-full h-auto overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide">
+          <TrendingRentIndexCarousel rent={mixedItems} 
+        />
         </div>
       </section>
 
       {/*Why Okuper */}
-      <div className="md:px-30 px-15 my-20 bg-blue-600 h-auto p-10">
+      <div className="md:px-30 px-15 my-20 bg-blue-600 h-auto p-10 -mt-1">
         <p className="text-4xl font-semibold my-6 md:text-center text-left text-white">Why Choose Okuper</p>
         <h3 className="md:text-center text-justify text-2xl mb-5 -mt-3 text-white">A better way to find and rent your next home.</h3>
         <p className="md:text-center text-justify text-white mb-15 md:px-20 px-0">We built Okuper to remove the unecessary barriers between genuine homeowners and people looking for a home. We help verified tenants and homeowners connect directly, making property discovery more transparent, accesible, and trustworthy.</p>
@@ -202,12 +204,14 @@ function Homepage() {
       </section>
 
       {/* Shortlets */}
-      <section className="max-w-7xl mx-auto px-10 md:px-4 py-12">
-        <div className="flex items-center justify-between mb-6">
+      <section className="px-5 md:px-4 md:py-10 py-20 bg-gray-200 -mt-40">
+        <div className="flex items-center justify-between mb-2 pt-10">
+          
           <h3 className="text-3xl font-semibold">Shortlets Nearby</h3>
+          
           <div className="gap-4 hidden md:flex">
             <FaChevronCircleLeft
-              color={hoverLeft ? "#003399" : "#e4e5e9"}
+              color={hoverLeft ? "#003559" : "#003399"}
               size={40}
               className="cursor-pointer"
               onMouseEnter={() => setHoverLeft(true)}
@@ -215,7 +219,7 @@ function Homepage() {
               onClick={() => scrollLeft(shortletsRef)}
             />
             <FaChevronCircleRight
-              color={hoverRight ? "#003399" : "#e4e5e9"}
+              color={hoverLeft ? "#003559" : "#003399"}
               size={40}
               className="cursor-pointer"
               onMouseEnter={() => setHoverRight(true)}
@@ -224,7 +228,8 @@ function Homepage() {
             />
           </div>
         </div>
-        <div ref={shortletsRef} className="flex -ml-28 md:-ml-0 gap-4 overflow-x-auto scroll-smooth scrollbar-hide">
+        
+        <div ref={shortletsRef} className="md:flex row gap-4 md:w-screen w-full h-auto overflow-x-none md:overflow-x-auto scroll-smooth scrollbar-hide">
           <ShortletIndexCarousel shortlet={mixedItems}/>
         </div>
       </section>

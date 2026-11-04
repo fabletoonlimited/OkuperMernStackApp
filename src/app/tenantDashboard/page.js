@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TenantDashboardCard from "../../components/tenantDashboardCard";
 import TenantDashboardFooter from "../../components/tenantDashboardFooter";
@@ -136,9 +136,10 @@ function TenantDashboard() {
 
   return (
     <>
-      <div className="tenantDashboardContainer flex">
+      <div className="bg-white h-auto">
         {/* Sidebar */}
         <TenantDashboardSidebar />
+        <ToastContainer />
 
         {/* Main content */}
         <div className="flex-1">
@@ -157,15 +158,16 @@ function TenantDashboard() {
             </p>
           </div>
 
-          <div className="tenantDashboardNextSteps md:mt-8 p-7">
-            <h3 className="font-medium md:text-4xl text-2xl pl-7">
+          <div className="tenantDashboardNextSteps md:mt-10 mt-12 md:px-20 px-0">
+            <h3 className="font-medium md:text-4xl text-2xl md:pl-0 pl-7">
               Your next steps
             </h3>
-            <p className="mt-2 md:text-xl pl-7 md:w-auto text-justify">
+            <p className="mt-2 md:text-xl px-2 md:pl-0 pl-7 md:w-auto w-auto text-left">
               There are a few things left to do. In order to begin your rental journey, please complete your profile.
             </p>
           </div>
-          <div className="md:px-16 px-0">
+          
+          <div className="md:px-18 px-4 mt-8 pl-9">
             <TenantDashboardCard />
           </div>
         </div>

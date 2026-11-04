@@ -267,7 +267,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="bg-gray-100 h-auto">
+    <div className="bg-white h-auto">
       <h1
         className="font-bold text-4xl text-blue-950"
         style={{ paddingLeft: 50, paddingTop: 70 }}
@@ -413,14 +413,14 @@ useEffect(() => {
         {/* RIGHT SECTION */}
         <div className={"relative h-40 rounded-2xl shadow-lg bannerBgColor mb-200"}>
           <div className={"relative p-10 rounded-t-2xl md:w-155 w-50% bg-[rgba(0,51,153,1)] py-2 md:h-20 leading-relaxed bannerBgColor"}>
-            <h2 className="font-medium md:text-4xl text-3xl text-white leading-8 md:leading-12 md:pt-15 pt-20 px-2 md:px-2 text-center md:text-center">
+            <h2 className="font-medium md:text-4xl text-2xl text-white leading-8 md:leading-12 md:pt-15 pt-8 px-0 md:px-2 text-center md:text-center">
               <b>
                 Sign up on Okuper to connect directly with landlords and tenants.
               </b>
             </h2>
           </div>
 
-          <p className="absolute text-sm md:font-medium leading-[1.5] mt-5 md:mt-40 md:text-[20px] text-white text-center px-15 md:px-25 md:text-center">
+          <p className="absolute text-sm md:font-medium leading-[1.5] mt-2 md:mt-40 md:text-[20px] text-white text-center px-10 md:px-25 md:text-center">
             No agents. No hidden fees. Just verified people and real homes.
           </p>
 
@@ -428,7 +428,7 @@ useEffect(() => {
           <img
             src={BASE_URL + "/bannerlady_uzwewr"}
             alt="bannerlady"
-            className={"bannerLady md:h-auto h-60 md:w-120 w-120 bottom-[-541px] md:bottom-[-654px]"}
+            className={"bannerLady md:h-auto h-60 md:w-120 w-120 bottom-[-379px] md:bottom-[-654px]"}
             style={{ position: "absolute", height: "auto" }}
           />
 
