@@ -75,39 +75,62 @@ export async function POST(req) {
   }
 }
 
+
 export async function GET(req) {
-  try {
-    await dbConnect();
+    try {
+        await dbConnect();
 
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
 
-    if (!id) {
-      return NextResponse.json(
-        { message: "Property id is required" },
-        { status: 400 }
-      );
+        if (!token) {
+            return NextResponse.json(
+                { message: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        const { payload } = await jwtVerify(
+            token,
+            new TextEncoder().encode(process.env.JWT_SECRET)
+        );
+
+        // Find logged-in tenant
+        const tenant = await Tenant.findById(payload.id);
+
+        if (!tenant) {
+            return NextResponse.json(
+                { message: "Only tenants can access saved homes" },
+                { status: 403 }
+            );
+        }
+
+        // Fetch all properties saved by this tenant
+        const favorites = await Favorite.find({
+            userId: tenant.user,
+        })
+            .populate({
+                path: "propertyId",
+                populate: {
+                    path: "selectedTenant",
+                },
+            })
+            .sort({ createdAt: -1 });
+
+        return NextResponse.json(
+            {
+                tenantId: tenant._id,
+                favorites,
+            },
+            { status: 200 }
+        );
+
+    } catch (error) {
+        console.error("GET /api/favorites error:", error);
+
+        return NextResponse.json(
+            { message: error.message },
+            { status: 500 }
+        );
     }
-
-    const property = await Property.findById(id)
-      .populate("landlord", "name email phone profilePic")
-      .populate("utilityBill");
-
-    if (!property) {
-      return NextResponse.json(
-        { message: "Property not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(property, { status: 200 });
-
-  } catch (error) {
-    console.error("GET /api/favorites error:", error);
-
-    return NextResponse.json(
-      { message: error.message },
-      { status: 500 }
-    );
-  }
 }

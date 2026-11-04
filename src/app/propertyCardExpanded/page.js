@@ -16,7 +16,8 @@ import Link from "next/link";
 
 
 const Index = () => {
-    
+    const router = useRouter();
+
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const searchParams = useSearchParams();
     const propertyId = searchParams.get("propertyId");
@@ -29,8 +30,6 @@ const Index = () => {
     const [messageSent, setMessageSent] = useState(false);
     const [rating, setRating] = useState(0);
     const [mapping, setMapping] = useState(null)
-
-    const router = useRouter();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -154,32 +153,40 @@ useEffect(() => {
         return [];
     };
 
-    useEffect(() => {
-        if (saveProperty) {
-            const saveToFavorites = async () => {
-                try {
-                    const res = await fetch("/api/favorites", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                        body: JSON.stringify({ 
-                            propertyId: property._id, 
-                        }),
-                    });
-            const data = await res.json();
+    const handleSaveProperty = async () => {
+    if (!property?._id) {
+        toast.error("Property is still loading");
+        return;
+    }
 
-            if (!res.ok) {
-                toast.error(data.message || "Please sign in or register first.");
-                return;
-            }
-                toast.success("Property saved to favorites!");
-            } catch (error) {
-                console.error("Error saving to favorites:", error);
-                toast.error("Failed to save property to favorites");
-            }};
-            saveToFavorites();
+    try {
+        const res = await fetch("/api/favorites", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                propertyId: property._id,
+            }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            toast.error(data.message || "Please sign in first");
+            return;
         }
-    }, [saveProperty, property, router]);
+
+        toast.success("Property saved to favorites!");
+
+        router.push("/tenantSavedHomes");
+
+    } catch (error) {
+        console.error("Save property error:", error);
+        toast.error("Failed to save property");
+    }
+};
   
 
     const [formData, setFormData] = useState({
@@ -319,6 +326,7 @@ useEffect(() => {
                             <FontAwesomeIcon
                                 icon={faCheckCircle}
                                 className="text-3xl text-blue-300/95 rounded-full p-1"
+                                onClick={handleSaveProperty}
                             />
                         </div>
                     </div>
@@ -354,7 +362,7 @@ useEffect(() => {
                         <FontAwesomeIcon
                             icon={faCheckCircle}
                             className="text-3xl text-blue-500/75 rounded-full hover:scale-115 transition duration-300 ease-in-out p-1 shadow-lg"
-                            onClick={() => setSavePropertyState(!saveProperty)}
+                            onClick={handleSaveProperty}
                         />
                     </div>
                 </div>
@@ -451,7 +459,7 @@ useEffect(() => {
                 </div>
 
                 {/* LISTED BY / AD CARD */}
-                <div className="mt-14 flex md:flex-row md:justify-between justify-around items-start gap-6">
+                <div className="mt-14 md:flex row space-y-5 md:justify-between justify-around items-start gap-6">
                     {/* Listed by */}
                     <div className="w-full md:flex-1 md:ml-3">
                         <h2 className="text-4xl md:text-3xl font-medium mb-3">

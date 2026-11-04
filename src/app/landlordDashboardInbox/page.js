@@ -447,7 +447,7 @@ function LandlordInbox() {
     const fetchProfile = async () => {
       try {
         setProfileLoading(true);
-        const res = await fetch(`/api/profile?actorId=${participant._id}`, {
+        const res = await fetch(`/api/tenantProfile?actorId=${participant._id}`, {
           credentials: "include",
         });
 
@@ -508,7 +508,7 @@ function LandlordInbox() {
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
                   {profilePic && (
                     <CldImage
-                      src={previewPic}
+                      src={profilePic}
                       width={60}
                       height={60}
                       crop="fill"

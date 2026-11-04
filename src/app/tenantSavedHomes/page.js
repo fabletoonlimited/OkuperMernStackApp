@@ -1,63 +1,65 @@
 'use client'
-
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import TenantDashboardSidebar from '@/components/tenantDashboardSidebar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import Link from 'next/link'
 
 const Page = () => {
     const router = useRouter()
 
-    const [selectedProperty, setSelectedProperty] = useState(false)
     const [loading, setLoading] = useState(true)
-    const [property, setProperty] = useState(null)
+    const [properties, setProperties] = useState([])
     const [tenantId, setTenantId] = useState(null)
 
-    const isTenantSelected =
-        property?.selectedTenant?.toString() === tenantId?.toString()
-
     useEffect(() => {
-        const fetchTenant = async () => {
+        const fetchSavedProperties = async () => {
             try {
-                const response = await fetch('/api/tenant', {
+                const response = await fetch('/api/favorites', {
                     method: 'GET',
                     credentials: 'include',
+                    cache: 'no-store',
                 })
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch tenant')
-                }
 
                 const data = await response.json()
 
-                console.log('Tenant:', data)
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || 'Failed to fetch saved properties'
+                    )
+                }
 
-                // Tenant ID
-                setTenantId(data._id)
+                console.log('SAVED FAVORITES:', data)
 
-                // Get the saved property
-                const savedProperty = data.property?.[0] || null
+                setTenantId(data.tenantId)
 
-                setProperty(savedProperty)
+                // Extract actual property documents
+                const savedProperties = [
+                    ...new Map(
+                        (data.favorites || [])
+                            .map(favorite => favorite.propertyId)
+                            .filter(property => property && property._id)
+                            .map(property => [property._id.toString(), property])
+                    ).values()
+                ];
 
-                // Property exists in tenant's saved properties
-                setSelectedProperty(!!savedProperty)
+                setProperties(savedProperties);
 
             } catch (error) {
-                console.error('Error fetching tenant:', error)
+                console.error('Error fetching saved properties:', error)
             } finally {
                 setLoading(false)
             }
         }
 
-        fetchTenant()
+        fetchSavedProperties()
     }, [])
 
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <p>Loading...</p>
+                Loading saved properties...
             </div>
         )
     }
@@ -66,69 +68,126 @@ const Page = () => {
         <div>
             <TenantDashboardSidebar />
 
-            <div className="justify-items-center p-6">
+            <div className="p-6">
 
-                {/* PROPERTY IMAGE */}
-                <div className="rounded-full bg-gray-500 w-30 h-30 overflow-hidden">
+                <h1 className="text-2xl font-bold mb-6">
+                    My Saved Homes
+                </h1>
 
-                    {property?.previewPic ? (
-                        <img
-                            src={property.previewPic}
-                            alt={property.title || 'Property'}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-white text-center">
-                            No Image
-                        </div>
-                    )}
+                {properties.length === 0 ? (
 
-                </div>
+                    <div className="text-center p-6">
+                        <h2 className="text-xl font-bold">
+                            No saved properties
+                        </h2>
 
-                {/* PROPERTY ID */}
-                <p className="mt-4">
-                    {property?._id || 'No property selected'}
-                </p>
+                        <p className="text-gray-500 mt-2">
+                            Properties you save will appear here.
+                        </p>
+                    </div>
 
-                {/* PROPERTY TITLE */}
-                <h2 className="text-xl font-bold mt-2">
-                    {property?.title || 'No property selected'}
-                </h2>
+                ) : (
 
-                {/* PROPERTY ADDRESS */}
-                {property?.address && (
-                    <p className="text-gray-600 mt-1">
-                        {property.address}
-                    </p>
-                )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* SELECTION STATUS */}
-                <div className="mt-4">
-                    <p className="flex items-center">
+                        {properties.map(property => {
 
-                        {isTenantSelected
-                            ? 'You have been selected'
-                            : 'Waiting for landlord selection'
-                        }
+                            const selectedTenantId =
+                                property.selectedTenant?._id ||
+                                property.selectedTenant
 
-                        {isTenantSelected && (
-                            <FontAwesomeIcon
-                                icon={faCheckCircle}
-                                className="text-green-500 ml-2"
-                            />
-                        )}
+                            const isTenantSelected =
+                                selectedTenantId?.toString() ===
+                                tenantId?.toString()
 
-                    </p>
-                </div>
+                            return (
+                                <div
+                                    key={property._id}
+                                    className="border rounded-lg p-5 shadow-md"
+                                >
+                                <Link 
+                                    href={`/propertyCardExpanded?propertyId=${property._id}`}
+                                    className='block cursor-pointer'
+                                >
 
-                {/* PAYMENT */}
-                {isTenantSelected && (
-                    <button
-                        onClick={() => router.push('/payment')}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                        Proceed to pay
-                    </button>
+                                    {/* PROPERTY IMAGE */}
+                                    <div className="w-full h-56 overflow-hidden rounded-lg bg-gray-200">
+
+                                        {property.previewPic ? (
+                                            <img
+                                                src={property.previewPic}
+                                                alt={property.title || 'Property'}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full">
+                                                No Image
+                                            </div>
+                                        )}
+
+                                    </div>
+
+                                    {/* PROPERTY DETAILS */}
+                                    <p className="mt-4 text-sm text-gray-500">
+                                        {property._id}
+                                    </p>
+
+                                    <h2 className="text-xl font-bold mt-2">
+                                        {property.title}
+                                    </h2>
+
+                                    <p className="text-gray-600 mt-1">
+                                        {property.address}
+                                    </p>
+
+                                    <p className="font-semibold mt-2">
+                                        {property.price}                                         
+                                    </p>
+                                    <p className="text-sm mt-3 text-blue-600">
+                                        View property and contact landlord
+                                    </p>                                
+                                </Link>
+
+                                    {/* LANDLORD SELECTION STATUS */}
+                                    <div className="mt-4">
+
+                                        {isTenantSelected ? (
+
+                                            <p className="flex items-center text-green-600">
+                                                You have been selected
+
+                                                <FontAwesomeIcon
+                                                    icon={faCheckCircle}
+                                                    className="ml-2"
+                                                />
+                                            </p>
+
+                                        ) : (
+
+                                            <p className="text-orange-500">
+                                                Click to chat landlord to start selection process or wait for landlord selection if you have.
+                                            </p>
+
+                                        )}
+
+                                    </div>
+
+                                    {isTenantSelected && (
+                                       <button
+                                            onClick={() =>
+                                                router.push(`/payment?propertyId=${property._id}`)
+                                            }
+                                            className="bg-blue-600 text-white px-5 py-2 rounded mt-4"
+                                        >
+                                            Proceed to pay
+                                        </button>
+                                    )}
+                                </div>
+
+                            )
+                        })}
+
+                    </div>
                 )}
 
             </div>

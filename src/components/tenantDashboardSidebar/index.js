@@ -109,9 +109,9 @@ const index = () => {
                       <li className="hover:text-yellow-500 flex items-center gap-2"> Messages <FaEnvelope /></li>
                   </Link>
 
-                  <Link href="/disputes">
+                  {/* <Link href="/disputes">
                       <li className="hover:text-yellow-500 flex items-center gap-2">Disputes <FaExclamationCircle /></li>
-                  </Link>
+                  </Link> */}
 
                   <Link href="/tenantVerification">
                       <li className="hover:text-yellow-500 flex items-center gap-2"> Verification <FaUserCheck /></li>

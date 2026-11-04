@@ -3,227 +3,262 @@ import React from "react";
 import TenantDashboardSidebar from "../../components/tenantDashboardSidebar";
 import TrendingRentIndexCarousel from "@/components/trendingRentIndexCarousel"
 import PropertyCard from "@/components/propertyCard";
-import { FaBookmark, FaEnvelope, FaHistory, FaClock } from "react-icons/fa";
+import { FaBookmark, FaEnvelope, FaHistory, FaClock, FaCashRegister } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Link from "next/link"
 
 
 const Page = (_id) => {
-    const [tenant, setTenant] = useState(null);
-    const [tenantKyc, setTenantKyc] = useState(null);
-    const [tenantProfile, setTenantProfile] = useState(null)
-    const [savedHomesCount, setSavedHomesCount] = useState(null);
-    const [messages, setMessages] = useState(null);
-    const [disputes, setDisputes] = useState(null);
-    const [payment, setPayment] = useState(null);
-    const [property, setProperty] = useState(null);
+const [tenant, setTenant] = useState(null);
+const [tenantKyc, setTenantKyc] = useState(null);
+const [tenantProfile, setTenantProfile] = useState(null);
+
+const [savedHomesCount, setSavedHomesCount] = useState(0);
+const [messages, setMessages] = useState(0);
+const [disputes, setDisputes] = useState(0);
+const [transactions, setTransactions] = useState([]);
+const [property, setProperty] = useState([]);
+
+const [loading, setLoading] = useState(true);
+
+const getItems = (data, possibleKeys) => {
+    if (Array.isArray(data)) return data;
+
+    for (const key of possibleKeys) {
+        if (Array.isArray(data?.[key])) {
+            return data[key];
+        }
+    }
+
+    return [];
+};
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const res = await fetch("/api/tenantProfile/upload", {
-                    method: "GET",
-                    credentials: "include",
-                });
-    
-                if (!res.ok) {
-                    toast.error("Failed to load tenant profile");
-                    return;
-                }
-    
-                const data = await res.json();        
-                console.log(data); 
-                setTenantProfile(data);
-
-            } catch (err) {
-                console.error("Profile fetch error:", err);
-                toast.error("Failed to load profile");
-            } finally {
-                setLoading(false);
-            }
-        };
-    
-        fetchProfile();
-    }, []);
-
-    //Fetch Tenant
-    useEffect(() => {
-        const fetchTenant = async () => {
-            try {
-              const res = await fetch("/api/tenant", {
+    const fetchProfile = async () => {
+        try {
+            const res = await fetch("/api/tenantProfile/upload", {
                 method: "GET",
                 credentials: "include",
-              });
-    
-              if (!res.ok) {
-                console.error("Failed to fetch tenant");
-                return;
-              }
-    
-              const tenant = await res.json();
-              setTenant(tenant);
-            } catch (err) {
-              console.error("Tenant fetch error:", err);
+                cache: "no-store",
+            });
+
+            if (!res.ok) throw new Error("Failed to load tenant profile");
+
+            const data = await res.json();
+            setTenantProfile(data);
+
+        } catch (err) {
+            console.error("Profile fetch error:", err);
+        }
+    };
+
+    fetchProfile();
+}, []);
+
+    //Fetch Tenant
+   // Fetch Tenant
+useEffect(() => {
+    const fetchTenant = async () => {
+        try {
+            const res = await fetch("/api/tenant", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to fetch tenant");
             }
-        };
-    
-            fetchTenant();
-        }, []);
+
+            const data = await res.json();
+            setTenant(data);
+
+        } catch (err) {
+            console.error("Tenant fetch error:", err);
+        }
+    };
+
+    fetchTenant();
+}, []);
 
     //Tenant KYC
-    useEffect(() => {
-      const fetchKyc = async () => {
-      try {
-        const kycRes = await fetch("/api/tenantKyc", {
-          method: "GET",
-          credentials: "include"
-        });
+   useEffect(() => {
+    const fetchKyc = async () => {
+        try {
+            const res = await fetch("/api/tenantKyc", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
 
-        if (!kycRes) {
-          toast.error("Failed to fetch tenant KYC");
-          return;
+            if (!res.ok) throw new Error("Failed to fetch tenant KYC");
+
+            const data = await res.json();
+            setTenantKyc(data);
+
+        } catch (err) {
+            console.error("KYC fetch error:", err);
         }
-        const kycData = await kycRes.json();
-        if (kycData) {
-          setTenantKyc(kycData);
-        }
-      }
-      catch (err) {
-        toast.error("KYC fetch error:", err);
-      }
-      fetchKyc();
-    }}, []);
+    };
+
+        fetchKyc();
+    }, []);
 
     //Fetch SavedHomes Count
     useEffect(() => {
         const fetchSavedHomesCount = async () => {
             try {
-                const res = await fetch("/api/savedHomes", {
+                const res = await fetch("/api/favorites", {
                     method: "GET",
                     credentials: "include",
+                    cache: "no-store"
                 });
     
-                if (!res.ok) {
-                    setSavedHomesCount(null);
-                    return;
-                }
-                const savedHomesData = await res.json();
-                setSavedHomesCount(savedHomesData.Number || 0);
-            } catch (err) {
-                console.error("Saved Homes count error:", err);
-                setSavedHomesCount(null);
-            }
-        };
-        fetchSavedHomesCount()
+                if (!res.ok) throw new Error("Failed to fetch saved homes");
+
+            const data = await res.json();
+
+            const favorites = getItems(data, ["favorites"]);
+
+            // Count unique properties
+            const uniqueProperties = new Set(
+                favorites
+                    .map(item => item.propertyId?._id || item.propertyId)
+                    .filter(Boolean)
+                    .map(id => id.toString())
+            );
+
+            setSavedHomesCount(uniqueProperties.size);
+
+        } catch (err) {
+            console.error("Saved homes count error:", err);
+            setSavedHomesCount(0);
+        }
+    };
+
+        fetchSavedHomesCount();
     }, []);
 
-    //Fetch Messages
+    // Fetch Messages Count
     useEffect(() => {
         const fetchMessagesCount = async () => {
             try {
                 const res = await fetch("/api/message", {
                     method: "GET",
                     credentials: "include",
+                    cache: "no-store",
                 });
-    
+
+                const data = await res.json();
+
                 if (!res.ok) {
-                    setMessages(null);
-                    return;
+                    throw new Error(
+                        data.error || data.message || "Failed to fetch messages"
+                    );
                 }
-                const messageData = await res.json();
-                setMessages(messageData.Number || 0);
+
+                // Your backend returns conversations, not messages
+                const conversations = data.conversations || [];
+
+                setMessages(conversations.length);
+
             } catch (err) {
                 console.error("Messages count error:", err);
-                setMessages(null);
+                setMessages(0);
             }
         };
-        fetchMessagesCount()
+
+        fetchMessagesCount();
     }, []);
 
     //Dispute Count
     useEffect(() => {
-        const fetchDisputesCount = async () => {
-            try {
-                const res = await fetch("/api/disputes", {
-                    method: "GET",
-                    credentials: "include",
-                });
-    
-                if (!res.ok) {
-                    setDisputes(null);
-                    return;
-                }
-                const disputeData = await res.json();
-                setDisputes(disputeData.Number || 0);
-            } catch (err) {
-                console.error("Disputes count error:", err);
-                setDisputes(null);
-            }
-        };
-        fetchDisputesCount()
+    const fetchDisputesCount = async () => {
+        try {
+            const res = await fetch("/api/disputes", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            if (!res.ok) throw new Error("Failed to fetch disputes");
+
+            const data = await res.json();
+
+            const disputeList = getItems(data, ["disputes", "data"]);
+
+            setDisputes(
+                typeof data.Number === "number"
+                    ? data.Number
+                    : disputeList.length
+            );
+
+        } catch (err) {
+            console.error("Disputes count error:", err);
+            setDisputes(0);
+        }
+    };
+
+        fetchDisputesCount();
     }, []);
 
     //Transaction Count
     useEffect(() => {
-        const fetchTransactionCount = async () => {
-            try {
-                const res = await fetch("/api/payment/xPress", {
-                    method: "GET",
-                    credentials: "include",
-                    body: JSON.stringify({
-                        reference,
-                        email,
-                        amount,
-                        status: Pending, Successful, Failed,
-                        transactionId
-                    })
-                });
-    
-                if (!res.ok) {
-                    setPayment(null);
-                    return;
-                }
-                const paymentData = await res.json();
-                setPayment(paymentData.Number || 0);
-            } catch (err) {
-                console.error("Transactions count error:", err);
-                setPayment(null);
-            }
-        };
-        fetchTransactionCount()
+    const fetchTransactionCount = async () => {
+        try {
+            const res = await fetch("/api/payment/xPress", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            if (!res.ok) throw new Error("Failed to fetch transactions");
+
+            const data = await res.json();
+
+            const transactionList = getItems(data, [
+                "payments",
+                "transactions",
+                "data",
+            ]);
+
+            setTransactions(transactionList);
+
+        } catch (err) {
+            console.error("Transactions count error:", err);
+            setTransactions([]);
+        }
+    };
+
+        fetchTransactionCount();
     }, []);
 
     //Property
-    useEffect(() => {
-        const fetchProperty = async () => {
-            try {
-                const res = await fetch("/api/property", {
-                    method: "GET",
-                    credentials: "include",
-                    body: JSON.stringify({
-                        previewPic, img1, img2, img3, img4, img5,
-                        title, address, state, price, category,
-                        unitsAvailable, propertyType, bed, bath,
-                        buildingAmenities, propertyAmenities,
-                        neighbourhoodPostcode, nearbyPlaces,
-                        status: vacant, rented, sold, 
-                        rating, listedBy, agent
-                    })}
-                );
-    
-                if (!res.ok) {
-                    setProperty(null);
-                    return;
-                }
-                const propertyData = await res.json();
-                setPayment(propertyData.Number || 0);
-            } catch (err) {
-                console.error("Property fetch error:", err);
-                setProperty(null);
-            }
-        };
-        fetchProperty()
+   useEffect(() => {
+    const fetchProperties = async () => {
+        try {
+            const res = await fetch("/api/property", {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            });
+
+            if (!res.ok) throw new Error("Failed to fetch properties");
+
+            const data = await res.json();
+
+            setProperty(
+                getItems(data, ["properties", "property", "data"])
+            );
+
+        } catch (err) {
+            console.error("Property fetch error:", err);
+            setProperty([]);
+        }
+    };
+
+        fetchProperties();
     }, []);
 
 
@@ -242,7 +277,7 @@ const Page = (_id) => {
                             Dear, {}
                             {tenant
                             ? `${tenant.firstName} ${tenant?.lastName}`
-                            : "Landlord"}
+                            : "Tenant"}
                             !
                         </h1>
                         <p className="text-white">
@@ -266,9 +301,7 @@ const Page = (_id) => {
                         <div>
                             <p className="text-sm text-blue-950">Saved Homes</p>
                             <h2 className="text-3xl mt-1 font-bold">
-                                {savedHomesCount === null
-                                ? "0"
-                                : `${savedHomesCount}`}
+                                {savedHomesCount}
                             </h2>
                         </div>
                     </div>
@@ -281,9 +314,7 @@ const Page = (_id) => {
                         <div>
                             <p className="text-sm text-blue-950">Messages</p>
                                 <h2 className="text-3xl mt-1 font-bold">
-                                    {messages === null
-                                    ? "0"
-                                    : `${messages}`}
+                                    {messages}
                                 </h2>
                         </div>
                     </div>
@@ -293,32 +324,29 @@ const Page = (_id) => {
                             <FaHistory />
                         </div>
 
-                        <div>
+                        <div> 
+                            
                             <p className="text-sm text-blue-950">
                                 Disputes
                             </p>
                             <h2 className="text-3xl mt-1 font-bold">
-                                {disputes === null
-                                ? "0"
-                                : `${disputes}`}   
+                                {disputes}
                             </h2>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="bg-blue-100 text-blue-600 p-3 rounded-full">
-                            <FaClock />
-                        </div>
-
+                        <div className="bg-yellow-100 text-yellow-600 p-3 rounded-full">
+                                <FaCashRegister />
+                            </div>
                         <div>
                             <p className="text-sm text-blue-950 font-medium">
                                 Transaction History
                             </p>
-                                <h2 className="text-3xl mt-1 font-bold">
-                                {payment === null
-                                ? "0"
-                                : `${payment}`}   
-                                </h2>
+
+                            <h2 className="text-3xl mt-1 font-bold">
+                                {transactions.length}
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -329,7 +357,7 @@ const Page = (_id) => {
                         Transaction History
                     </h2>
 
-                    <div className="grid grid-cols-6 text-sm font-medium text-gray-500 p-4">
+                    <div className="md:gap-50 flex gap-1.5 text-sm font-medium text-gray-500 p-1">
                         <p>ID</p>
                         <p>STATUS</p>
                         <p>PAYMENT</p>
@@ -337,38 +365,38 @@ const Page = (_id) => {
                         <p>AMOUNT</p>
                         <p>PROPERTY</p>
                     </div>
-                    <div className=" rounded-xl shadow">
+                    <div className="rounded-xl shadow">
                         {/* Rows */}
-                        {[payment].map((item) => {
+                        {[transactions].map((item) => {
                             // const isPending = item === 1;
                             return (
                                 <div key={item}
-                                    className="grid grid-cols-6 items-center p-4 text-sm mb-5 bg-white rounded-2xl shadow-sm gap-4">
+                                    className="md:overflow-x-hidden overflow-x-scroll grid grid-cols-6 items-center p-4 text-sm mb-5 bg-white rounded-2xl shadow-sm gap-4">
                                     {/* Profile picture before name */}
                                     <div className="flex items-center gap-2">
                                         <img
-                                            src={tenantKyc?.previewPic || null}
+                                            src={tenantProfile?.previewPic || null}
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full"
                                         />
-                                        <p>Oluwaseun.O</p>
+                                        <p className="text-blue-950">{tenantProfile?.firstName} {""} {tenantProfile?.lastName}</p>
                                     </div>
 
                                     {/* Status badge with conditional color */}
                                     <span
                                         className={`px-2 py-1 rounded text-xs w-fit ${
-                                            payment?.status
+                                            transactions?.status
                                                 ? "bg-yellow-100 text-yellow-700"
                                                 : "bg-green-100 text-green-700"
                                         }`}>
                                         {/* {isPending ? "Pending" : "Successful"} */}
                                     </span>
 
-                                    <p>{payment?.transactionId || null}</p>
+                                    <p>{transactions?.transactionId || null}</p>
 
-                                    <p>{payment?.timestamps}</p>
+                                    <p>{transactions?.timestamps}</p>
 
-                                    <p>{payment?.amount}</p>
+                                    <p>{transactions?.amount}</p>
 
                                     {/* Original image + SLR-102 */}
                                     <div className="flex items-center gap-2">
@@ -391,8 +419,8 @@ const Page = (_id) => {
                 </div>
 
                 {/* Recent Properties */}
-                <div className="bg-white rounded-xl shadow p-6">
-                    <h2 className="text-4xl font-semibold text-blue-950 mb-6">
+                <div className="bg-white rounded-xl shadow">
+                    <h2 className="text-4xl font-semibold text-blue-950 p-4">
                         Recent Properties
                     </h2>
 

@@ -13,8 +13,8 @@ const index = () => {
                 </Link>
                 <Link href="/copyright">
                     <li>
-                        <p className=" md:m-0 m-5 text-center">
-                            &copy; Copyright.All Right Reserved
+                        <p className="text-center">
+                            &copy; All Right Reserved
                         </p>
                     </li>
                 </Link>
